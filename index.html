@@ -2080,21 +2080,19 @@
         async function init() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('data').value = today;
-        
+
             // Carregar unidade salva do localStorage
             selectedUnit = localStorage.getItem('selectedUnit') || null;
             updateUnitDisplay();
-        
+
             await loadFromJsonBin();
-            
+
             // Definir estado inicial das abas (apenas Mnemonicos ativo)
             document.getElementById('responsaveis-section').classList.add('hidden');
             document.querySelector('.toggle-button').classList.add('active');
-            
-            // Abrir o modal de seleção de unidade se nenhuma unidade estiver selecionada
-            if (!selectedUnit) {
-                openUnitModal();
-            }
+
+            // Abrir o modal de seleção de unidade sempre que a página for atualizada
+            openUnitModal();
         }
         
         init();
