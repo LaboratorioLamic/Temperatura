@@ -1219,56 +1219,57 @@
         }
         
         function renderMnemonicos() {
-            const list = document.getElementById('mnemonicos-list');
-            list.innerHTML = '';
-            const filteredMnemonicos = mnemonicos.filter(item => item.unit === selectedUnit);
-            filteredMnemonicos.forEach((item, index) => {
-                const globalIndex = mnemonicos.findIndex(m => m === item);
-                const card = document.createElement('div');
-                card.className = 'mnemonico-card';
-                card.innerHTML = `
-                    <div class="card-content">
-                        <div class="card-field">
-                            <label>Mnemonico</label>
-                            <input type="text" value="${item.mnemonico}" onchange="updateMnemonico(${globalIndex}, 'mnemonico', this.value)">
-                        </div>
-                        <div class="card-field">
-                            <label>Tipo</label>
-                            <input type="text" value="${item.tipo}" onchange="updateMnemonico(${globalIndex}, 'tipo', this.value)">
-                        </div>
-                        <div class="card-field">
-                            <label>Legenda</label>
-                            <input type="text" value="${item.legenda}" onchange="updateMnemonico(${globalIndex}, 'legenda', this.value)">
-                        </div>
-                        <div class="card-field">
-                            <label>Min</label>
-                            <input type="number" step="0.1" value="${item.min}" onchange="updateMnemonico(${globalIndex}, 'min', parseFloat(this.value))">
-                        </div>
-                        <div class="card-field">
-                            <label>Max</label>
-                            <input type="number" step="0.1" value="${item.max}" onchange="updateMnemonico(${globalIndex}, 'max', parseFloat(this.value))">
-                        </div>
+        const list = document.getElementById('mnemonicos-list');
+        list.innerHTML = '';
+        const filteredMnemonicos = mnemonicos.filter(item => item.unit === selectedUnit)
+            .sort((a, b) => a.mnemonico.localeCompare(b.mnemonico)); // Ordena em ordem alfabética
+        filteredMnemonicos.forEach((item, index) => {
+            const globalIndex = mnemonicos.findIndex(m => m === item);
+            const card = document.createElement('div');
+            card.className = 'mnemonico-card';
+            card.innerHTML = `
+                <div class="card-content">
+                    <div class="card-field">
+                        <label>Mnemonico</label>
+                        <input type="text" value="${item.mnemonico}" onchange="updateMnemonico(${globalIndex}, 'mnemonico', this.value)">
                     </div>
-                    <button class="delete-card" onclick="deleteMnemonico(${globalIndex})">Excluir</button>
-                `;
-                list.appendChild(card);
-            });
-        }
+                    <div class="card-field">
+                        <label>Tipo</label>
+                        <input type="text" value="${item.tipo}" onchange="updateMnemonico(${globalIndex}, 'tipo', this.value)">
+                    </div>
+                    <div class="card-field">
+                        <label>Legenda</label>
+                        <input type="text" value="${item.legenda}" onchange="updateMnemonico(${globalIndex}, 'legenda', this.value)">
+                    </div>
+                    <div class="card-field">
+                        <label>Min</label>
+                        <input type="number" step="0.1" value="${item.min}" onchange="updateMnemonico(${globalIndex}, 'min', parseFloat(this.value))">
+                    </div>
+                    <div class="card-field">
+                        <label>Max</label>
+                        <input type="number" step="0.1" value="${item.max}" onchange="updateMnemonico(${globalIndex}, 'max', parseFloat(this.value))">
+                    </div>
+                </div>
+                <button class="delete-card" onclick="deleteMnemonico(${globalIndex})">Excluir</button>
+            `;
+            list.appendChild(card);
+        });
+    }
         
         // Funções para Cadastro de Responsáveis
-        async function addResponsavel() {
-            if (!selectedUnit) {
-                alert('Por favor, selecione uma unidade antes de adicionar um responsável.');
-                return;
-            }
-            const responsavel = document.getElementById('responsavel').value.trim();
-            if (responsavel) {
-                responsaveis.push({ name: responsavel, unit: selectedUnit });
-                await saveToJsonBin();
-                renderResponsaveis();
-                renderDropdowns();
-                document.getElementById('responsavel').value = '';
-            }
+        function renderResponsaveis() {
+        const list = document.getElementById('responsaveis-list');
+        list.innerHTML = '';
+        const filteredResponsaveis = responsaveis.filter(item => item.unit === selectedUnit)
+            .sort((a, b) => a.name.localeCompare(b.name)); // Ordena em ordem alfabética
+        filteredResponsaveis.forEach((item, index) => {
+            const globalIndex = responsaveis.findIndex(r => r === item);
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `<span>${item.name}</span>
+                             <button onclick="deleteResponsavel(${globalIndex})">Excluir</button>`;
+            list.appendChild(div);
+        });
         }
         
         async function deleteResponsavel(index) {
@@ -1937,37 +1938,44 @@
         
         // Funções para o Dashboard
         function renderDashboardFilters() {
-            const anoSelect = document.getElementById('filter-ano');
-            const currentYear = new Date().getFullYear();
-            anoSelect.innerHTML = '<option value="">Selecione</option>';
-            for (let i = currentYear; i >= currentYear - 4; i--) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i;
-                anoSelect.appendChild(option);
-            }
-        
-            document.getElementById('filter-mnemonico').addEventListener('change', function() {
-                const mnemonico = this.value;
-                const mnemonicoData = mnemonicos.find(item => item.mnemonico === mnemonico && item.unit === selectedUnit);
-                document.getElementById('mnemonico-tipo').textContent = mnemonicoData ? mnemonicoData.tipo : '';
-                document.getElementById('mnemonico-legenda').textContent = mnemonicoData ? mnemonicoData.legenda : '';
-                document.getElementById('mnemonico-min').textContent = mnemonicoData ? mnemonicoData.min.toFixed(1) : '';
-                document.getElementById('mnemonico-max').textContent = mnemonicoData ? mnemonicoData.max.toFixed(1) : '';
-                saveDashboardFilters();
-                renderDashboardTable();
-            });
-        
-            document.getElementById('filter-mes').addEventListener('change', function() {
-                saveDashboardFilters();
-                renderDashboardTable();
-            });
-            
-            document.getElementById('filter-ano').addEventListener('change', function() {
-                saveDashboardFilters();
-                renderDashboardTable();
-            });
+        const anoSelect = document.getElementById('filter-ano');
+        const currentYear = new Date().getFullYear();
+        anoSelect.innerHTML = '<option value="">Selecione</option>';
+        for (let i = currentYear; i >= currentYear - 4; i--) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            anoSelect.appendChild(option);
         }
+
+        // Definir o ano atual como padrão se nenhum filtro estiver salvo
+        const savedFilters = localStorage.getItem(`dashboardFilters_${selectedUnit}`);
+        if (!savedFilters) {
+            anoSelect.value = currentYear;
+            saveDashboardFilters();
+        }
+
+        document.getElementById('filter-mnemonico').addEventListener('change', function() {
+            const mnemonico = this.value;
+            const mnemonicoData = mnemonicos.find(item => item.mnemonico === mnemonico && item.unit === selectedUnit);
+            document.getElementById('mnemonico-tipo').textContent = mnemonicoData ? mnemonicoData.tipo : '';
+            document.getElementById('mnemonico-legenda').textContent = mnemonicoData ? mnemonicoData.legenda : '';
+            document.getElementById('mnemonico-min').textContent = mnemonicoData ? mnemonicoData.min.toFixed(1) : '';
+            document.getElementById('mnemonico-max').textContent = mnemonicoData ? mnemonicoData.max.toFixed(1) : '';
+            saveDashboardFilters();
+            renderDashboardTable();
+        });
+
+        document.getElementById('filter-mes').addEventListener('change', function() {
+            saveDashboardFilters();
+            renderDashboardTable();
+        });
+        
+        document.getElementById('filter-ano').addEventListener('change', function() {
+            saveDashboardFilters();
+            renderDashboardTable();
+        });
+    }
         
         function renderDashboardTable() {
     const mes = document.getElementById('filter-mes').value;
@@ -2077,23 +2085,29 @@
     // Atualizar gráficos
     updateCharts();
 }
-        async function init() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('data').value = today;
+         async function init() {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('data').value = today;
 
-            // Carregar unidade salva do localStorage
-            selectedUnit = localStorage.getItem('selectedUnit') || null;
-            updateUnitDisplay();
+                // Carregar unidade salva do localStorage
+                selectedUnit = localStorage.getItem('selectedUnit') || null;
+                updateUnitDisplay();
 
-            await loadFromJsonBin();
+                await loadFromJsonBin();
 
-            // Definir estado inicial das abas (apenas Mnemonicos ativo)
-            document.getElementById('responsaveis-section').classList.add('hidden');
-            document.querySelector('.toggle-button').classList.add('active');
+                // Definir estado inicial das abas (apenas Mnemonicos ativo)
+                document.getElementById('responsaveis-section').classList.add('hidden');
+                document.querySelector('.toggle-button').classList.add('active');
 
-            // Abrir o modal de seleção de unidade sempre que a página for atualizada
-            openUnitModal();
-        }
+                // Carregar filtros do dashboard e renderizar tabela e gráficos
+                renderDashboardFilters();
+                loadDashboardFilters();
+                renderDashboardTable();
+                createCharts();
+
+                // Abrir o modal de seleção de unidade sempre que a página for atualizada
+                openUnitModal();
+            }
         
         init();
         
