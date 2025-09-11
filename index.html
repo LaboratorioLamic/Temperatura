@@ -848,6 +848,49 @@
             position: relative;
             height: 300px;
         }
+        .loading {
+        position: relative;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    .loading::after {
+        content: '';
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+        margin-left: 8px;
+        vertical-align: middle;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .list-item .edit-input {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+        width: 100%;
+        max-width: 200px;
+    }
+
+    .list-item .edit-input:focus {
+        border-color: #005f99;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 95, 153, 0.2);
+    }
+
+    .list-item .edit-input.invalid {
+        border-color: #ff4d4d;
+        background-color: #ffecec;
+    }
     </style>
 </head>
 <body>
@@ -1176,10 +1219,16 @@
         
         // Funções para Cadastro de Mnemonicos
         async function addMnemonico() {
-            if (!selectedUnit) {
-                alert('Por favor, selecione uma unidade antes de adicionar um mnemonico.');
-                return;
-            }
+        if (!selectedUnit) {
+            alert('Por favor, selecione uma unidade antes de adicionar um mnemonico.');
+            return;
+        }
+        const button = document.querySelector('#mnemonicos-section button');
+        button.classList.add('loading');
+        button.disabled = true;
+        button.textContent = 'Adicionando...';
+
+        try {
             const mnemonico = document.getElementById('mnemonico').value.trim();
             const tipo = document.getElementById('tipo').value.trim();
             const legenda = document.getElementById('legenda').value.trim();
@@ -1198,7 +1247,15 @@
             } else {
                 alert('Por favor, preencha todos os campos do mnemonico.');
             }
+        } catch (error) {
+            console.error('Erro ao adicionar mnemonico:', error);
+            alert('Erro ao salvar os dados no servidor.');
+        } finally {
+            button.classList.remove('loading');
+            button.disabled = false;
+            button.textContent = 'Adicionar';
         }
+    }
         
         async function updateMnemonico(index, field, value) {
             if (field === 'min' || field === 'max') {
@@ -1280,55 +1337,111 @@
         }
         
         function renderResponsaveis() {
-            const list = document.getElementById('responsaveis-list');
-            list.innerHTML = '';
-            const filteredResponsaveis = responsaveis.filter(item => item.unit === selectedUnit);
-            filteredResponsaveis.forEach((item, index) => {
-                const globalIndex = responsaveis.findIndex(r => r === item);
-                const div = document.createElement('div');
-                div.className = 'list-item';
-                div.innerHTML = `<span>${item.name}</span>
-                                 <button onclick="deleteResponsavel(${globalIndex})">Excluir</button>`;
-                list.appendChild(div);
-            });
-        }
+        const list = document.getElementById('responsaveis-list');
+        list.innerHTML = '';
+        const filteredResponsaveis = responsaveis.filter(item => item.unit === selectedUnit)
+            .sort((a, b) => a.name.localeCompare(b.name)); // Ordena em ordem alfabética
+        filteredResponsaveis.forEach((item, index) => {
+            const globalIndex = responsaveis.findIndex(r => r === item);
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `
+                <input type="text" class="edit-input" value="${item.name}" onchange="updateResponsavel(${globalIndex}, this.value)">
+                <button onclick="deleteResponsavel(${globalIndex})">Excluir</button>
+            `;
+            list.appendChild(div);
+        });
+    }
         
         // Funções para Dropdowns
         function renderDropdowns() {
-            const mnemonicoSelect = document.getElementById('dados-mnemonico');
-            mnemonicoSelect.innerHTML = '<option value="">Selecione</option>';
-            const filterMnemonicoSelect = document.getElementById('filter-mnemonico');
-            filterMnemonicoSelect.innerHTML = '<option value="">Selecione</option>';
-            const filteredMnemonicos = mnemonicos.filter(item => item.unit === selectedUnit);
-            filteredMnemonicos.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.mnemonico;
-                option.textContent = item.mnemonico;
-                mnemonicoSelect.appendChild(option.cloneNode(true));
-                filterMnemonicoSelect.appendChild(option);
-            });
+        const mnemonicoSelect = document.getElementById('dados-mnemonico');
+        mnemonicoSelect.innerHTML = '<option value="">Selecione</option>';
+        const filterMnemonicoSelect = document.getElementById('filter-mnemonico');
+        filterMnemonicoSelect.innerHTML = '<option value="">Selecione</option>';
+        const filteredMnemonicos = mnemonicos.filter(item => item.unit === selectedUnit)
+            .sort((a, b) => a.mnemonico.localeCompare(b.mnemonico)); // Ordena mnemonicos em ordem alfabética
+        filteredMnemonicos.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.mnemonico;
+            option.textContent = item.mnemonico;
+            mnemonicoSelect.appendChild(option.cloneNode(true));
+            filterMnemonicoSelect.appendChild(option);
+        });
+
+        const responsavelSelect = document.getElementById('dados-responsavel');
+        responsavelSelect.innerHTML = '<option value="">Selecione</option>';
+        const filteredResponsaveis = responsaveis.filter(item => item.unit === selectedUnit)
+            .sort((a, b) => a.name.localeCompare(b.name)); // Ordena responsáveis em ordem alfabética
+        filteredResponsaveis.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.name;
+            option.textContent = item.name;
+            responsavelSelect.appendChild(option);
+        });
+    }
         
-            const responsavelSelect = document.getElementById('dados-responsavel');
-            responsavelSelect.innerHTML = '<option value="">Selecione</option>';
-            const filteredResponsaveis = responsaveis.filter(item => item.unit === selectedUnit);
-            filteredResponsaveis.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.name;
-                option.textContent = item.name;
-                responsavelSelect.appendChild(option);
-            });
+
+        async function addResponsavel() {
+        if (!selectedUnit) {
+            alert('Por favor, selecione uma unidade antes de adicionar um responsável.');
+            return;
         }
-        
+        const button = document.querySelector('#responsaveis-section button');
+        button.classList.add('loading');
+        button.disabled = true;
+        button.textContent = 'Adicionando...';
+
+        try {
+            const responsavel = document.getElementById('responsavel').value.trim();
+            if (responsavel) {
+                responsaveis.push({ name: responsavel, unit: selectedUnit });
+                await saveToJsonBin();
+                renderResponsaveis();
+                renderDropdowns();
+                document.getElementById('responsavel').value = '';
+            } else {
+                alert('Por favor, preencha o campo de responsável.');
+            }
+        } catch (error) {
+            console.error('Erro ao adicionar responsável:', error);
+            alert('Erro ao salvar os dados no servidor.');
+        } finally {
+            button.classList.remove('loading');
+            button.disabled = false;
+            button.textContent = 'Adicionar';
+        }
+    }
+
+    async function updateResponsavel(index, value) {
+        const trimmedValue = value.trim();
+        if (trimmedValue === '') {
+            document.querySelectorAll('.list-item .edit-input')[index].classList.add('invalid');
+            return;
+        }
+        responsaveis[index].name = trimmedValue;
+        await saveToJsonBin();
+        renderResponsaveis();
+        renderDropdowns();
+        renderDashboardTable();
+    }
+
         // Funções para Dados
         async function addDado() {
-            if (!selectedUnit) {
-                alert('Por favor, selecione uma unidade antes de adicionar dados.');
-                return;
-            }
-            if (dados.filter(item => item.unit === selectedUnit).length >= 50) {
-                alert('Limite máximo de 50 dados atingido para esta unidade.');
-                return;
-            }
+        if (!selectedUnit) {
+            alert('Por favor, selecione uma unidade antes de adicionar dados.');
+            return;
+        }
+        if (dados.filter(item => item.unit === selectedUnit).length >= 50) {
+            alert('Limite máximo de 50 dados atingido para esta unidade.');
+            return;
+        }
+        const button = document.querySelector('#dados button');
+        button.classList.add('loading');
+        button.disabled = true;
+        button.textContent = 'Adicionando...';
+
+        try {
             const data = document.getElementById('data').value;
             const mnemonico = document.getElementById('dados-mnemonico').value;
             const responsavel = document.getElementById('dados-responsavel').value;
@@ -1371,7 +1484,15 @@
             } else {
                 alert('Por favor, corrija os campos inválidos ou preencha pelo menos a temperatura atual de manhã ou tarde.');
             }
+        } catch (error) {
+            console.error('Erro ao adicionar dado:', error);
+            alert('Erro ao salvar os dados no servidor.');
+        } finally {
+            button.classList.remove('loading');
+            button.disabled = false;
+            button.textContent = 'Adicionar';
         }
+    }
         
         function validateDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeAtual) {
             const manhaMinInput = document.getElementById('manha-min');
