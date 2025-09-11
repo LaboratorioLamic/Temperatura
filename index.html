@@ -2011,6 +2011,9 @@
                     title: {
                         display: true,
                         text: 'Data'
+                    },
+                    ticks: {
+                        autoSkip: false // Garante que todos os dias sejam exibidos
                     }
                 }
             }
@@ -2126,6 +2129,9 @@ function createTardeChart() {
                     title: {
                         display: true,
                         text: 'Data'
+                    },
+                    ticks: {
+                        autoSkip: false // Garante que todos os dias sejam exibidos
                     }
                 }
             }
@@ -2133,26 +2139,24 @@ function createTardeChart() {
     });
 }
 
-        function getFilteredDataForCharts() {
-        const mes = document.getElementById('filter-mes').value;
-        const ano = document.getElementById('filter-ano').value;
-        const mnemonico = document.getElementById('filter-mnemonico').value;
+function getFilteredDataForCharts() {
+    const mes = document.getElementById('filter-mes').value;
+    const ano = document.getElementById('filter-ano').value;
+    const mnemonico = document.getElementById('filter-mnemonico').value;
 
-        if (!mes || !ano || !mnemonico || !selectedUnit) {
-            return [];
-        }
-
-        return dados.filter(item => {
-            const itemDate = new Date(item.data);
-            const itemMonth = itemDate.getMonth() + 1;
-            const itemYear = itemDate.getFullYear();
-            return itemMonth === parseInt(mes) &&
-                   itemYear === parseInt(ano) &&
-                   item.mnemonico === mnemonico &&
-                   item.unit === selectedUnit;
-        }).sort((a, b) => new Date(a.data) - new Date(b.data)); // Ordena por data crescente (menor à esquerda, maior à direita)
+    if (!mes || !ano || !mnemonico || !selectedUnit) {
+        return [];
     }
-        
+
+    return dados.filter(item => {
+        const [itemYear, itemMonth] = item.data.split('-').map(Number);
+        return itemMonth === parseInt(mes) &&
+               itemYear === parseInt(ano) &&
+               item.mnemonico === mnemonico &&
+               item.unit === selectedUnit;
+    }).sort((a, b) => a.data.localeCompare(b.data)); // Ordena por data crescente (do primeiro ao último dia)
+}
+
         function getCurrentMnemonicoData() {
             const mnemonico = document.getElementById('filter-mnemonico').value;
             return mnemonicos.find(m => m.mnemonico === mnemonico && m.unit === selectedUnit);
