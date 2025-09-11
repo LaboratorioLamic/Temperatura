@@ -1757,16 +1757,34 @@
         }
         
         async function deleteDado(index) {
-            dados.splice(index, 1);
-            if (currentPage > Math.ceil(dados.filter(item => item.unit === selectedUnit).length / itemsPerPage)) {
-                currentPage = Math.max(1, Math.ceil(dados.filter(item => item.unit === selectedUnit).length / itemsPerPage));
-            }
-            dados.sort((a, b) => new Date(b.data) - new Date(a.data));
-            await saveToJsonBin();
-            renderDadosCards();
-            renderPagination();
-            renderDashboardTable();
+    const button = document.querySelectorAll('.dados-card .delete-card')[index % itemsPerPage];
+    if (button) {
+        button.classList.add('loading');
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner"></span>';
+    }
+
+    try {
+        dados.splice(index, 1);
+        if (currentPage > Math.ceil(dados.filter(item => item.unit === selectedUnit).length / itemsPerPage)) {
+            currentPage = Math.max(1, Math.ceil(dados.filter(item => item.unit === selectedUnit).length / itemsPerPage));
         }
+        dados.sort((a, b) => new Date(b.data) - new Date(a.data));
+        await saveToJsonBin();
+        renderDadosCards();
+        renderPagination();
+        renderDashboardTable();
+    } catch (error) {
+        console.error('Erro ao deletar dado:', error);
+        alert('Erro ao deletar o dado no servidor.');
+    } finally {
+        if (button) {
+            button.classList.remove('loading');
+            button.disabled = false;
+            button.innerHTML = '&#10006;';
+        }
+    }
+}
         
         function renderPagination() {
         const paginationContainer = document.getElementById('pagination');
@@ -1880,218 +1898,234 @@
         }
         
         function createManhaChart() {
-        const ctx = document.getElementById('manhaChart').getContext('2d');
-    
-        if (manhaChart) {
-            manhaChart.destroy();
-        }
-    
-        const filteredDados = getFilteredDataForCharts();
-        const mnemonicoData = getCurrentMnemonicoData();
-    
-        manhaChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: filteredDados.map(item => formatDateBR(item.data)),
-                datasets: [
-                    {
-                        label: 'Min ºC',
-                        data: filteredDados.map(item => item.manhaMin !== null ? item.manhaMin : 0),
-                        borderColor: '#3498db',
-                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Max ºC',
-                        data: filteredDados.map(item => item.manhaMax !== null ? item.manhaMax : 0),
-                        borderColor: '#e74c3c',
-                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Atual ºC',
-                        data: filteredDados.map(item => item.manhaAtual !== null ? item.manhaAtual : 0),
-                        borderColor: '#2ecc71',
-                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                        tension: 0.4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    annotation: {
-                        annotations: mnemonicoData ? [
-                            {
-                                type: 'line',
-                                yMin: mnemonicoData.min,
-                                yMax: mnemonicoData.min,
-                                borderColor: '#bf0000',
-                                borderWidth: 2,
-                                borderDash: [],
-                                label: {
-                                    content: `Min Ideal: ${mnemonicoData.min}ºC`,
-                                    enabled: true,
-                                    position: 'start',
-                                    backgroundColor: 'rgba(0,0,0,0.8)',
-                                    color: '#fff',
-                                    padding: 6,
-                                    font: {
-                                        size: 12
-                                    }
-                                }
-                            },
-                            {
-                                type: 'line',
-                                yMin: mnemonicoData.max,
-                                yMax: mnemonicoData.max,
-                                borderColor: '#bf0000',
-                                borderWidth: 2,
-                                borderDash: [],
-                                label: {
-                                    content: `Max Ideal: ${mnemonicoData.max}ºC`,
-                                    enabled: true,
-                                    position: 'start',
-                                    backgroundColor: 'rgba(0,0,0,0.8)',
-                                    color: '#fff',
-                                    padding: 6,
-                                    font: {
-                                        size: 12
-                                    }
+    const ctx = document.getElementById('manhaChart').getContext('2d');
+
+    if (manhaChart) {
+        manhaChart.destroy();
+    }
+
+    const filteredDados = getFilteredDataForCharts();
+    const mnemonicoData = getCurrentMnemonicoData();
+
+    // Filtrar dados válidos para o gráfico da manhã (excluir null)
+    const validDados = filteredDados.filter(item => 
+        item.manhaMin !== null || item.manhaMax !== null || item.manhaAtual !== null
+    );
+
+    manhaChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: validDados.map(item => formatDateBR(item.data)),
+            datasets: [
+                {
+                    label: 'Min ºC',
+                    data: validDados.map(item => item.manhaMin !== null ? item.manhaMin : null),
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    tension: 0.4,
+                    spanGaps: true // Permite pular valores null
+                },
+                {
+                    label: 'Max ºC',
+                    data: validDados.map(item => item.manhaMax !== null ? item.manhaMax : null),
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    tension: 0.4,
+                    spanGaps: true // Permite pular valores null
+                },
+                {
+                    label: 'Atual ºC',
+                    data: validDados.map(item => item.manhaAtual !== null ? item.manhaAtual : null),
+                    borderColor: '#2ecc71',
+                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                    tension: 0.4,
+                    spanGaps: true // Permite pular valores null
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                annotation: {
+                    annotations: mnemonicoData ? [
+                        {
+                            type: 'line',
+                            yMin: mnemonicoData.min,
+                            yMax: mnemonicoData.min,
+                            borderColor: '#bf0000',
+                            borderWidth: 2,
+                            borderDash: [],
+                            label: {
+                                content: `Min Ideal: ${mnemonicoData.min}ºC`,
+                                enabled: true,
+                                position: 'start',
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                color: '#fff',
+                                padding: 6,
+                                font: {
+                                    size: 12
                                 }
                             }
-                        ] : []
+                        },
+                        {
+                            type: 'line',
+                            yMin: mnemonicoData.max,
+                            yMax: mnemonicoData.max,
+                            borderColor: '#bf0000',
+                            borderWidth: 2,
+                            borderDash: [],
+                            label: {
+                                content: `Max Ideal: ${mnemonicoData.max}ºC`,
+                                enabled: true,
+                                position: 'start',
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                color: '#fff',
+                                padding: 6,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    ] : []
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Temperatura (ºC)'
                     }
                 },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        title: {
-                            display: true,
-                            text: 'Temperatura (ºC)'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Data'
-                        }
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Data'
                     }
                 }
             }
-        });
-    }
-    
-    function createTardeChart() {
-        const ctx = document.getElementById('tardeChart').getContext('2d');
-    
-        if (tardeChart) {
-            tardeChart.destroy();
         }
-    
-        const filteredDados = getFilteredDataForCharts();
-        const mnemonicoData = getCurrentMnemonicoData();
-    
-        tardeChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: filteredDados.map(item => formatDateBR(item.data)),
-                datasets: [
-                    {
-                        label: 'Min ºC',
-                        data: filteredDados.map(item => item.tardeMin !== null ? item.tardeMin : 0),
-                        borderColor: '#3498db',
-                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Max ºC',
-                        data: filteredDados.map(item => item.tardeMax !== null ? item.tardeMax : 0),
-                        borderColor: '#e74c3c',
-                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Atual ºC',
-                        data: filteredDados.map(item => item.tardeAtual !== null ? item.tardeAtual : 0),
-                        borderColor: '#2ecc71',
-                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                        tension: 0.4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    annotation: {
-                        annotations: mnemonicoData ? [
-                            {
-                                type: 'line',
-                                yMin: mnemonicoData.min,
-                                yMax: mnemonicoData.min,
-                                borderColor: '#bf0000',
-                                borderWidth: 2,
-                                borderDash: [],
-                                label: {
-                                    content: `Min Ideal: ${mnemonicoData.min}ºC`,
-                                    enabled: true,
-                                    position: 'start',
-                                    backgroundColor: 'rgba(0,0,0,0.8)',
-                                    color: '#fff',
-                                    padding: 6,
-                                    font: {
-                                        size: 12
-                                    }
-                                }
-                            },
-                            {
-                                type: 'line',
-                                yMin: mnemonicoData.max,
-                                yMax: mnemonicoData.max,
-                                borderColor: '#bf0000',
-                                borderWidth: 2,
-                                borderDash: [],
-                                label: {
-                                    content: `Max Ideal: ${mnemonicoData.max}ºC`,
-                                    enabled: true,
-                                    position: 'start',
-                                    backgroundColor: 'rgba(0,0,0,0.8)',
-                                    color: '#fff',
-                                    padding: 6,
-                                    font: {
-                                        size: 12
-                                    }
+    });
+}
+
+function createTardeChart() {
+    const ctx = document.getElementById('tardeChart').getContext('2d');
+
+    if (tardeChart) {
+        tardeChart.destroy();
+    }
+
+    const filteredDados = getFilteredDataForCharts();
+    const mnemonicoData = getCurrentMnemonicoData();
+
+    // Filtrar dados válidos para o gráfico da tarde (excluir null)
+    const validDados = filteredDados.filter(item => 
+        item.tardeMin !== null || item.tardeMax !== null || item.tardeAtual !== null
+    );
+
+    tardeChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: validDados.map(item => formatDateBR(item.data)),
+            datasets: [
+                {
+                    label: 'Min ºC',
+                    data: validDados.map(item => item.tardeMin !== null ? item.tardeMin : null),
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    tension: 0.4,
+                    spanGaps: true // Permite pular valores null
+                },
+                {
+                    label: 'Max ºC',
+                    data: validDados.map(item => item.tardeMax !== null ? item.tardeMax : null),
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    tension: 0.4,
+                    spanGaps: true // Permite pular valores null
+                },
+                {
+                    label: 'Atual ºC',
+                    data: validDados.map(item => item.tardeAtual !== null ? item.tardeAtual : null),
+                    borderColor: '#2ecc71',
+                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                    tension: 0.4,
+                    spanGaps: true // Permite pular valores null
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                annotation: {
+                    annotations: mnemonicoData ? [
+                        {
+                            type: 'line',
+                            yMin: mnemonicoData.min,
+                            yMax: mnemonicoData.min,
+                            borderColor: '#bf0000',
+                            borderWidth: 2,
+                            borderDash: [],
+                            label: {
+                                content: `Min Ideal: ${mnemonicoData.min}ºC`,
+                                enabled: true,
+                                position: 'start',
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                color: '#fff',
+                                padding: 6,
+                                font: {
+                                    size: 12
                                 }
                             }
-                        ] : []
+                        },
+                        {
+                            type: 'line',
+                            yMin: mnemonicoData.max,
+                            yMax: mnemonicoData.max,
+                            borderColor: '#bf0000',
+                            borderWidth: 2,
+                            borderDash: [],
+                            label: {
+                                content: `Max Ideal: ${mnemonicoData.max}ºC`,
+                                enabled: true,
+                                position: 'start',
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                color: '#fff',
+                                padding: 6,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    ] : []
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Temperatura (ºC)'
                     }
                 },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        title: {
-                            display: true,
-                            text: 'Temperatura (ºC)'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Data'
-                        }
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Data'
                     }
                 }
             }
-        });
-    }
+        }
+    });
+}
 
         function getFilteredDataForCharts() {
         const mes = document.getElementById('filter-mes').value;
