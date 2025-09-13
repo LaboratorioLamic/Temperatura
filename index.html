@@ -1150,6 +1150,31 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+.alert-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #ff4d4d;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.alert-message.visible {
+    opacity: 1;
+}
+
+.alert-message.hidden {
+    display: none;
+}
+
+.alert-message.success {
+    background-color: #2ecc71; /* Verde para sucesso */
+}
     </style>
 </head>
 <body>
@@ -1816,6 +1841,7 @@
                     renderDadosCards();
                     renderPagination();
                     renderDashboardTable();
+                    showSuccessAlert();
                     if (manhaAtual === null && tardeAtual === null) {
                         const globalIndex = dados.findIndex(d =>
                             d.data === newDado.data &&
@@ -2807,6 +2833,22 @@
                 }, 1500);
             }, 5000);
         }
+
+        function showSuccessAlert() {
+    const alertElement = document.getElementById('alert-message');
+    alertElement.textContent = 'Dados atualizados com sucesso';
+    alertElement.classList.remove('hidden');
+    alertElement.classList.add('visible', 'success');
+    
+    setTimeout(() => {
+        alertElement.classList.remove('visible', 'success');
+        setTimeout(() => {
+            alertElement.classList.add('hidden');
+            alertElement.textContent = 'Aguardando preenchimento completo';
+        }, 1500);
+    }, 5000);
+}
+
         
         document.getElementById('manha-min').addEventListener('input', validateForm);
         document.getElementById('manha-max').addEventListener('input', validateForm);
