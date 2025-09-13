@@ -1132,6 +1132,31 @@
     top: 0; /* Animação para deslizar para baixo */
 }
 
+.alert-success {
+    position: fixed;
+    top: -100px; /* Começa escondido acima da tela */
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #30fc3a, #0dc016);
+    color: #ffffff;
+    padding: 15px 30px;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    transition: top 0.5s ease-in-out;
+    border: 1px solid #ddd;
+    border-top: none;
+}
+
+.alert-success.visible {
+    top: 0; /* Animação para deslizar para baixo */
+}
+
 .loader {
     border: 3px solid #f3f3f3;
     border-top: 3px solid #005f99;
@@ -1163,18 +1188,6 @@
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
 }
-
-.alert-message.visible {
-    opacity: 1;
-}
-
-.alert-message.hidden {
-    display: none;
-}
-
-.alert-message.success {
-    background-color: #2ecc71; /* Verde para sucesso */
-}
     </style>
 </head>
 <body>
@@ -1187,6 +1200,9 @@
         Aguardando preenchimento completo
         <span class="loader"></span>
     </div>
+    <div id="alert-message-success" class="alert-success hidden">
+        Dados atualizados com sucesso ✔
+        </div>
 </header>
 
 <nav>
@@ -2072,6 +2088,7 @@
                     renderDadosCards();
                     renderDashboardTable();
                     updateCharts();
+                    showSuccessAlert();
                 } else {
                     if (cardIndex !== -1) {
                         renderDadosCards();
@@ -2835,18 +2852,16 @@
         }
 
         function showSuccessAlert() {
-    const alertElement = document.getElementById('alert-message');
-    alertElement.textContent = 'Dados atualizados com sucesso';
-    alertElement.classList.remove('hidden');
-    alertElement.classList.add('visible', 'success');
-    
-    setTimeout(() => {
-        alertElement.classList.remove('visible', 'success');
-        setTimeout(() => {
-            alertElement.classList.add('hidden');
-            alertElement.textContent = 'Aguardando preenchimento completo';
-        }, 1500);
-    }, 5000);
+            const alertElement = document.getElementById('alert-message-success');
+            alertElement.classList.remove('hidden');
+            alertElement.classList.add('visible');
+            
+            setTimeout(() => {
+                alertElement.classList.remove('visible');
+                setTimeout(() => {
+                    alertElement.classList.add('hidden');
+                }, 1500);
+            }, 5000);
 }
 
         
