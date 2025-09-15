@@ -2552,7 +2552,7 @@
             const anoSelect = document.getElementById('filter-ano');
             const currentYear = new Date().getFullYear();
             anoSelect.innerHTML = '<option value="">Selecione</option>';
-            for (let i = currentYear; i >= currentYear - 4; i--) {
+            for (let i = currentYear; i >= currentYear - 2; i--) {
                 const option = document.createElement('option');
                 option.value = i;
                 option.textContent = i;
