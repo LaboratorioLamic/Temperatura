@@ -861,7 +861,7 @@
         display: inline-block;
         width: 16px;
         height: 16px;
-        border: 2px solid #ffffff;
+        border: 2px solid #0099ff;
         border-radius: 50%;
         border-top-color: transparent;
         animation: spin 1s linear infinite;
@@ -2162,17 +2162,35 @@ function renderDadosCards() {
 }
 
 async function updateDado(index, field, value) {
-    let card = null;
-    const filteredDados = dados.filter(item => item.unitId === selectedUnitId)
-        .sort((a, b) => new Date(b.data) - new Date(a.data));
+    // Encontrar o card correspondente ao globalIndex
+    const filteredDados = dados
+        .filter(item => item.unitId === selectedUnitId)
+        .sort((a, b) => {
+            const dateA = new Date(a.data);
+            const dateB = new Date(b.data);
+            dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
+            dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
+            const dateComparison = dateB - dateA;
+            if (dateComparison !== 0) return dateComparison;
+            const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
+            const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
+            return mnemonicoA.localeCompare(mnemonicoB);
+        });
 
     const start = (currentPage - 1) * itemsPerPage;
     const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
-    const cardIndex = paginatedDados.findIndex(d => d === dados[index]);
+    const cardIndex = paginatedDados.findIndex(d => 
+        d.data === dados[index].data &&
+        d.mnemonicoId === dados[index].mnemonicoId &&
+        d.responsavelId === dados[index].responsavelId &&
+        d.unitId === dados[index].unitId
+    );
 
+    let card = null;
     if (cardIndex !== -1) {
-        card = document.querySelectorAll('.dados-card')[cardIndex];
-        if (card) {
+        const cards = document.querySelectorAll('.dados-card');
+        if (cardIndex < cards.length) {
+            card = cards[cardIndex];
             card.classList.add('loading');
             card.style.opacity = '0.7';
             card.style.transition = 'opacity 0.3s ease';
@@ -2180,12 +2198,14 @@ async function updateDado(index, field, value) {
     }
 
     try {
+        // Atualizar o campo
         if (['manhaMin', 'manhaMax', 'manhaAtual', 'tardeMin', 'tardeMax', 'tardeAtual'].includes(field)) {
             dados[index][field] = value === '' ? null : parseFloat(value);
         } else if (field === 'data') {
             dados[index][field] = value;
         }
 
+        // Validar o card
         const isValid = validateCard(index);
 
         const manhaAtual = dados[index].manhaAtual;
@@ -2211,10 +2231,7 @@ async function updateDado(index, field, value) {
             updateCharts();
             showSuccessAlert();
         } else {
-            if (cardIndex !== -1) {
-                renderDadosCards();
-            }
-            console.log('Dados inválidos ou condições de envio não atendidas.');
+            renderDadosCards(); // Re-renderizar para garantir que a validação visual esteja correta
             showAlert();
         }
     } catch (error) {
@@ -2230,10 +2247,24 @@ async function updateDado(index, field, value) {
 
 function validateCard(globalIndex) {
     const validation = validateDadoByIndex(globalIndex);
+    if (!validation.valid) {
+        console.warn(`Validação falhou para o índice ${globalIndex}:`, validation.invalidFields);
+    }
 
+    // Encontrar o card correspondente ao globalIndex
     const filteredDados = dados
         .filter(item => item && item.unitId === selectedUnitId)
-        .sort((a, b) => new Date(b.data) - new Date(a.data));
+        .sort((a, b) => {
+            const dateA = new Date(a.data);
+            const dateB = new Date(b.data);
+            dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
+            dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
+            const dateComparison = dateB - dateA;
+            if (dateComparison !== 0) return dateComparison;
+            const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
+            const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
+            return mnemonicoA.localeCompare(mnemonicoB);
+        });
 
     const start = (currentPage - 1) * itemsPerPage;
     const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
@@ -2259,11 +2290,13 @@ function validateCard(globalIndex) {
                 tardeAtual: 'input[onchange*="\'tardeAtual\'"]'
             };
 
+            // Remover classes 'invalid' de todos os campos
             Object.values(fieldSelectors).forEach(selector => {
                 const input = card.querySelector(selector);
                 if (input) input.classList.remove('invalid');
             });
 
+            // Adicionar classe 'invalid' aos campos inválidos
             validation.invalidFields.forEach(field => {
                 const input = card.querySelector(fieldSelectors[field]);
                 if (input) input.classList.add('invalid');
