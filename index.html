@@ -1188,9 +1188,53 @@
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
 }
+/* Estilos para a tela de carregamento com fundo fosco */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 3000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-spinner {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #005f99;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+.loading-text {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
     </style>
 </head>
 <body>
+    <div class="loading-screen" id="loading-screen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Carregando dados...</div>
+</div>
     <header class="header">
     <img src="https://raw.githubusercontent.com/LaboratorioLamic/Dados/889745f5320300e54e3c1de1f8255a95f7e4b5bc/assents/logo.png" alt="Logo" class="header-logo">
     <h1>Controle de Temperatura</h1>
@@ -1446,7 +1490,12 @@
 // Configuração do JSONBin.io
 const JSONBIN_API_KEY = '$2a$10$cREwumm/vr2Mj149sDZkKuXLp.pxT0D6PMgkf.yMEWR7YmIlrHJtm';
 const JSONBIN_BASE_URL = 'https://api.jsonbin.io/v3/b';
-const JSONBIN_ID = '68c1c26343b1c97be93e4563';
+const JSONBIN_IDS = {
+    main: '68c1c26343b1c97be93e4563',
+    unit1: '68c9bcb8d0ea881f40803435',
+    unit2: '68c9bcc7d0ea881f40803447',
+    otherUnits: '68c9bcd1ae596e708ff101df'
+};
 
 // Dados em memória
 let mnemonicos = [];
@@ -1478,20 +1527,54 @@ let selectedUnitId = null;
 let manhaChart = null;
 let tardeChart = null;
 
+// Função para determinar o binID com base na unidade
+function getBinIdForUnit(unitId) {
+    if (unitId === 1) return JSONBIN_IDS.unit1;
+    if (unitId === 2) return JSONBIN_IDS.unit2;
+    return JSONBIN_IDS.otherUnits;
+}
+
 // Funções para comunicação com JSONBin.io
 async function saveToJsonBin() {
-    const data = { mnemonicos, responsaveis, dados, unidades };
+    const mainData = { mnemonicos, responsaveis, unidades };
+    const unitDataMap = {};
+
+    // Agrupar dados por binID
+    dados.forEach(dado => {
+        const binId = getBinIdForUnit(dado.unitId);
+        if (!unitDataMap[binId]) {
+            unitDataMap[binId] = [];
+        }
+        unitDataMap[binId].push(dado);
+    });
+
     try {
-        const response = await fetch(`${JSONBIN_BASE_URL}/${JSONBIN_ID}`, {
+        // Salvar mnemonicos, responsaveis e unidades no bin principal
+        const mainResponse = await fetch(`${JSONBIN_BASE_URL}/${JSONBIN_IDS.main}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Master-Key': JSONBIN_API_KEY
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(mainData)
         });
-        if (!response.ok) {
-            throw new Error('Erro ao salvar no JSONBin');
+        if (!mainResponse.ok) {
+            throw new Error('Erro ao salvar no JSONBin principal');
+        }
+
+        // Salvar dados nos bins correspondentes às unidades
+        for (const [binId, data] of Object.entries(unitDataMap)) {
+            const response = await fetch(`${JSONBIN_BASE_URL}/${binId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_API_KEY
+                },
+                body: JSON.stringify({ dados: data })
+            });
+            if (!response.ok) {
+                throw new Error(`Erro ao salvar no JSONBin ${binId}`);
+            }
         }
     } catch (error) {
         console.error('Erro ao salvar:', error);
@@ -1501,29 +1584,47 @@ async function saveToJsonBin() {
 
 async function loadFromJsonBin() {
     try {
-        const response = await fetch(`${JSONBIN_BASE_URL}/${JSONBIN_ID}/latest`, {
+        // Carregar mnemonicos, responsaveis e unidades do bin principal
+        const mainResponse = await fetch(`${JSONBIN_BASE_URL}/${JSONBIN_IDS.main}/latest`, {
             headers: {
                 'X-Master-Key': JSONBIN_API_KEY
             }
         });
-        if (response.ok) {
-            const result = await response.json();
-            const data = result.record;
-            mnemonicos = data.mnemonicos || [];
-            responsaveis = data.responsaveis || [];
-            dados = data.dados || [];
-            unidades = data.unidades || unidades;
-            updateUnitDisplay();
-            renderMnemonicos();
-            renderResponsaveis();
-            renderDropdowns();
-            renderDadosCards();
-            renderPagination();
-            renderDashboardTable();
-            updateCharts();
+        if (mainResponse.ok) {
+            const mainData = await mainResponse.json();
+            mnemonicos = mainData.record.mnemonicos || [];
+            responsaveis = mainData.record.responsaveis || [];
+            unidades = mainData.record.unidades || unidades;
         } else {
-            throw new Error('Erro ao carregar do JSONBin');
+            throw new Error('Erro ao carregar do JSONBin principal');
         }
+
+        // Carregar dados de todos os bins de unidades
+        dados = [];
+        const binIds = [JSONBIN_IDS.unit1, JSONBIN_IDS.unit2, JSONBIN_IDS.otherUnits];
+        for (const binId of binIds) {
+            const response = await fetch(`${JSONBIN_BASE_URL}/${binId}/latest`, {
+                headers: {
+                    'X-Master-Key': JSONBIN_API_KEY
+                }
+            });
+            if (response.ok) {
+                const result = await response.json();
+                const unitData = result.record.dados || [];
+                dados.push(...unitData);
+            } else {
+                console.warn(`Erro ao carregar do JSONBin ${binId}`);
+            }
+        }
+
+        updateUnitDisplay();
+        renderMnemonicos();
+        renderResponsaveis();
+        renderDropdowns();
+        renderDadosCards();
+        renderPagination();
+        renderDashboardTable();
+        updateCharts();
     } catch (error) {
         console.error('Erro ao carregar:', error);
     }
@@ -1579,7 +1680,6 @@ async function addMnemonico() {
         const min = parseFloat(document.getElementById('min').value);
         const max = parseFloat(document.getElementById('max').value);
         if (mnemonico && tipo && legenda && !isNaN(min) && !isNaN(max)) {
-            // Gera um novo ID incremental
             const newId = mnemonicos.length > 0 ? Math.max(...mnemonicos.map(m => m.id || 0)) + 1 : 1;
             mnemonicos.push({ id: newId, mnemonico, tipo, legenda, min, max, unitId: selectedUnitId });
             await saveToJsonBin();
@@ -1673,7 +1773,6 @@ async function addResponsavel() {
     try {
         const responsavel = document.getElementById('responsavel').value.trim();
         if (responsavel) {
-            // Gera um novo ID incremental
             const newId = responsaveis.length > 0 ? Math.max(...responsaveis.map(r => r.id || 0)) + 1 : 1;
             responsaveis.push({ id: newId, name: responsavel, unitId: selectedUnitId });
             await saveToJsonBin();
@@ -1763,13 +1862,11 @@ function validateDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeA
     let valid = true;
     const invalidFields = [];
 
-    // Limpar classes 'invalid' anteriores
     const inputs = ['manha-min', 'manha-max', 'manha-atual', 'tarde-min', 'tarde-max', 'tarde-atual', 'dados-mnemonico', 'dados-responsavel'];
     inputs.forEach(id => {
         document.getElementById(id).classList.remove('invalid');
     });
 
-    // Validar campos obrigatórios
     if (!document.getElementById('dados-mnemonico').value) {
         invalidFields.push('dados-mnemonico');
         valid = false;
@@ -1779,7 +1876,6 @@ function validateDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeA
         valid = false;
     }
 
-    // Validar Manhã
     if (manhaMin !== null && manhaMax !== null && manhaAtual !== null) {
         if (manhaMin > manhaAtual || manhaMin > manhaMax) {
             invalidFields.push('manha-min');
@@ -1801,7 +1897,6 @@ function validateDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeA
         valid = false;
     }
 
-    // Validar Tarde
     if (tardeMin !== null && tardeMax !== null && tardeAtual !== null) {
         if (tardeMin > tardeAtual || tardeMin > tardeMax) {
             invalidFields.push('tarde-min');
@@ -1823,7 +1918,6 @@ function validateDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeA
         valid = false;
     }
 
-    // Aplicar classes 'invalid' aos campos problemáticos
     invalidFields.forEach(field => {
         document.getElementById(field).classList.add('invalid');
     });
@@ -1846,12 +1940,9 @@ async function addDado() {
         const mnemonicoId = parseInt(document.getElementById('dados-mnemonico').value);
         const responsavelId = parseInt(document.getElementById('dados-responsavel').value);
 
-        // Campos Manhã
         const manhaMin = document.getElementById('manha-min').value.trim() === '' ? null : parseFloat(document.getElementById('manha-min').value);
         const manhaMax = document.getElementById('manha-max').value.trim() === '' ? null : parseFloat(document.getElementById('manha-max').value);
         const manhaAtual = document.getElementById('manha-atual').value.trim() === '' ? null : parseFloat(document.getElementById('manha-atual').value);
-
-        // Campos Tarde
         const tardeMin = document.getElementById('tarde-min').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-min').value);
         const tardeMax = document.getElementById('tarde-max').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-max').value);
         const tardeAtual = document.getElementById('tarde-atual').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-atual').value);
@@ -2897,6 +2988,49 @@ function showSuccessAlert() {
             alertElement.classList.add('hidden');
         }, 1500);
     }, 5000);
+}
+
+// Função para gerenciar a tela de carregamento
+function toggleLoadingScreen(show) {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (show) {
+        loadingScreen.style.display = 'flex';
+        loadingScreen.classList.remove('hidden');
+    } else {
+        loadingScreen.classList.add('hidden');
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 500); // Aguarda a transição de opacidade
+    }
+}
+
+// Função init modificada para incluir a tela de carregamento
+async function init() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('data').value = today;
+
+    selectedUnitId = parseInt(localStorage.getItem('selectedUnitId')) || null;
+    updateUnitDisplay();
+
+    // Mostrar tela de carregamento
+    toggleLoadingScreen(true);
+
+    try {
+        await loadFromJsonBin();
+    } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+        alert('Erro ao carregar os dados do servidor.');
+    } finally {
+        // Ocultar tela de carregamento e abrir modal de unidades
+        toggleLoadingScreen(false);
+        document.getElementById('responsaveis-section').classList.add('hidden');
+        document.querySelector('.toggle-button').classList.add('active');
+        renderDashboardFilters();
+        loadDashboardFilters();
+        renderDashboardTable();
+        createCharts();
+        openUnitModal();
+    }
 }
 
 document.getElementById('manha-min').addEventListener('input', validateForm);
