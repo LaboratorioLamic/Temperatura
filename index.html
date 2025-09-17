@@ -1228,6 +1228,117 @@
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+/* Estilo para a janela modal de senha */
+.password-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 2500;
+    justify-content: center;
+    align-items: center;
+}
+
+.password-modal-content {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 2px solid #005f99;
+    position: relative;
+    animation: slideIn 0.3s ease;
+}
+
+.password-modal-content.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+    20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+.password-modal-content h3 {
+    margin-bottom: 20px;
+    color: #001f3f;
+    font-weight: 600;
+    text-align: center;
+}
+
+.password-modal-content input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.password-modal-content input:focus {
+    border-color: #005f99;
+    box-shadow: 0 0 8px rgba(0, 95, 153, 0.2);
+    outline: none;
+}
+
+.password-modal-content input.invalid {
+    border-color: #ff4d4d;
+    background-color: #ffecec;
+}
+
+.password-modal-content button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #001f3f, #003087);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.password-modal-content button:hover {
+    background: linear-gradient(135deg, #003087, #005f99);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.password-modal-content button.invalid {
+    background: linear-gradient(135deg, #ff4d4d, #cc0000);
+}
+
+.password-modal-content .close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px; /* Reduzido de 15px para 10px para alinhar mais à direita */
+    background: none;
+    border: none;
+    font-size: 14px; /* Mantido de acordo com o ajuste anterior */
+    color: #ff4d4d;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 4px; /* Reduzido para diminuir a área clicável horizontal */
+    line-height: 1; /* Evita expansão vertical desnecessária */
+    width: 30px; /* Define uma largura fixa para o botão */
+    height: 30px; /* Define uma altura fixa para o botão */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-modal-content .close-modal:hover {
+    color: #ffffff;
+}
+
     </style>
 </head>
 <body>
@@ -1247,6 +1358,14 @@
     <div id="alert-message-success" class="alert-success hidden">
         Dados atualizados com sucesso ✔
         </div>
+    <div class="password-modal" id="password-modal">
+        <div class="password-modal-content">
+            <h3>Inserir Senha</h3>
+            <button class="close-modal" onclick="closePasswordModal()">&#10006;</button>
+            <input type="password" id="password-input" placeholder="Digite a senha">
+            <button onclick="checkPassword()">Confirmar</button>
+        </div>
+    </div>
 </header>
 
 <nav>
@@ -3065,6 +3184,99 @@ async function init() {
         openUnitModal();
     }
 }
+
+const CORRECT_PASSWORD = 'Lamic759@';
+let isCadastroAccessible = false;
+
+// Função para abrir a modal de senha
+function openPasswordModal() {
+    const modal = document.getElementById('password-modal');
+    const input = document.getElementById('password-input');
+    const confirmButton = document.querySelector('#password-modal button:not(.close-modal)');
+
+    input.value = '';
+    input.classList.remove('invalid');
+    confirmButton.classList.remove('invalid');
+    modal.querySelector('.password-modal-content').classList.remove('shake');
+    modal.style.display = 'flex';
+    input.focus();
+}
+
+// Função para fechar a modal de senha
+function closePasswordModal() {
+    document.getElementById('password-modal').style.display = 'none';
+    
+    // Voltar para a aba Dashboard
+    document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelector('.tab-button[data-tab="dashboard"]').classList.add('active');
+    document.getElementById('dashboard').classList.add('active');
+    
+    // Atualizar exibições do dashboard
+    renderDashboardFilters();
+    loadDashboardFilters();
+    renderDashboardTable();
+    createCharts();
+}
+
+// Função para verificar a senha
+function checkPassword() {
+    const input = document.getElementById('password-input');
+    const confirmButton = document.querySelector('#password-modal button:not(.close-modal)');
+    const modalContent = document.querySelector('.password-modal-content');
+    const password = input.value.trim();
+
+    if (password === CORRECT_PASSWORD) {
+        isCadastroAccessible = true;
+        closePasswordModal();
+        // Ativar a aba Cadastro
+        document.querySelector('.tab-button[data-tab="cadastro"]').classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('cadastro').classList.add('active');
+        // Atualizar exibições
+        renderMnemonicos();
+        renderResponsaveis();
+    } else {
+        input.classList.add('invalid');
+        confirmButton.classList.add('invalid');
+        modalContent.classList.add('shake');
+        setTimeout(() => {
+            modalContent.classList.remove('shake');
+        }, 500);
+    }
+}
+
+// Modificar o evento de clique da aba Cadastro
+document.querySelectorAll('.tab-button').forEach(tab => {
+    if (tab.dataset.tab === 'cadastro') {
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isCadastroAccessible) {
+                // Comportamento padrão da aba
+                document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('cadastro').classList.add('active');
+                renderMnemonicos();
+                renderResponsaveis();
+            } else {
+                openPasswordModal();
+            }
+        });
+    }
+});
+
+// Adicionar evento de tecla Enter no input de senha
+document.addEventListener('DOMContentLoaded', () => {
+    const passwordInput = document.getElementById('password-input');
+    if (passwordInput) {
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+    }
+});
 
 document.getElementById('manha-min').addEventListener('input', validateForm);
 document.getElementById('manha-max').addEventListener('input', validateForm);
