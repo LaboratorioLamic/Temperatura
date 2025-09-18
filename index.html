@@ -1347,26 +1347,25 @@
     <div class="loading-text">Carregando dados...</div>
 </div>
     <header class="header">
-    <img src="https://raw.githubusercontent.com/LaboratorioLamic/Dados/889745f5320300e54e3c1de1f8255a95f7e4b5bc/assents/logo.png" alt="Logo" class="header-logo">
-    <h1>Controle de Temperatura</h1>
-    <div class="unit-subtitle" id="selected-unit">Selecione uma Unidade</div>
-    <button class="change-unit-button" onclick="openUnitModal()">Trocar Unidade</button>
-    <div id="alert-message" class="alert hidden">
-        Aguardando preenchimento correto
-        <span class="loader"></span>
-    </div>
-    <div id="alert-message-success" class="alert-success hidden">
-        Dados atualizados com sucesso ✔
+        <img src="https://raw.githubusercontent.com/LaboratorioLamic/Dados/889745f5320300e54e3c1de1f8255a95f7e4b5bc/assents/logo.png" alt="Logo" class="header-logo">
+        <h1>Controle de Temperatura</h1>
+        <div class="unit-subtitle">01 - Unidade NTO</div>
+        <div id="alert-message" class="alert hidden">
+            Aguardando preenchimento correto
+            <span class="loader"></span>
         </div>
-    <div class="password-modal" id="password-modal">
-        <div class="password-modal-content">
-            <h3>Inserir Senha</h3>
-            <button class="close-modal" onclick="closePasswordModal()">&#10006;</button>
-            <input type="password" id="password-input" placeholder="Digite a senha">
-            <button onclick="checkPassword()">Confirmar</button>
+        <div id="alert-message-success" class="alert-success hidden">
+            Dados atualizados com sucesso ✔
         </div>
-    </div>
-</header>
+        <div class="password-modal" id="password-modal">
+            <div class="password-modal-content">
+                <h3>Inserir Senha</h3>
+                <button class="close-modal" onclick="closePasswordModal()">&#10006;</button>
+                <input type="password" id="password-input" placeholder="Digite a senha">
+                <button onclick="checkPassword()">Confirmar</button>
+            </div>
+        </div>
+    </header>
 
 <nav>
     <div class="tabs">
@@ -1375,31 +1374,6 @@
         <button class="tab-button" data-tab="dados">Dados</button>
     </div>
 </nav>
-
-    <div class="modal" id="unit-modal">
-        <div class="modal-content">
-            <h3>Selecionar Unidade</h3>
-            <select id="unit-select">
-                <option value="">Selecione uma Unidade</option>
-                <option value="Caixas de Transporte">📦 Caixas de Transporte</option>
-                <option value="01 - Unidade NTO">01 - Unidade NTO</option>
-                <option value="03 - Unidade Crato">03 - Unidade Crato</option>
-                <option value="05 - Unidade Novo Juazeiro">05 - Unidade Novo Juazeiro</option>
-                <option value="06 - Unidade Milagres">06 - Unidade Milagres</option>
-                <option value="09 - Unidade Barro">09 - Unidade Barro</option>
-                <option value="10 - Unidade Office Cariri">10 - Unidade Office Cariri</option>
-                <option value="12 - Unidade Caririaçu">12 - Unidade Caririaçu</option>
-                <option value="13 - Unidade Campos Sales">13 - Unidade Campos Sales</option>
-                <option value="14 - Unidade Nova Olinda">14 - Unidade Nova Olinda</option>
-                <option value="16 - Unidade Araripe">16 - Unidade Araripe</option>
-                <option value="23 - Unidade Salesianos">23 - Unidade Salesianos</option>
-                <option value="62 - Unidade Clemir Arrais">62 - Unidade Clemir Arrais</option>
-                <option value="88 - Unidade Unicardio">88 - Unidade Unicardio</option>
-                <option value="97 - Unidade Endoclinic">97 - Unidade Endoclinic</option>
-            </select>
-            <button onclick="selectUnit()">Confirmar</button>
-        </div>
-    </div>
 
     <div class="annotation-modal" id="annotation-modal">
         <div class="annotation-modal-content">
@@ -1607,195 +1581,87 @@
 
     <script>
         // Configuração do JSONBin.io
-                const JSONBIN_API_KEY = '$2a$10$cREwumm/vr2Mj149sDZkKuXLp.pxT0D6PMgkf.yMEWR7YmIlrHJtm';
-                const JSONBIN_BASE_URL = 'https://api.jsonbin.io/v3/b';
-                const JSONBIN_IDS = {
-                    main: '68c1c26343b1c97be93e4563',
-                    unit1: '68c9bcb8d0ea881f40803435',
-                    unit2: '68c9bcc7d0ea881f40803447',
-                    otherUnits: '68c9bcd1ae596e708ff101df'
-                };
-                
-                // Dados em memória
-                let mnemonicos = [];
-                let responsaveis = [];
-                let dados = [];
-                let unidades = [
-                    { id: 2, name: "Caixas de Transporte" },
-                    { id: 1, name: "01 - Unidade NTO" },
-                    { id: 3, name: "03 - Unidade Crato" },
-                    { id: 5, name: "05 - Unidade Novo Juazeiro" },
-                    { id: 6, name: "06 - Unidade Milagres" },
-                    { id: 9, name: "09 - Unidade Barro" },
-                    { id: 10, name: "10 - Unidade Office Cariri" },
-                    { id: 12, name: "12 - Unidade Caririaçu" },
-                    { id: 13, name: "13 - Unidade Campos Sales" },
-                    { id: 14, name: "14 - Unidade Nova Olinda" },
-                    { id: 16, name: "16 - Unidade Araripe" },
-                    { id: 23, name: "23 - Unidade Salesianos" },
-                    { id: 62, name: "62 - Unidade Clemir Arrais" },
-                    { id: 88, name: "88 - Unidade Unicardio" },
-                    { id: 97, name: "97 - Unidade Endoclinic" }
-                ];
-                let currentPage = 1;
-                const itemsPerPage = 40;
-                const maxPagesDisplayed = 5;
-                let selectedUnitId = null;
-                
-                // Variáveis para os gráficos
-                let manhaChart = null;
-                let tardeChart = null;
-                
-                // Temporizador para redirecionamento automático da aba Dados para Dashboard
-                let dadosTabTimeout = null;
+        const JSONBIN_API_KEY = '$2a$10$cREwumm/vr2Mj149sDZkKuXLp.pxT0D6PMgkf.yMEWR7YmIlrHJtm';
+        const JSONBIN_BASE_URL = 'https://api.jsonbin.io/v3/b';
+        const JSONBIN_ID = '68c9bcb8d0ea881f40803435';
         
-                // Função para iniciar o temporizador de redirecionamento
-                function startDadosTabTimer() {
-                    clearDadosTabTimer(); // Limpa qualquer temporizador existente
-                    dadosTabTimeout = setTimeout(() => {
-                        redirectToDashboard();
-                    }, 60000); // 60 segundos
+        // Dados em memória
+        let mnemonicos = [];
+        let responsaveis = [];
+        let dados = [];
+        const selectedUnitId = 1; // Unidade fixa: 01 - Unidade NTO
+        let currentPage = 1;
+        const itemsPerPage = 40;
+        const maxPagesDisplayed = 5;
+        
+        // Variáveis para os gráficos
+        let manhaChart = null;
+        let tardeChart = null;
+        
+        // Temporizador para redirecionamento automático da aba Dados para Dashboard
+        let dadosTabTimeout = null;
+        
+        // Função para iniciar o temporizador de redirecionamento
+        function startDadosTabTimer() {
+            clearDadosTabTimer(); // Limpa qualquer temporizador existente
+            dadosTabTimeout = setTimeout(() => {
+                redirectToDashboard();
+            }, 60000); // 60 segundos
+        }
+        
+        // Função para limpar o temporizador
+        function clearDadosTabTimer() {
+            if (dadosTabTimeout) {
+                clearTimeout(dadosTabTimeout);
+                dadosTabTimeout = null;
+            }
+        }
+        
+        // Função para redirecionar para a aba Dashboard
+        function redirectToDashboard() {
+            document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector('.tab-button[data-tab="dashboard"]').classList.add('active');
+            document.getElementById('dashboard').classList.add('active');
+            renderDashboardFilters();
+            loadDashboardFilters();
+            renderDashboardTable();
+            updateCharts();
+        }
+        
+        // Funções para comunicação com JSONBin.io
+        async function saveToJsonBin() {
+            const data = { mnemonicos, responsaveis, dados };
+            try {
+                const response = await fetch(`${JSONBIN_BASE_URL}/${JSONBIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_API_KEY
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (!response.ok) {
+                    throw new Error('Erro ao salvar no JSONBin');
                 }
+            } catch (error) {
+                console.error('Erro ao salvar:', error);
+                alert('Erro ao salvar os dados no servidor.');
+            }
+        }
         
-                // Função para limpar o temporizador
-                function clearDadosTabTimer() {
-                    if (dadosTabTimeout) {
-                        clearTimeout(dadosTabTimeout);
-                        dadosTabTimeout = null;
+        async function loadFromJsonBin() {
+            try {
+                const response = await fetch(`${JSONBIN_BASE_URL}/${JSONBIN_ID}/latest`, {
+                    headers: {
+                        'X-Master-Key': JSONBIN_API_KEY
                     }
-                }
-        
-                // Função para redirecionar para a aba Dashboard
-                function redirectToDashboard() {
-                    document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    document.querySelector('.tab-button[data-tab="dashboard"]').classList.add('active');
-                    document.getElementById('dashboard').classList.add('active');
-                    renderDashboardFilters();
-                    loadDashboardFilters();
-                    renderDashboardTable();
-                    updateCharts();
-                }
-        
-                // Função para determinar o binID com base na unidade
-                function getBinIdForUnit(unitId) {
-                    if (unitId === 1) return JSONBIN_IDS.unit1;
-                    if (unitId === 2) return JSONBIN_IDS.unit2;
-                    return JSONBIN_IDS.otherUnits;
-                }
-                
-                // Funções para comunicação com JSONBin.io
-                async function saveToJsonBin() {
-                    const mainData = { mnemonicos, responsaveis, unidades };
-                    const unitDataMap = {};
-                
-                    // Agrupar dados por binID
-                    dados.forEach(dado => {
-                        const binId = getBinIdForUnit(dado.unitId);
-                        if (!unitDataMap[binId]) {
-                            unitDataMap[binId] = [];
-                        }
-                        unitDataMap[binId].push(dado);
-                    });
-                
-                    try {
-                        // Salvar mnemonicos, responsaveis e unidades no bin principal
-                        const mainResponse = await fetch(`${JSONBIN_BASE_URL}/${JSONBIN_IDS.main}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-Master-Key': JSONBIN_API_KEY
-                            },
-                            body: JSON.stringify(mainData)
-                        });
-                        if (!mainResponse.ok) {
-                            throw new Error('Erro ao salvar no JSONBin principal');
-                        }
-                
-                        // Salvar dados nos bins correspondentes às unidades
-                        for (const [binId, data] of Object.entries(unitDataMap)) {
-                            const response = await fetch(`${JSONBIN_BASE_URL}/${binId}`, {
-                                method: 'PUT',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-Master-Key': JSONBIN_API_KEY
-                                },
-                                body: JSON.stringify({ dados: data })
-                            });
-                            if (!response.ok) {
-                                throw new Error(`Erro ao salvar no JSONBin ${binId}`);
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Erro ao salvar:', error);
-                        alert('Erro ao salvar os dados no servidor.');
-                    }
-                }
-                
-                async function loadFromJsonBin() {
-                    try {
-                        // Carregar mnemonicos, responsaveis e unidades do bin principal
-                        const mainResponse = await fetch(`${JSONBIN_BASE_URL}/${JSONBIN_IDS.main}/latest`, {
-                            headers: {
-                                'X-Master-Key': JSONBIN_API_KEY
-                            }
-                        });
-                        if (mainResponse.ok) {
-                            const mainData = await mainResponse.json();
-                            mnemonicos = mainData.record.mnemonicos || [];
-                            responsaveis = mainData.record.responsaveis || [];
-                            unidades = mainData.record.unidades || unidades;
-                        } else {
-                            throw new Error('Erro ao carregar do JSONBin principal');
-                        }
-                
-                        // Carregar dados de todos os bins de unidades
-                        dados = [];
-                        const binIds = [JSONBIN_IDS.unit1, JSONBIN_IDS.unit2, JSONBIN_IDS.otherUnits];
-                        for (const binId of binIds) {
-                            const response = await fetch(`${JSONBIN_BASE_URL}/${binId}/latest`, {
-                                headers: {
-                                    'X-Master-Key': JSONBIN_API_KEY
-                                }
-                            });
-                            if (response.ok) {
-                                const result = await response.json();
-                                const unitData = result.record.dados || [];
-                                dados.push(...unitData);
-                            } else {
-                                console.warn(`Erro ao carregar do JSONBin ${binId}`);
-                            }
-                        }
-                
-                        updateUnitDisplay();
-                        renderMnemonicos();
-                        renderResponsaveis();
-                        renderDropdowns();
-                        renderDadosCards();
-                        renderPagination();
-                        renderDashboardTable();
-                        updateCharts();
-                    } catch (error) {
-                        console.error('Erro ao carregar:', error);
-                    }
-                }
-                
-                // Função para abrir a janela modal
-                function openUnitModal() {
-                    const modal = document.getElementById('unit-modal');
-                    modal.style.display = 'flex';
-                    const select = document.getElementById('unit-select');
-                    select.value = selectedUnitId ? unidades.find(u => u.id === selectedUnitId).name : '';
-                }
-                
-                // Função para selecionar a unidade
-                async function selectUnit() {
-                    const select = document.getElementById('unit-select');
-                    const selectedUnit = unidades.find(u => u.name === select.value);
-                    selectedUnitId = selectedUnit ? selectedUnit.id : null;
-                    localStorage.setItem('selectedUnitId', selectedUnitId);
-                    updateUnitDisplay();
-                    document.getElementById('unit-modal').style.display = 'none';
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    mnemonicos = result.record.mnemonicos || [];
+                    responsaveis = result.record.responsaveis || [];
+                    dados = result.record.dados || [];
                     renderMnemonicos();
                     renderResponsaveis();
                     renderDropdowns();
@@ -1803,1509 +1669,1468 @@
                     renderPagination();
                     renderDashboardTable();
                     updateCharts();
+                } else {
+                    throw new Error('Erro ao carregar do JSONBin');
                 }
-                
-                // Função para atualizar a exibição da unidade selecionada
-                function updateUnitDisplay() {
-                    const unitDisplay = document.getElementById('selected-unit');
-                    const selectedUnit = unidades.find(u => u.id === selectedUnitId);
-                    unitDisplay.textContent = selectedUnit ? selectedUnit.name : 'Selecione uma Unidade';
-                }
-                
-                // Funções para Cadastro de Mnemonicos
-                async function addMnemonico() {
-                    if (!selectedUnitId) {
-                        alert('Por favor, selecione uma unidade antes de adicionar um mnemonico.');
-                        return;
-                    }
-                    const button = document.querySelector('#mnemonicos-section button');
-                    button.classList.add('loading');
-                    button.disabled = true;
-                    button.textContent = 'Adicionando';
-                
-                    try {
-                        const mnemonico = document.getElementById('mnemonico').value.trim();
-                        const tipo = document.getElementById('tipo').value.trim();
-                        const legenda = document.getElementById('legenda').value.trim();
-                        const min = parseFloat(document.getElementById('min').value);
-                        const max = parseFloat(document.getElementById('max').value);
-                        if (mnemonico && tipo && legenda && !isNaN(min) && !isNaN(max)) {
-                            const newId = mnemonicos.length > 0 ? Math.max(...mnemonicos.map(m => m.id || 0)) + 1 : 1;
-                            mnemonicos.push({ id: newId, mnemonico, tipo, legenda, min, max, unitId: selectedUnitId });
-                            await saveToJsonBin();
-                            renderMnemonicos();
-                            renderDropdowns();
-                            document.getElementById('mnemonico').value = '';
-                            document.getElementById('tipo').value = '';
-                            document.getElementById('legenda').value = '';
-                            document.getElementById('min').value = '';
-                            document.getElementById('max').value = '';
-                        } else {
-                            alert('Por favor, preencha todos os campos do mnemonico.');
-                        }
-                    } catch (error) {
-                        console.error('Erro ao adicionar mnemonico:', error);
-                        alert('Erro ao salvar os dados no servidor.');
-                    } finally {
-                        button.classList.remove('loading');
-                        button.disabled = false;
-                        button.textContent = 'Adicionar';
-                    }
-                }
-                
-                async function updateMnemonico(index, field, value) {
-                    if (field === 'min' || field === 'max') {
-                        if (isNaN(value)) return;
-                    }
-                    mnemonicos[index][field] = value;
-                    await saveToJsonBin();
-                    renderDropdowns();
-                    renderDashboardTable();
-                }
-                
-                async function deleteMnemonico(index) {
-                    mnemonicos.splice(index, 1);
+            } catch (error) {
+                console.error('Erro ao carregar:', error);
+            }
+        }
+        
+        // Funções para Cadastro de Mnemonicos
+        async function addMnemonico() {
+            const button = document.querySelector('#mnemonicos-section button');
+            button.classList.add('loading');
+            button.disabled = true;
+            button.textContent = 'Adicionando';
+        
+            try {
+                const mnemonico = document.getElementById('mnemonico').value.trim();
+                const tipo = document.getElementById('tipo').value.trim();
+                const legenda = document.getElementById('legenda').value.trim();
+                const min = parseFloat(document.getElementById('min').value);
+                const max = parseFloat(document.getElementById('max').value);
+                if (mnemonico && tipo && legenda && !isNaN(min) && !isNaN(max)) {
+                    const newId = mnemonicos.length > 0 ? Math.max(...mnemonicos.map(m => m.id || 0)) + 1 : 1;
+                    mnemonicos.push({ id: newId, mnemonico, tipo, legenda, min, max, unitId: selectedUnitId });
                     await saveToJsonBin();
                     renderMnemonicos();
                     renderDropdowns();
-                    renderDashboardTable();
+                    document.getElementById('mnemonico').value = '';
+                    document.getElementById('tipo').value = '';
+                    document.getElementById('legenda').value = '';
+                    document.getElementById('min').value = '';
+                    document.getElementById('max').value = '';
+                } else {
+                    alert('Por favor, preencha todos os campos do mnemonico.');
                 }
-                
-                function renderMnemonicos() {
-                    const list = document.getElementById('mnemonicos-list');
-                    list.innerHTML = '';
-                    const filteredMnemonicos = mnemonicos.filter(item => item.unitId === selectedUnitId)
-                        .sort((a, b) => a.mnemonico.localeCompare(b.mnemonico));
-                    filteredMnemonicos.forEach((item, index) => {
-                        const globalIndex = mnemonicos.findIndex(m => m.id === item.id);
-                        const card = document.createElement('div');
-                        card.className = 'mnemonico-card';
-                        card.innerHTML = `
-                            <div class="card-content">
-                                <div class="card-field">
-                                    <label>Mnemonico</label>
-                                    <input type="text" value="${item.mnemonico}" onchange="updateMnemonico(${globalIndex}, 'mnemonico', this.value)">
-                                </div>
-                                <div class="card-field">
-                                    <label>Tipo</label>
-                                    <input type="text" value="${item.tipo}" onchange="updateMnemonico(${globalIndex}, 'tipo', this.value)">
-                                </div>
-                                <div class="card-field">
-                                    <label>Legenda</label>
-                                    <input type="text" value="${item.legenda}" onchange="updateMnemonico(${globalIndex}, 'legenda', this.value)">
-                                </div>
-                                <div class="card-field">
-                                    <label>Min</label>
-                                    <input type="number" step="0.1" value="${item.min}" onchange="updateMnemonico(${globalIndex}, 'min', parseFloat(this.value))">
-                                </div>
-                                <div class="card-field">
-                                    <label>Max</label>
-                                    <input type="number" step="0.1" value="${item.max}" onchange="updateMnemonico(${globalIndex}, 'max', parseFloat(this.value))">
-                                </div>
-                            </div>
-                            <button class="delete-card" onclick="deleteMnemonico(${globalIndex})">Excluir</button>
-                        `;
-                        list.appendChild(card);
-                    });
-                }
-                
-                // Funções para Cadastro de Responsáveis
-                async function addResponsavel() {
-                    if (!selectedUnitId) {
-                        alert('Por favor, selecione uma unidade antes de adicionar um responsável.');
-                        return;
-                    }
-                    const button = document.querySelector('#responsaveis-section button');
-                    button.classList.add('loading');
-                    button.disabled = true;
-                    button.textContent = 'Adicionando';
-                
-                    try {
-                        const responsavel = document.getElementById('responsavel').value.trim();
-                        if (responsavel) {
-                            const newId = responsaveis.length > 0 ? Math.max(...responsaveis.map(r => r.id || 0)) + 1 : 1;
-                            responsaveis.push({ id: newId, name: responsavel, unitId: selectedUnitId });
-                            await saveToJsonBin();
-                            renderResponsaveis();
-                            renderDropdowns();
-                            document.getElementById('responsavel').value = '';
-                        } else {
-                            alert('Por favor, preencha o campo de responsável.');
-                        }
-                    } catch (error) {
-                        console.error('Erro ao adicionar responsável:', error);
-                        alert('Erro ao salvar os dados no servidor.');
-                    } finally {
-                        button.classList.remove('loading');
-                        button.disabled = false;
-                        button.textContent = 'Adicionar';
-                    }
-                }
-                
-                async function updateResponsavel(index, value) {
-                    const trimmedValue = value.trim();
-                    if (trimmedValue === '') {
-                        document.querySelectorAll('.list-item .edit-input')[index].classList.add('invalid');
-                        return;
-                    }
-                    responsaveis[index].name = trimmedValue;
+            } catch (error) {
+                console.error('Erro ao adicionar mnemonico:', error);
+                alert('Erro ao salvar os dados no servidor.');
+            } finally {
+                button.classList.remove('loading');
+                button.disabled = false;
+                button.textContent = 'Adicionar';
+            }
+        }
+        
+        async function updateMnemonico(index, field, value) {
+            if (field === 'min' || field === 'max') {
+                if (isNaN(value)) return;
+            }
+            mnemonicos[index][field] = value;
+            await saveToJsonBin();
+            renderDropdowns();
+            renderDashboardTable();
+        }
+        
+        async function deleteMnemonico(index) {
+            mnemonicos.splice(index, 1);
+            await saveToJsonBin();
+            renderMnemonicos();
+            renderDropdowns();
+            renderDashboardTable();
+        }
+        
+        function renderMnemonicos() {
+            const list = document.getElementById('mnemonicos-list');
+            list.innerHTML = '';
+            const filteredMnemonicos = mnemonicos.filter(item => item.unitId === selectedUnitId)
+                .sort((a, b) => a.mnemonico.localeCompare(b.mnemonico));
+            filteredMnemonicos.forEach((item, index) => {
+                const globalIndex = mnemonicos.findIndex(m => m.id === item.id);
+                const card = document.createElement('div');
+                card.className = 'mnemonico-card';
+                card.innerHTML = `
+                    <div class="card-content">
+                        <div class="card-field">
+                            <label>Mnemonico</label>
+                            <input type="text" value="${item.mnemonico}" onchange="updateMnemonico(${globalIndex}, 'mnemonico', this.value)">
+                        </div>
+                        <div class="card-field">
+                            <label>Tipo</label>
+                            <input type="text" value="${item.tipo}" onchange="updateMnemonico(${globalIndex}, 'tipo', this.value)">
+                        </div>
+                        <div class="card-field">
+                            <label>Legenda</label>
+                            <input type="text" value="${item.legenda}" onchange="updateMnemonico(${globalIndex}, 'legenda', this.value)">
+                        </div>
+                        <div class="card-field">
+                            <label>Min</label>
+                            <input type="number" step="0.1" value="${item.min}" onchange="updateMnemonico(${globalIndex}, 'min', parseFloat(this.value))">
+                        </div>
+                        <div class="card-field">
+                            <label>Max</label>
+                            <input type="number" step="0.1" value="${item.max}" onchange="updateMnemonico(${globalIndex}, 'max', parseFloat(this.value))">
+                        </div>
+                    </div>
+                    <button class="delete-card" onclick="deleteMnemonico(${globalIndex})">Excluir</button>
+                `;
+                list.appendChild(card);
+            });
+        }
+        
+        // Funções para Cadastro de Responsáveis
+        async function addResponsavel() {
+            const button = document.querySelector('#responsaveis-section button');
+            button.classList.add('loading');
+            button.disabled = true;
+            button.textContent = 'Adicionando';
+        
+            try {
+                const responsavel = document.getElementById('responsavel').value.trim();
+                if (responsavel) {
+                    const newId = responsaveis.length > 0 ? Math.max(...responsaveis.map(r => r.id || 0)) + 1 : 1;
+                    responsaveis.push({ id: newId, name: responsavel, unitId: selectedUnitId });
                     await saveToJsonBin();
                     renderResponsaveis();
                     renderDropdowns();
-                    renderDashboardTable();
+                    document.getElementById('responsavel').value = '';
+                } else {
+                    alert('Por favor, preencha o campo de responsável.');
                 }
-                
-                async function deleteResponsavel(index) {
-                    responsaveis.splice(index, 1);
-                    await saveToJsonBin();
-                    renderResponsaveis();
-                    renderDropdowns();
+            } catch (error) {
+                console.error('Erro ao adicionar responsável:', error);
+                alert('Erro ao salvar os dados no servidor.');
+            } finally {
+                button.classList.remove('loading');
+                button.disabled = false;
+                button.textContent = 'Adicionar';
+            }
+        }
+        
+        async function updateResponsavel(index, value) {
+            const trimmedValue = value.trim();
+            if (trimmedValue === '') {
+                document.querySelectorAll('.list-item .edit-input')[index].classList.add('invalid');
+                return;
+            }
+            responsaveis[index].name = trimmedValue;
+            await saveToJsonBin();
+            renderResponsaveis();
+            renderDropdowns();
+            renderDashboardTable();
+        }
+        
+        async function deleteResponsavel(index) {
+            responsaveis.splice(index, 1);
+            await saveToJsonBin();
+            renderResponsaveis();
+            renderDropdowns();
+        }
+        
+        function renderResponsaveis() {
+            const list = document.getElementById('responsaveis-list');
+            list.innerHTML = '';
+            const filteredResponsaveis = responsaveis.filter(item => item.unitId === selectedUnitId)
+                .sort((a, b) => a.name.localeCompare(b.name));
+            filteredResponsaveis.forEach((item, index) => {
+                const globalIndex = responsaveis.findIndex(r => r.id === item.id);
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `
+                    <input type="text" class="edit-input" value="${item.name}" onchange="updateResponsavel(${globalIndex}, this.value)">
+                    <button onclick="deleteResponsavel(${globalIndex})">Excluir</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+        
+        // Funções para Dropdowns
+        function renderDropdowns() {
+            const mnemonicoSelect = document.getElementById('dados-mnemonico');
+            mnemonicoSelect.innerHTML = '<option value="">Selecione</option>';
+            const filterMnemonicoSelect = document.getElementById('filter-mnemonico');
+            filterMnemonicoSelect.innerHTML = '<option value="">Selecione</option>';
+            const filteredMnemonicos = mnemonicos.filter(item => item.unitId === selectedUnitId)
+                .sort((a, b) => a.mnemonico.localeCompare(b.mnemonico));
+            filteredMnemonicos.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.mnemonico;
+                mnemonicoSelect.appendChild(option.cloneNode(true));
+                filterMnemonicoSelect.appendChild(option);
+            });
+        
+            const responsavelSelect = document.getElementById('dados-responsavel');
+            responsavelSelect.innerHTML = '<option value="">Selecione</option>';
+            const filteredResponsaveis = responsaveis.filter(item => item.unitId === selectedUnitId)
+                .sort((a, b) => a.name.localeCompare(b.name));
+            filteredResponsaveis.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.name;
+                responsavelSelect.appendChild(option);
+            });
+        }
+        
+        // Função de validação para o formulário de dados
+        function validateDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeAtual) {
+            let valid = true;
+            const invalidFields = [];
+        
+            const inputs = ['manha-min', 'manha-max', 'manha-atual', 'tarde-min', 'tarde-max', 'tarde-atual', 'dados-mnemonico', 'dados-responsavel'];
+            inputs.forEach(id => {
+                document.getElementById(id).classList.remove('invalid');
+            });
+        
+            if (!document.getElementById('dados-mnemonico').value) {
+                invalidFields.push('dados-mnemonico');
+                valid = false;
+            }
+            if (!document.getElementById('dados-responsavel').value) {
+                invalidFields.push('dados-responsavel');
+                valid = false;
+            }
+        
+            if (manhaMin !== null && manhaMax !== null && manhaAtual !== null) {
+                if (manhaMin > manhaAtual || manhaMin > manhaMax) {
+                    invalidFields.push('manha-min');
+                    valid = false;
                 }
-                
-                function renderResponsaveis() {
-                    const list = document.getElementById('responsaveis-list');
-                    list.innerHTML = '';
-                    const filteredResponsaveis = responsaveis.filter(item => item.unitId === selectedUnitId)
-                        .sort((a, b) => a.name.localeCompare(b.name));
-                    filteredResponsaveis.forEach((item, index) => {
-                        const globalIndex = responsaveis.findIndex(r => r.id === item.id);
-                        const div = document.createElement('div');
-                        div.className = 'list-item';
-                        div.innerHTML = `
-                            <input type="text" class="edit-input" value="${item.name}" onchange="updateResponsavel(${globalIndex}, this.value)">
-                            <button onclick="deleteResponsavel(${globalIndex})">Excluir</button>
-                        `;
-                        list.appendChild(div);
-                    });
+                if (manhaMax < manhaAtual || manhaMax < manhaMin) {
+                    invalidFields.push('manha-max');
+                    valid = false;
                 }
-                
-                // Funções para Dropdowns
-                function renderDropdowns() {
-                    const mnemonicoSelect = document.getElementById('dados-mnemonico');
-                    mnemonicoSelect.innerHTML = '<option value="">Selecione</option>';
-                    const filterMnemonicoSelect = document.getElementById('filter-mnemonico');
-                    filterMnemonicoSelect.innerHTML = '<option value="">Selecione</option>';
-                    const filteredMnemonicos = mnemonicos.filter(item => item.unitId === selectedUnitId)
-                        .sort((a, b) => a.mnemonico.localeCompare(b.mnemonico));
-                    filteredMnemonicos.forEach(item => {
-                        const option = document.createElement('option');
-                        option.value = item.id;
-                        option.textContent = item.mnemonico;
-                        mnemonicoSelect.appendChild(option.cloneNode(true));
-                        filterMnemonicoSelect.appendChild(option);
-                    });
-                
-                    const responsavelSelect = document.getElementById('dados-responsavel');
-                    responsavelSelect.innerHTML = '<option value="">Selecione</option>';
-                    const filteredResponsaveis = responsaveis.filter(item => item.unitId === selectedUnitId)
-                        .sort((a, b) => a.name.localeCompare(b.name));
-                    filteredResponsaveis.forEach(item => {
-                        const option = document.createElement('option');
-                        option.value = item.id;
-                        option.textContent = item.name;
-                        responsavelSelect.appendChild(option);
-                    });
+                if (manhaAtual < manhaMin || manhaAtual > manhaMax) {
+                    invalidFields.push('manha-atual');
+                    valid = false;
                 }
-                
-                // Função de validação para o formulário de dados
-                function validateDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeAtual) {
-                    let valid = true;
-                    const invalidFields = [];
-                
-                    const inputs = ['manha-min', 'manha-max', 'manha-atual', 'tarde-min', 'tarde-max', 'tarde-atual', 'dados-mnemonico', 'dados-responsavel'];
-                    inputs.forEach(id => {
-                        document.getElementById(id).classList.remove('invalid');
-                    });
-                
-                    if (!document.getElementById('dados-mnemonico').value) {
-                        invalidFields.push('dados-mnemonico');
-                        valid = false;
-                    }
-                    if (!document.getElementById('dados-responsavel').value) {
-                        invalidFields.push('dados-responsavel');
-                        valid = false;
-                    }
-                
-                    if (manhaMin !== null && manhaMax !== null && manhaAtual !== null) {
-                        if (manhaMin > manhaAtual || manhaMin > manhaMax) {
-                            invalidFields.push('manha-min');
-                            valid = false;
-                        }
-                        if (manhaMax < manhaAtual || manhaMax < manhaMin) {
-                            invalidFields.push('manha-max');
-                            valid = false;
-                        }
-                        if (manhaAtual < manhaMin || manhaAtual > manhaMax) {
-                            invalidFields.push('manha-atual');
-                            valid = false;
-                        }
-                    } else if (manhaMin !== null && manhaAtual === null) {
-                        invalidFields.push('manha-min');
-                        valid = false;
-                    } else if (manhaMax !== null && manhaAtual === null) {
-                        invalidFields.push('manha-max');
-                        valid = false;
-                    }
-                
-                    if (tardeMin !== null && tardeMax !== null && tardeAtual !== null) {
-                        if (tardeMin > tardeAtual || tardeMin > tardeMax) {
-                            invalidFields.push('tarde-min');
-                            valid = false;
-                        }
-                        if (tardeMax < tardeAtual || tardeMax < tardeMin) {
-                            invalidFields.push('tarde-max');
-                            valid = false;
-                        }
-                        if (tardeAtual < tardeMin || tardeAtual > tardeMax) {
-                            invalidFields.push('tarde-atual');
-                            valid = false;
-                        }
-                    } else if (tardeMin !== null && tardeAtual === null) {
-                        invalidFields.push('tarde-min');
-                        valid = false;
-                    } else if (tardeMax !== null && tardeAtual === null) {
-                        invalidFields.push('tarde-max');
-                        valid = false;
-                    }
-                
-                    invalidFields.forEach(field => {
-                        document.getElementById(field).classList.add('invalid');
-                    });
-                
-                    return valid;
+            } else if (manhaMin !== null && manhaAtual === null) {
+                invalidFields.push('manha-min');
+                valid = false;
+            } else if (manhaMax !== null && manhaAtual === null) {
+                invalidFields.push('manha-max');
+                valid = false;
+            }
+        
+            if (tardeMin !== null && tardeMax !== null && tardeAtual !== null) {
+                if (tardeMin > tardeAtual || tardeMin > tardeMax) {
+                    invalidFields.push('tarde-min');
+                    valid = false;
                 }
-                
-                // Funções para Dados
-                async function addDado() {
-                    if (!selectedUnitId) {
-                        alert('Por favor, selecione uma unidade antes de adicionar dados.');
-                        return;
-                    }
-                    const button = document.querySelector('#dados button');
-                    button.classList.add('loading');
-                    button.disabled = true;
-                    button.textContent = '';
-                    try {
-                        const data = document.getElementById('data').value;
-                        const mnemonicoId = parseInt(document.getElementById('dados-mnemonico').value);
-                        const responsavelId = parseInt(document.getElementById('dados-responsavel').value);
-                
-                        const manhaMin = document.getElementById('manha-min').value.trim() === '' ? null : parseFloat(document.getElementById('manha-min').value);
-                        const manhaMax = document.getElementById('manha-max').value.trim() === '' ? null : parseFloat(document.getElementById('manha-max').value);
-                        const manhaAtual = document.getElementById('manha-atual').value.trim() === '' ? null : parseFloat(document.getElementById('manha-atual').value);
-                        const tardeMin = document.getElementById('tarde-min').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-min').value);
-                        const tardeMax = document.getElementById('tarde-max').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-max').value);
-                        const tardeAtual = document.getElementById('tarde-atual').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-atual').value);
-                
-                        if (validateDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeAtual) && data && mnemonicoId && responsavelId) {
-                            const newDado = {
-                                data,
-                                mnemonicoId,
-                                responsavelId,
-                                manhaMin,
-                                manhaMax,
-                                manhaAtual,
-                                tardeMin,
-                                tardeMax,
-                                tardeAtual,
-                                unitId: selectedUnitId,
-                                annotation: null
-                            };
-                            dados.unshift(newDado);
-                            dados.sort((a, b) => new Date(b.data) - new Date(a.data));
-                            if (dados.filter(item => item.unitId === selectedUnitId).length > 50) {
-                                const oldest = dados.filter(item => item.unitId === selectedUnitId).slice(-1)[0];
-                                const index = dados.findIndex(item => item === oldest);
-                                dados.splice(index, 1);
-                            }
-                            await saveToJsonBin();
-                            currentPage = 1;
-                            renderDadosCards();
-                            renderPagination();
-                            renderDashboardTable();
-                            showSuccessAlert();
-                            if (manhaAtual === null && tardeAtual === null) {
-                                const globalIndex = dados.findIndex(d =>
-                                    d.data === newDado.data &&
-                                    d.mnemonicoId === newDado.mnemonicoId &&
-                                    d.responsavelId === newDado.responsavelId &&
-                                    d.unitId === newDado.unitId
-                                );
-                                if (globalIndex !== -1) {
-                                    openAnnotationModal(globalIndex);
-                                }
-                            }
-                            clearDadosForm();
-                            // Redirecionar para a aba Dashboard
-                            redirectToDashboard();
-                        } else {
-                            alert('Por favor, corrija os campos inválidos (data, mnemonico e responsável são obrigatórios).');
-                        }
-                    } catch (error) {
-                        console.error('Erro ao adicionar dado:', error);
-                        alert('Erro ao salvar os dados no servidor.');
-                    } finally {
-                        button.classList.remove('loading');
-                        button.disabled = false;
-                        button.textContent = 'Adicionar';
-                    }
+                if (tardeMax < tardeAtual || tardeMax < tardeMin) {
+                    invalidFields.push('tarde-max');
+                    valid = false;
                 }
-                
-                // Função para validar dados puramente no modelo
-                function validateDadoByIndex(index) {
-                    if (index < 0 || index >= dados.length || !dados[index] || dados[index].unitId !== selectedUnitId) {
-                        return { valid: false, invalidFields: [] };
-                    }
-                
-                    const item = dados[index];
-                    const manhaMin = item.manhaMin;
-                    const manhaMax = item.manhaMax;
-                    const manhaAtual = item.manhaAtual;
-                    const tardeMin = item.tardeMin;
-                    const tardeMax = item.tardeMax;
-                    const tardeAtual = item.tardeAtual;
-                
-                    let valid = true;
-                    const invalidFields = [];
-                
-                    if (manhaMin !== null && manhaMax !== null && manhaAtual !== null) {
-                        if (manhaMin > manhaAtual || manhaMin > manhaMax) {
-                            invalidFields.push('manhaMin');
-                            valid = false;
-                        }
-                        if (manhaMax < manhaAtual || manhaMax < manhaMin) {
-                            invalidFields.push('manhaMax');
-                            valid = false;
-                        }
-                        if (manhaAtual < manhaMin || manhaAtual > manhaMax) {
-                            invalidFields.push('manhaAtual');
-                            valid = false;
-                        }
-                    } else if (manhaMin !== null && manhaAtual === null) {
-                        invalidFields.push('manhaMin');
-                        valid = false;
-                    } else if (manhaMax !== null && manhaAtual === null) {
-                        invalidFields.push('manhaMax');
-                        valid = false;
-                    }
-                
-                    if (tardeMin !== null && tardeMax !== null && tardeAtual !== null) {
-                        if (tardeMin > tardeAtual || tardeMin > tardeMax) {
-                            invalidFields.push('tardeMin');
-                            valid = false;
-                        }
-                        if (tardeMax < tardeAtual || tardeMax < tardeMin) {
-                            invalidFields.push('tardeMax');
-                            valid = false;
-                        }
-                        if (tardeAtual < tardeMin || tardeAtual > tardeMax) {
-                            invalidFields.push('tardeAtual');
-                            valid = false;
-                        }
-                    } else if (tardeMin !== null && tardeAtual === null) {
-                        invalidFields.push('tardeMin');
-                        valid = false;
-                    } else if (tardeMax !== null && tardeAtual === null) {
-                        invalidFields.push('tardeMax');
-                        valid = false;
-                    }
-                
-                    return { valid, invalidFields };
+                if (tardeAtual < tardeMin || tardeAtual > tardeMax) {
+                    invalidFields.push('tarde-atual');
+                    valid = false;
                 }
-                
-                function clearDadosForm() {
-                    const today = new Date().toISOString().split('T')[0];
-                    document.getElementById('data').value = today;
-                    document.getElementById('dados-mnemonico').value = '';
-                    document.getElementById('dados-responsavel').value = '';
-                    document.getElementById('manha-min').value = '';
-                    document.getElementById('manha-max').value = '';
-                    document.getElementById('manha-atual').value = '';
-                    document.getElementById('tarde-min').value = '';
-                    document.getElementById('tarde-max').value = '';
-                    document.getElementById('tarde-atual').value = '';
-                    const inputs = ['manha-min', 'manha-max', 'manha-atual', 'tarde-min', 'tarde-max', 'tarde-atual', 'dados-mnemonico', 'dados-responsavel'];
-                    inputs.forEach(id => {
-                        document.getElementById(id).classList.remove('invalid');
-                    });
-                }
-                
-                function renderDadosCards() {
-                    const cardsContainer = document.getElementById('dados-cards');
-                    cardsContainer.innerHTML = '';
-                    const filteredDados = dados.filter(item => item.unitId === selectedUnitId)
-                        .sort((a, b) => {
-                            const dateA = new Date(a.data);
-                            const dateB = new Date(b.data);
-                            dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
-                            dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
-                            const dateComparison = dateB - dateA;
-                            if (dateComparison !== 0) return dateComparison;
-                            const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
-                            const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
-                            return mnemonicoA.localeCompare(mnemonicoB);
-                        });
-                    const start = (currentPage - 1) * itemsPerPage;
-                    const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
-                
-                    paginatedDados.forEach((item, localIndex) => {
-                        const globalIndex = dados.findIndex(d => 
-                            d.data === item.data &&
-                            d.mnemonicoId === item.mnemonicoId &&
-                            d.responsavelId === item.responsavelId &&
-                            d.unitId === item.unitId
-                        );
-                
-                        if (globalIndex === -1) {
-                            console.warn('Índice global não encontrado para o item:', item);
-                            return;
-                        }
-                
-                        const mnemonico = mnemonicos.find(m => m.id === item.mnemonicoId)?.mnemonico || 'Desconhecido';
-                        const responsavel = responsaveis.find(r => r.id === item.responsavelId)?.name || 'Desconhecido';
-                
-                        const card = document.createElement('div');
-                        card.className = 'dados-card';
-                        card.innerHTML = `
-                            <div class="field">
-                                <label>Data</label>
-                                <input type="date" value="${item.data}" onchange="updateDado(${globalIndex}, 'data', this.value)">
-                            </div>
-                            <div class="field">
-                                <label>Mnemonico</label>
-                                <input type="text" value="${mnemonico}" readonly>
-                            </div>
-                            <div class="field">
-                                <label>Responsável</label>
-                                <input type="text" value="${responsavel}" readonly>
-                            </div>
-                            <div class="field">
-                                <label>⛅ Min ºC</label>
-                                <input type="number" step="0.1" value="${item.manhaMin !== null ? item.manhaMin : ''}" onchange="updateDado(${globalIndex}, 'manhaMin', this.value.trim() === '' ? null : parseFloat(this.value))">
-                            </div>
-                            <div class="field">
-                                <label>⛅ Max ºC</label>
-                                <input type="number" step="0.1" value="${item.manhaMax !== null ? item.manhaMax : ''}" onchange="updateDado(${globalIndex}, 'manhaMax', this.value.trim() === '' ? null : parseFloat(this.value))">
-                            </div>
-                            <div class="field">
-                                <label>⛅ Atual ºC</label>
-                                <input type="number" step="0.1" value="${item.manhaAtual !== null ? item.manhaAtual : ''}" onchange="updateDado(${globalIndex}, 'manhaAtual', this.value.trim() === '' ? null : parseFloat(this.value))">
-                            </div>
-                            <div class="field">
-                                <label>🌞 Min ºC</label>
-                                <input type="number" step="0.1" value="${item.tardeMin !== null ? item.tardeMin : ''}" onchange="updateDado(${globalIndex}, 'tardeMin', this.value.trim() === '' ? null : parseFloat(this.value))">
-                            </div>
-                            <div class="field">
-                                <label>🌞 Max ºC</label>
-                                <input type="number" step="0.1" value="${item.tardeMax !== null ? item.tardeMax : ''}" onchange="updateDado(${globalIndex}, 'tardeMax', this.value.trim() === '' ? null : parseFloat(this.value))">
-                            </div>
-                            <div class="field">
-                                <label>🌞 Atual ºC</label>
-                                <input type="number" step="0.1" value="${item.tardeAtual !== null ? item.tardeAtual : ''}" onchange="updateDado(${globalIndex}, 'tardeAtual', this.value.trim() === '' ? null : parseFloat(this.value))">
-                            </div>
-                            <button class="delete-card" onclick="deleteDado(${globalIndex})">&#10006;</button>
-                            <i class="fas fa-sticky-note annotation-icon ${item.annotation ? 'has-note' : ''}" onclick="openAnnotationModal(${globalIndex})"></i>
-                        `;
-                        cardsContainer.appendChild(card);
-                
-                        validateCard(globalIndex);
-                    });
-                    renderPagination();
-                }
-                
-                async function updateDado(index, field, value) {
-                    // Encontrar o card correspondente ao globalIndex
-                    const filteredDados = dados
-                        .filter(item => item.unitId === selectedUnitId)
-                        .sort((a, b) => {
-                            const dateA = new Date(a.data);
-                            const dateB = new Date(b.data);
-                            dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
-                            dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
-                            const dateComparison = dateB - dateA;
-                            if (dateComparison !== 0) return dateComparison;
-                            const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
-                            const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
-                            return mnemonicoA.localeCompare(mnemonicoB);
-                        });
-                
-                    const start = (currentPage - 1) * itemsPerPage;
-                    const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
-                    const cardIndex = paginatedDados.findIndex(d => 
-                        d.data === dados[index].data &&
-                        d.mnemonicoId === dados[index].mnemonicoId &&
-                        d.responsavelId === dados[index].responsavelId &&
-                        d.unitId === dados[index].unitId
-                    );
-                
-                    let card = null;
-                    if (cardIndex !== -1) {
-                        const cards = document.querySelectorAll('.dados-card');
-                        if (cardIndex < cards.length) {
-                            card = cards[cardIndex];
-                            card.classList.add('loading');
-                            card.style.opacity = '0.7';
-                            card.style.transition = 'opacity 0.3s ease';
-                        }
-                    }
-                
-                    try {
-                        // Atualizar o campo
-                        if (['manhaMin', 'manhaMax', 'manhaAtual', 'tardeMin', 'tardeMax', 'tardeAtual'].includes(field)) {
-                            dados[index][field] = value === '' ? null : parseFloat(value);
-                        } else if (field === 'data') {
-                            dados[index][field] = value;
-                        }
-                
-                        // Validar o card
-                        const isValid = validateCard(index);
-                
-                        const manhaAtual = dados[index].manhaAtual;
-                        const tardeAtual = dados[index].tardeAtual;
-                        const manhaMin = dados[index].manhaMin;
-                        const manhaMax = dados[index].manhaMax;
-                        const tardeMin = dados[index].tardeMin;
-                        const tardeMax = dados[index].tardeMax;
-                
-                        const canSendManha = manhaAtual !== null && (
-                            (manhaMin === null && manhaMax === null) ||
-                            (manhaMin !== null && manhaMax !== null && isValid)
-                        );
-                        const canSendTarde = tardeAtual !== null && (
-                            (tardeMin === null && tardeMax === null) ||
-                            (tardeMin !== null && tardeMax !== null && isValid)
-                        );
-                
-                        if (isValid && (canSendManha || canSendTarde || field === 'data')) {
-                            await saveToJsonBin();
-                            renderDadosCards();
-                            renderDashboardTable();
-                            updateCharts();
-                            showSuccessAlert();
-                            // Redirecionar para a aba Dashboard
-                            redirectToDashboard();
-                        } else {
-                            renderDadosCards(); // Re-renderizar para garantir que a validação visual esteja correta
-                            showAlert();
-                        }
-                    } catch (error) {
-                        console.error('Erro ao atualizar dado:', error);
-                        renderDadosCards();
-                    } finally {
-                        if (card) {
-                            card.classList.remove('loading');
-                            card.style.opacity = '1';
-                        }
-                    }
-                }
-                
-                function validateCard(globalIndex) {
-                    const validation = validateDadoByIndex(globalIndex);
-                    if (!validation.valid) {
-                        console.warn(`Validação falhou para o índice ${globalIndex}:`, validation.invalidFields);
-                    }
-                
-                    // Encontrar o card correspondente ao globalIndex
-                    const filteredDados = dados
-                        .filter(item => item && item.unitId === selectedUnitId)
-                        .sort((a, b) => {
-                            const dateA = new Date(a.data);
-                            const dateB = new Date(b.data);
-                            dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
-                            dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
-                            const dateComparison = dateB - dateA;
-                            if (dateComparison !== 0) return dateComparison;
-                            const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
-                            const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
-                            return mnemonicoA.localeCompare(mnemonicoB);
-                        });
-                
-                    const start = (currentPage - 1) * itemsPerPage;
-                    const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
-                    const cardIndex = paginatedDados.findIndex(d => 
-                        d && 
-                        d.data === dados[globalIndex].data &&
-                        d.mnemonicoId === dados[globalIndex].mnemonicoId &&
-                        d.responsavelId === dados[globalIndex].responsavelId &&
-                        d.unitId === dados[globalIndex].unitId
-                    );
-                
-                    if (cardIndex !== -1) {
-                        const cards = document.querySelectorAll('.dados-card');
-                        if (cardIndex < cards.length) {
-                            const card = cards[cardIndex];
-                
-                            const fieldSelectors = {
-                                manhaMin: 'input[onchange*="\'manhaMin\'"]',
-                                manhaMax: 'input[onchange*="\'manhaMax\'"]',
-                                manhaAtual: 'input[onchange*="\'manhaAtual\'"]',
-                                tardeMin: 'input[onchange*="\'tardeMin\'"]',
-                                tardeMax: 'input[onchange*="\'tardeMax\'"]',
-                                tardeAtual: 'input[onchange*="\'tardeAtual\'"]'
-                            };
-                
-                            // Remover classes 'invalid' de todos os campos
-                            Object.values(fieldSelectors).forEach(selector => {
-                                const input = card.querySelector(selector);
-                                if (input) input.classList.remove('invalid');
-                            });
-                
-                            // Adicionar classe 'invalid' aos campos inválidos
-                            validation.invalidFields.forEach(field => {
-                                const input = card.querySelector(fieldSelectors[field]);
-                                if (input) input.classList.add('invalid');
-                            });
-                        }
-                    }
-                
-                    return validation.valid;
-                }
-                
-                async function deleteDado(index) {
-                    const button = document.querySelectorAll('.dados-card .delete-card')[index % itemsPerPage];
-                    if (button) {
-                        button.classList.add('loading');
-                        button.disabled = true;
-                        button.innerHTML = '<span class="spinner"></span>';
-                    }
-                
-                    try {
-                        dados.splice(index, 1);
-                        if (currentPage > Math.ceil(dados.filter(item => item.unitId === selectedUnitId).length / itemsPerPage)) {
-                            currentPage = Math.max(1, Math.ceil(dados.filter(item => item.unitId === selectedUnitId).length / itemsPerPage));
-                        }
-                        dados.sort((a, b) => new Date(b.data) - new Date(a.data));
-                        await saveToJsonBin();
-                        renderDadosCards();
-                        renderPagination();
-                        renderDashboardTable();
-                        // Redirecionar para a aba Dashboard
-                        redirectToDashboard();
-                    } catch (error) {
-                        console.error('Erro ao deletar dado:', error);
-                        alert('Erro ao deletar o dado no servidor.');
-                    } finally {
-                        if (button) {
-                            button.classList.remove('loading');
-                            button.disabled = false;
-                            button.innerHTML = '&#10006;';
-                        }
-                    }
-                }
-                
-                function renderPagination() {
-                    const paginationContainer = document.getElementById('pagination');
-                    paginationContainer.innerHTML = '';
-                    const filteredDados = dados.filter(item => item.unitId === selectedUnitId);
-                    const totalPages = Math.ceil(filteredDados.length / itemsPerPage);
-                
-                    if (totalPages <= 1) return;
-                
-                    const firstButton = document.createElement('button');
-                    firstButton.textContent = '<';
-                    firstButton.className = 'first-page';
-                    firstButton.disabled = currentPage === 1;
-                    firstButton.addEventListener('click', () => {
-                        currentPage = 1;
-                        renderDadosCards();
-                        renderPagination();
-                    });
-                    paginationContainer.appendChild(firstButton);
-                
-                    let startPage = Math.max(1, currentPage - Math.floor(maxPagesDisplayed / 2));
-                    let endPage = Math.min(totalPages, startPage + maxPagesDisplayed - 1);
-                
-                    if (endPage - startPage + 1 < maxPagesDisplayed) {
-                        startPage = Math.max(1, endPage - maxPagesDisplayed + 1);
-                    }
-                
-                    for (let i = startPage; i <= endPage; i++) {
-                        const button = document.createElement('button');
-                        button.textContent = i;
-                        button.className = i === currentPage ? 'active' : '';
-                        button.addEventListener('click', () => {
-                            currentPage = i;
-                            renderDadosCards();
-                            renderPagination();
-                        });
-                        paginationContainer.appendChild(button);
-                    }
-                
-                    const lastButton = document.createElement('button');
-                    lastButton.textContent = '>';
-                    lastButton.disabled = currentPage === totalPages;
-                    lastButton.addEventListener('click', () => {
-                        currentPage = totalPages;
-                        renderDadosCards();
-                        renderPagination();
-                    });
-                    paginationContainer.appendChild(lastButton);
-                }
-                
-                function saveDashboardFilters() {
-                    const filters = {
-                        mes: document.getElementById('filter-mes').value,
-                        ano: document.getElementById('filter-ano').value,
-                        mnemonicoId: document.getElementById('filter-mnemonico').value
+            } else if (tardeMin !== null && tardeAtual === null) {
+                invalidFields.push('tarde-min');
+                valid = false;
+            } else if (tardeMax !== null && tardeAtual === null) {
+                invalidFields.push('tarde-max');
+                valid = false;
+            }
+        
+            invalidFields.forEach(field => {
+                document.getElementById(field).classList.add('invalid');
+            });
+        
+            return valid;
+        }
+        
+        // Funções para Dados
+        async function addDado() {
+            const button = document.querySelector('#dados button');
+            button.classList.add('loading');
+            button.disabled = true;
+            button.textContent = '';
+            try {
+                const data = document.getElementById('data').value;
+                const mnemonicoId = parseInt(document.getElementById('dados-mnemonico').value);
+                const responsavelId = parseInt(document.getElementById('dados-responsavel').value);
+        
+                const manhaMin = document.getElementById('manha-min').value.trim() === '' ? null : parseFloat(document.getElementById('manha-min').value);
+                const manhaMax = document.getElementById('manha-max').value.trim() === '' ? null : parseFloat(document.getElementById('manha-max').value);
+                const manhaAtual = document.getElementById('manha-atual').value.trim() === '' ? null : parseFloat(document.getElementById('manha-atual').value);
+                const tardeMin = document.getElementById('tarde-min').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-min').value);
+                const tardeMax = document.getElementById('tarde-max').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-max').value);
+                const tardeAtual = document.getElementById('tarde-atual').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-atual').value);
+        
+                if (validateDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeAtual) && data && mnemonicoId && responsavelId) {
+                    const newDado = {
+                        data,
+                        mnemonicoId,
+                        responsavelId,
+                        manhaMin,
+                        manhaMax,
+                        manhaAtual,
+                        tardeMin,
+                        tardeMax,
+                        tardeAtual,
+                        unitId: selectedUnitId,
+                        annotation: null
                     };
-                    localStorage.setItem(`dashboardFilters_${selectedUnitId}`, JSON.stringify(filters));
-                }
-                
-                function loadDashboardFilters() {
-                    const savedFilters = localStorage.getItem(`dashboardFilters_${selectedUnitId}`);
-                    if (savedFilters) {
-                        const filters = JSON.parse(savedFilters);
-                        document.getElementById('filter-mes').value = filters.mes || '';
-                        document.getElementById('filter-ano').value = filters.ano || '';
-                        document.getElementById('filter-mnemonico').value = filters.mnemonicoId || '';
-                
-                        if (filters.mnemonicoId) {
-                            const mnemonicoData = mnemonicos.find(item => item.id === parseInt(filters.mnemonicoId) && item.unitId === selectedUnitId);
-                            if (mnemonicoData) {
-                                document.getElementById('mnemonico-tipo').textContent = mnemonicoData.tipo;
-                                document.getElementById('mnemonico-legenda').textContent = mnemonicoData.legenda;
-                                document.getElementById('mnemonico-min').textContent = mnemonicoData.min.toFixed(1);
-                                document.getElementById('mnemonico-max').textContent = mnemonicoData.max.toFixed(1);
-                            }
-                        }
+                    dados.unshift(newDado);
+                    dados.sort((a, b) => new Date(b.data) - new Date(a.data));
+                    if (dados.filter(item => item.unitId === selectedUnitId).length > 50) {
+                        const oldest = dados.filter(item => item.unitId === selectedUnitId).slice(-1)[0];
+                        const index = dados.findIndex(item => item === oldest);
+                        dados.splice(index, 1);
                     }
-                }
-                
-                function toggleCadastroSection(section) {
-                    document.getElementById('mnemonicos-section').classList.add('hidden');
-                    document.getElementById('responsaveis-section').classList.add('hidden');
-                
-                    document.querySelectorAll('.toggle-button').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                
-                    const sectionElement = document.getElementById(`${section}-section`);
-                    sectionElement.classList.remove('hidden');
-                
-                    const button = event.target.closest('.toggle-button');
-                    button.classList.add('active');
-                }
-                
-                function formatDateBR(dateString) {
-                    const [year, month, day] = dateString.split('-').map(Number);
-                    return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
-                }
-                
-                function createCharts() {
-                    createManhaChart();
-                    createTardeChart();
-                }
-                
-                function createManhaChart() {
-                    const ctx = document.getElementById('manhaChart').getContext('2d');
-                    if (manhaChart) {
-                        manhaChart.destroy();
-                    }
-                
-                    const filteredDados = getFilteredDataForCharts();
-                    const mnemonicoData = getCurrentMnemonicoData();
-                
-                    const validDados = filteredDados.filter(item => 
-                        item.manhaMin !== null || item.manhaMax !== null || item.manhaAtual !== null
-                    );
-                
-                    manhaChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: validDados.map(item => formatDateBR(item.data)),
-                            datasets: [
-                                {
-                                    label: 'Min ºC',
-                                    data: validDados.map(item => item.manhaMin !== null ? item.manhaMin : null),
-                                    borderColor: '#3498db',
-                                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                                    tension: 0.4,
-                                    spanGaps: true
-                                },
-                                {
-                                    label: 'Max ºC',
-                                    data: validDados.map(item => item.manhaMax !== null ? item.manhaMax : null),
-                                    borderColor: '#e74c3c',
-                                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                                    tension: 0.4,
-                                    spanGaps: true
-                                },
-                                {
-                                    label: 'Atual ºC',
-                                    data: validDados.map(item => item.manhaAtual !== null ? item.manhaAtual : null),
-                                    borderColor: '#2ecc71',
-                                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                                    tension: 0.4,
-                                    spanGaps: true
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                },
-                                annotation: {
-                                    annotations: mnemonicoData ? [
-                                        {
-                                            type: 'line',
-                                            yMin: mnemonicoData.min,
-                                            yMax: mnemonicoData.min,
-                                            borderColor: '#bf0000',
-                                            borderWidth: 2,
-                                            borderDash: [],
-                                            label: {
-                                                content: `Min Ideal: ${mnemonicoData.min}ºC`,
-                                                enabled: true,
-                                                position: 'start',
-                                                backgroundColor: 'rgba(0,0,0,0.8)',
-                                                color: '#fff',
-                                                padding: 6,
-                                                font: {
-                                                    size: 12
-                                                }
-                                            }
-                                        },
-                                        {
-                                            type: 'line',
-                                            yMin: mnemonicoData.max,
-                                            yMax: mnemonicoData.max,
-                                            borderColor: '#bf0000',
-                                            borderWidth: 2,
-                                            borderDash: [],
-                                            label: {
-                                                content: `Max Ideal: ${mnemonicoData.max}ºC`,
-                                                enabled: true,
-                                                position: 'start',
-                                                backgroundColor: 'rgba(0,0,0,0.8)',
-                                                color: '#fff',
-                                                padding: 6,
-                                                font: {
-                                                    size: 12
-                                                }
-                                            }
-                                        }
-                                    ] : []
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: false,
-                                    title: {
-                                        display: true,
-                                        text: 'Temperatura (ºC)'
-                                    }
-                                },
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Data'
-                                    },
-                                    ticks: {
-                                        autoSkip: false
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-                
-                function createTardeChart() {
-                    const ctx = document.getElementById('tardeChart').getContext('2d');
-                    if (tardeChart) {
-                        tardeChart.destroy();
-                    }
-                
-                    const filteredDados = getFilteredDataForCharts();
-                    const mnemonicoData = getCurrentMnemonicoData();
-                
-                    const validDados = filteredDados.filter(item => 
-                        item.tardeMin !== null || item.tardeMax !== null || item.tardeAtual !== null
-                    );
-                
-                    tardeChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: validDados.map(item => formatDateBR(item.data)),
-                            datasets: [
-                                {
-                                    label: 'Min ºC',
-                                    data: validDados.map(item => item.tardeMin !== null ? item.tardeMin : null),
-                                    borderColor: '#3498db',
-                                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                                    tension: 0.4,
-                                    spanGaps: true
-                                },
-                                {
-                                    label: 'Max ºC',
-                                    data: validDados.map(item => item.tardeMax !== null ? item.tardeMax : null),
-                                    borderColor: '#e74c3c',
-                                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                                    tension: 0.4,
-                                    spanGaps: true
-                                },
-                                {
-                                    label: 'Atual ºC',
-                                    data: validDados.map(item => item.tardeAtual !== null ? item.tardeAtual : null),
-                                    borderColor: '#2ecc71',
-                                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                                    tension: 0.4,
-                                    spanGaps: true
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                },
-                                annotation: {
-                                    annotations: mnemonicoData ? [
-                                        {
-                                            type: 'line',
-                                            yMin: mnemonicoData.min,
-                                            yMax: mnemonicoData.min,
-                                            borderColor: '#bf0000',
-                                            borderWidth: 2,
-                                            borderDash: [],
-                                            label: {
-                                                content: `Min Ideal: ${mnemonicoData.min}ºC`,
-                                                enabled: true,
-                                                position: 'start',
-                                                backgroundColor: 'rgba(0,0,0,0.8)',
-                                                color: '#fff',
-                                                padding: 6,
-                                                font: {
-                                                    size: 12
-                                                }
-                                            }
-                                        },
-                                        {
-                                            type: 'line',
-                                            yMin: mnemonicoData.max,
-                                            yMax: mnemonicoData.max,
-                                            borderColor: '#bf0000',
-                                            borderWidth: 2,
-                                            borderDash: [],
-                                            label: {
-                                                content: `Max Ideal: ${mnemonicoData.max}ºC`,
-                                                enabled: true,
-                                                position: 'start',
-                                                backgroundColor: 'rgba(0,0,0,0.8)',
-                                                color: '#fff',
-                                                padding: 6,
-                                                font: {
-                                                    size: 12
-                                                }
-                                            }
-                                        }
-                                    ] : []
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: false,
-                                    title: {
-                                        display: true,
-                                        text: 'Temperatura (ºC)'
-                                    }
-                                },
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Data'
-                                    },
-                                    ticks: {
-                                        autoSkip: false
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-                
-                function getFilteredDataForCharts() {
-                    const mes = document.getElementById('filter-mes').value;
-                    const ano = document.getElementById('filter-ano').value;
-                    const mnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
-                
-                    if (!mes || !ano || !mnemonicoId || !selectedUnitId) {
-                        return [];
-                    }
-                
-                    return dados.filter(item => {
-                        const [itemYear, itemMonth] = item.data.split('-').map(Number);
-                        return itemMonth === parseInt(mes) &&
-                               itemYear === parseInt(ano) &&
-                               item.mnemonicoId === mnemonicoId &&
-                               item.unitId === selectedUnitId;
-                    }).sort((a, b) => a.data.localeCompare(b.data));
-                }
-                
-                function getCurrentMnemonicoData() {
-                    const mnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
-                    return mnemonicos.find(m => m.id === mnemonicoId && m.unitId === selectedUnitId);
-                }
-                
-                function updateCharts() {
-                    if (manhaChart && tardeChart) {
-                        createManhaChart();
-                        createTardeChart();
-                    }
-                }
-                
-                function renderDashboardFilters() {
-                    const anoSelect = document.getElementById('filter-ano');
-                    const currentYear = new Date().getFullYear();
-                    anoSelect.innerHTML = '<option value="">Selecione</option>';
-                    for (let i = currentYear; i >= currentYear - 2; i--) {
-                        const option = document.createElement('option');
-                        option.value = i;
-                        option.textContent = i;
-                        anoSelect.appendChild(option);
-                    }
-                
-                    const savedFilters = localStorage.getItem(`dashboardFilters_${selectedUnitId}`);
-                    if (!savedFilters) {
-                        anoSelect.value = currentYear;
-                        saveDashboardFilters();
-                    }
-                
-                    document.getElementById('filter-mnemonico').addEventListener('change', function() {
-                        const mnemonicoId = parseInt(this.value);
-                        const mnemonicoData = mnemonicos.find(item => item.id === mnemonicoId && item.unitId === selectedUnitId);
-                        document.getElementById('mnemonico-tipo').textContent = mnemonicoData ? mnemonicoData.tipo : '';
-                        document.getElementById('mnemonico-legenda').textContent = mnemonicoData ? mnemonicoData.legenda : '';
-                        document.getElementById('mnemonico-min').textContent = mnemonicoData ? mnemonicoData.min.toFixed(1) : '';
-                        document.getElementById('mnemonico-max').textContent = mnemonicoData ? mnemonicoData.max.toFixed(1) : '';
-                        saveDashboardFilters();
-                        renderDashboardTable();
-                    });
-                
-                    document.getElementById('filter-mes').addEventListener('change', function() {
-                        saveDashboardFilters();
-                        renderDashboardTable();
-                    });
-                
-                    document.getElementById('filter-ano').addEventListener('change', function() {
-                        saveDashboardFilters();
-                        renderDashboardTable();
-                    });
-                }
-                
-                function renderDashboardTable() {
-                    const mes = document.getElementById('filter-mes').value;
-                    const ano = document.getElementById('filter-ano').value;
-                    const mnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
-                    const tbody = document.querySelector('#dashboard-table tbody');
-                    tbody.innerHTML = '';
-                
-                    if (!mes || !ano || !mnemonicoId || !selectedUnitId) {
-                        return;
-                    }
-                
-                    const filteredDados = dados.filter(item => {
-                        const [itemYear, itemMonth] = item.data.split('-').map(Number);
-                        return itemMonth === parseInt(mes) &&
-                               itemYear === parseInt(ano) &&
-                               item.mnemonicoId === mnemonicoId &&
-                               item.unitId === selectedUnitId;
-                    }).sort((a, b) => {
-                        const dateComparison = b.data.localeCompare(a.data);
-                        if (dateComparison !== 0) return dateComparison;
-                        const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
-                        const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
-                        return mnemonicoA.localeCompare(mnemonicoB);
-                    });
-                
-                    filteredDados.forEach((item, index) => {
-                        const globalIndex = dados.findIndex(d => 
-                            d.data === item.data &&
-                            d.mnemonicoId === item.mnemonicoId &&
-                            d.responsavelId === item.responsavelId &&
-                            d.unitId === item.unitId
+                    await saveToJsonBin();
+                    currentPage = 1;
+                    renderDadosCards();
+                    renderPagination();
+                    renderDashboardTable();
+                    showSuccessAlert();
+                    if (manhaAtual === null && tardeAtual === null) {
+                        const globalIndex = dados.findIndex(d =>
+                            d.data === newDado.data &&
+                            d.mnemonicoId === newDado.mnemonicoId &&
+                            d.responsavelId === newDado.responsavelId &&
+                            d.unitId === newDado.unitId
                         );
-                
-                        if (globalIndex === -1) {
-                            console.error('Índice global não encontrado para o item:', item);
-                            return;
+                        if (globalIndex !== -1) {
+                            openAnnotationModal(globalIndex);
                         }
-                
-                        const row = document.createElement('tr');
-                
-                        const mnemonicoData = mnemonicos.find(m => m.id === item.mnemonicoId && m.unitId === selectedUnitId);
-                        const responsavel = responsaveis.find(r => r.id === item.responsavelId)?.name || 'Desconhecido';
-                        const mnemonico = mnemonicoData ? mnemonicoData.mnemonico : 'Desconhecido';
-                
-                        let manhaMinClass = '', manhaMaxClass = '', manhaAtualClass = '';
-                        let tardeMinClass = '', tardeMaxClass = '', tardeAtualClass = '';
-                        if (mnemonicoData) {
-                            if (item.manhaMin !== null) {
-                                if (item.manhaMin < mnemonicoData.min - 1 || item.manhaMin > mnemonicoData.max + 1) {
-                                    manhaMinClass = 'out-of-range';
-                                } else if (item.manhaMin >= mnemonicoData.min - 1 && item.manhaMin <= mnemonicoData.min ||
-                                           item.manhaMin >= mnemonicoData.max && item.manhaMin <= mnemonicoData.max + 1) {
-                                    manhaMinClass = 'at-limit';
-                                }
-                            }
-                
-                            if (item.manhaMax !== null) {
-                                if (item.manhaMax < mnemonicoData.min - 1 || item.manhaMax > mnemonicoData.max + 1) {
-                                    manhaMaxClass = 'out-of-range';
-                                } else if (item.manhaMax >= mnemonicoData.min - 1 && item.manhaMax <= mnemonicoData.min ||
-                                           item.manhaMax >= mnemonicoData.max && item.manhaMax <= mnemonicoData.max + 1) {
-                                    manhaMaxClass = 'at-limit';
-                                }
-                            }
-                
-                            if (item.manhaAtual !== null) {
-                                if (item.manhaAtual < mnemonicoData.min - 1 || item.manhaAtual > mnemonicoData.max + 1) {
-                                    manhaAtualClass = 'out-of-range';
-                                } else if (item.manhaAtual >= mnemonicoData.min - 1 && item.manhaAtual <= mnemonicoData.min ||
-                                           item.manhaAtual >= mnemonicoData.max && item.manhaAtual <= mnemonicoData.max + 1) {
-                                    manhaAtualClass = 'at-limit';
-                                }
-                            }
-                
-                            if (item.tardeMin !== null) {
-                                if (item.tardeMin < mnemonicoData.min - 1 || item.tardeMin > mnemonicoData.max + 1) {
-                                    tardeMinClass = 'out-of-range';
-                                } else if (item.tardeMin >= mnemonicoData.min - 1 && item.tardeMin <= mnemonicoData.min ||
-                                           item.tardeMin >= mnemonicoData.max && item.tardeMin <= mnemonicoData.max + 1) {
-                                    tardeMinClass = 'at-limit';
-                                }
-                            }
-                
-                            if (item.tardeMax !== null) {
-                                if (item.tardeMax < mnemonicoData.min - 1 || item.tardeMax > mnemonicoData.max + 1) {
-                                    tardeMaxClass = 'out-of-range';
-                                } else if (item.tardeMax >= mnemonicoData.min - 1 && item.tardeMax <= mnemonicoData.min ||
-                                           item.tardeMax >= mnemonicoData.max && item.tardeMax <= mnemonicoData.max + 1) {
-                                    tardeMaxClass = 'at-limit';
-                                }
-                            }
-                
-                            if (item.tardeAtual !== null) {
-                                if (item.tardeAtual < mnemonicoData.min - 1 || item.tardeAtual > mnemonicoData.max + 1) {
-                                    tardeAtualClass = 'out-of-range';
-                                } else if (item.tardeAtual >= mnemonicoData.min - 1 && item.tardeAtual <= mnemonicoData.min ||
-                                           item.tardeAtual >= mnemonicoData.max && item.tardeAtual <= mnemonicoData.max + 1) {
-                                    tardeAtualClass = 'at-limit';
-                                }
-                            }
-                        }
-                
-                        row.innerHTML = `
-                            <td>
-                                ${formatDateBR(item.data)}
-                                ${item.annotation ? `<span><i class="fas fa-sticky-note annotation-icon-table has-note" onclick="openAnnotationViewModal(${globalIndex})"></i></span>` : ''}
-                            </td>
-                            <td>${mnemonico}</td>
-                            <td>${responsavel}</td>
-                            <td class="${manhaMinClass}">${item.manhaMin !== null ? item.manhaMin.toFixed(1) : '-'}</td>
-                            <td class="${manhaMaxClass}">${item.manhaMax !== null ? item.manhaMax.toFixed(1) : '-'}</td>
-                            <td class="${manhaAtualClass}">${item.manhaAtual !== null ? item.manhaAtual.toFixed(1) : '-'}</td>
-                            <td class="${tardeMinClass}">${item.tardeMin !== null ? item.tardeMin.toFixed(1) : '-'}</td>
-                            <td class="${tardeMaxClass}">${item.tardeMax !== null ? item.tardeMax.toFixed(1) : '-'}</td>
-                            <td class="${tardeAtualClass}">${item.tardeAtual !== null ? item.tardeAtual.toFixed(1) : '-'}</td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                
+                    }
+                    clearDadosForm();
+                    // Redirecionar para a aba Dashboard
+                    redirectToDashboard();
+                } else {
+                    alert('Por favor, corrija os campos inválidos (data, mnemonico e responsável são obrigatórios).');
+                }
+            } catch (error) {
+                console.error('Erro ao adicionar dado:', error);
+                alert('Erro ao salvar os dados no servidor.');
+            } finally {
+                button.classList.remove('loading');
+                button.disabled = false;
+                button.textContent = 'Adicionar';
+            }
+        }
+        
+        // Função para validar dados puramente no modelo
+        function validateDadoByIndex(index) {
+            if (index < 0 || index >= dados.length || !dados[index] || dados[index].unitId !== selectedUnitId) {
+                return { valid: false, invalidFields: [] };
+            }
+        
+            const item = dados[index];
+            const manhaMin = item.manhaMin;
+            const manhaMax = item.manhaMax;
+            const manhaAtual = item.manhaAtual;
+            const tardeMin = item.tardeMin;
+            const tardeMax = item.tardeMax;
+            const tardeAtual = item.tardeAtual;
+        
+            let valid = true;
+            const invalidFields = [];
+        
+            if (manhaMin !== null && manhaMax !== null && manhaAtual !== null) {
+                if (manhaMin > manhaAtual || manhaMin > manhaMax) {
+                    invalidFields.push('manhaMin');
+                    valid = false;
+                }
+                if (manhaMax < manhaAtual || manhaMax < manhaMin) {
+                    invalidFields.push('manhaMax');
+                    valid = false;
+                }
+                if (manhaAtual < manhaMin || manhaAtual > manhaMax) {
+                    invalidFields.push('manhaAtual');
+                    valid = false;
+                }
+            } else if (manhaMin !== null && manhaAtual === null) {
+                invalidFields.push('manhaMin');
+                valid = false;
+            } else if (manhaMax !== null && manhaAtual === null) {
+                invalidFields.push('manhaMax');
+                valid = false;
+            }
+        
+            if (tardeMin !== null && tardeMax !== null && tardeAtual !== null) {
+                if (tardeMin > tardeAtual || tardeMin > tardeMax) {
+                    invalidFields.push('tardeMin');
+                    valid = false;
+                }
+                if (tardeMax < tardeAtual || tardeMax < tardeMin) {
+                    invalidFields.push('tardeMax');
+                    valid = false;
+                }
+                if (tardeAtual < tardeMin || tardeAtual > tardeMax) {
+                    invalidFields.push('tardeAtual');
+                    valid = false;
+                }
+            } else if (tardeMin !== null && tardeAtual === null) {
+                invalidFields.push('tardeMin');
+                valid = false;
+            } else if (tardeMax !== null && tardeAtual === null) {
+                invalidFields.push('tardeMax');
+                valid = false;
+            }
+        
+            return { valid, invalidFields };
+        }
+        
+        function clearDadosForm() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('data').value = today;
+            document.getElementById('dados-mnemonico').value = '';
+            document.getElementById('dados-responsavel').value = '';
+            document.getElementById('manha-min').value = '';
+            document.getElementById('manha-max').value = '';
+            document.getElementById('manha-atual').value = '';
+            document.getElementById('tarde-min').value = '';
+            document.getElementById('tarde-max').value = '';
+            document.getElementById('tarde-atual').value = '';
+            const inputs = ['manha-min', 'manha-max', 'manha-atual', 'tarde-min', 'tarde-max', 'tarde-atual', 'dados-mnemonico', 'dados-responsavel'];
+            inputs.forEach(id => {
+                document.getElementById(id).classList.remove('invalid');
+            });
+        }
+        
+        function renderDadosCards() {
+            const cardsContainer = document.getElementById('dados-cards');
+            cardsContainer.innerHTML = '';
+            const filteredDados = dados.filter(item => item.unitId === selectedUnitId)
+                .sort((a, b) => {
+                    const dateA = new Date(a.data);
+                    const dateB = new Date(b.data);
+                    dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
+                    dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
+                    const dateComparison = dateB - dateA;
+                    if (dateComparison !== 0) return dateComparison;
+                    const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
+                    const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
+                    return mnemonicoA.localeCompare(mnemonicoB);
+                });
+            const start = (currentPage - 1) * itemsPerPage;
+            const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
+        
+            paginatedDados.forEach((item, localIndex) => {
+                const globalIndex = dados.findIndex(d => 
+                    d.data === item.data &&
+                    d.mnemonicoId === item.mnemonicoId &&
+                    d.responsavelId === item.responsavelId &&
+                    d.unitId === item.unitId
+                );
+        
+                if (globalIndex === -1) {
+                    console.warn('Índice global não encontrado para o item:', item);
+                    return;
+                }
+        
+                const mnemonico = mnemonicos.find(m => m.id === item.mnemonicoId)?.mnemonico || 'Desconhecido';
+                const responsavel = responsaveis.find(r => r.id === item.responsavelId)?.name || 'Desconhecido';
+        
+                const card = document.createElement('div');
+                card.className = 'dados-card';
+                card.innerHTML = `
+                    <div class="field">
+                        <label>Data</label>
+                        <input type="date" value="${item.data}" onchange="updateDado(${globalIndex}, 'data', this.value)">
+                    </div>
+                    <div class="field">
+                        <label>Mnemonico</label>
+                        <input type="text" value="${mnemonico}" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Responsável</label>
+                        <input type="text" value="${responsavel}" readonly>
+                    </div>
+                    <div class="field">
+                        <label>⛅ Min ºC</label>
+                        <input type="number" step="0.1" value="${item.manhaMin !== null ? item.manhaMin : ''}" onchange="updateDado(${globalIndex}, 'manhaMin', this.value.trim() === '' ? null : parseFloat(this.value))">
+                    </div>
+                    <div class="field">
+                        <label>⛅ Max ºC</label>
+                        <input type="number" step="0.1" value="${item.manhaMax !== null ? item.manhaMax : ''}" onchange="updateDado(${globalIndex}, 'manhaMax', this.value.trim() === '' ? null : parseFloat(this.value))">
+                    </div>
+                    <div class="field">
+                        <label>⛅ Atual ºC</label>
+                        <input type="number" step="0.1" value="${item.manhaAtual !== null ? item.manhaAtual : ''}" onchange="updateDado(${globalIndex}, 'manhaAtual', this.value.trim() === '' ? null : parseFloat(this.value))">
+                    </div>
+                    <div class="field">
+                        <label>🌞 Min ºC</label>
+                        <input type="number" step="0.1" value="${item.tardeMin !== null ? item.tardeMin : ''}" onchange="updateDado(${globalIndex}, 'tardeMin', this.value.trim() === '' ? null : parseFloat(this.value))">
+                    </div>
+                    <div class="field">
+                        <label>🌞 Max ºC</label>
+                        <input type="number" step="0.1" value="${item.tardeMax !== null ? item.tardeMax : ''}" onchange="updateDado(${globalIndex}, 'tardeMax', this.value.trim() === '' ? null : parseFloat(this.value))">
+                    </div>
+                    <div class="field">
+                        <label>🌞 Atual ºC</label>
+                        <input type="number" step="0.1" value="${item.tardeAtual !== null ? item.tardeAtual : ''}" onchange="updateDado(${globalIndex}, 'tardeAtual', this.value.trim() === '' ? null : parseFloat(this.value))">
+                    </div>
+                    <button class="delete-card" onclick="deleteDado(${globalIndex})">&#10006;</button>
+                    <i class="fas fa-sticky-note annotation-icon ${item.annotation ? 'has-note' : ''}" onclick="openAnnotationModal(${globalIndex})"></i>
+                `;
+                cardsContainer.appendChild(card);
+        
+                validateCard(globalIndex);
+            });
+            renderPagination();
+        }
+        
+        async function updateDado(index, field, value) {
+            const filteredDados = dados
+                .filter(item => item.unitId === selectedUnitId)
+                .sort((a, b) => {
+                    const dateA = new Date(a.data);
+                    const dateB = new Date(b.data);
+                    dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
+                    dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
+                    const dateComparison = dateB - dateA;
+                    if (dateComparison !== 0) return dateComparison;
+                    const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
+                    const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
+                    return mnemonicoA.localeCompare(mnemonicoB);
+                });
+        
+            const start = (currentPage - 1) * itemsPerPage;
+            const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
+            const cardIndex = paginatedDados.findIndex(d => 
+                d.data === dados[index].data &&
+                d.mnemonicoId === dados[index].mnemonicoId &&
+                d.responsavelId === dados[index].responsavelId &&
+                d.unitId === dados[index].unitId
+            );
+        
+            let card = null;
+            if (cardIndex !== -1) {
+                const cards = document.querySelectorAll('.dados-card');
+                if (cardIndex < cards.length) {
+                    card = cards[cardIndex];
+                    card.classList.add('loading');
+                    card.style.opacity = '0.7';
+                    card.style.transition = 'opacity 0.3s ease';
+                }
+            }
+        
+            try {
+                if (['manhaMin', 'manhaMax', 'manhaAtual', 'tardeMin', 'tardeMax', 'tardeAtual'].includes(field)) {
+                    dados[index][field] = value === '' ? null : parseFloat(value);
+                } else if (field === 'data') {
+                    dados[index][field] = value;
+                }
+        
+                const isValid = validateCard(index);
+        
+                const manhaAtual = dados[index].manhaAtual;
+                const tardeAtual = dados[index].tardeAtual;
+                const manhaMin = dados[index].manhaMin;
+                const manhaMax = dados[index].manhaMax;
+                const tardeMin = dados[index].tardeMin;
+                const tardeMax = dados[index].tardeMax;
+        
+                const canSendManha = manhaAtual !== null && (
+                    (manhaMin === null && manhaMax === null) ||
+                    (manhaMin !== null && manhaMax !== null && isValid)
+                );
+                const canSendTarde = tardeAtual !== null && (
+                    (tardeMin === null && tardeMax === null) ||
+                    (tardeMin !== null && tardeMax !== null && isValid)
+                );
+        
+                if (isValid && (canSendManha || canSendTarde || field === 'data')) {
+                    await saveToJsonBin();
+                    renderDadosCards();
+                    renderDashboardTable();
                     updateCharts();
+                    showSuccessAlert();
+                    redirectToDashboard();
+                } else {
+                    renderDadosCards();
+                    showAlert();
                 }
-                
-                let currentAnnotationIndex = null;
-                
-                function openAnnotationModal(index) {
-                    currentAnnotationIndex = index;
-                    const modal = document.getElementById('annotation-modal');
-                    const textarea = document.getElementById('annotation-text');
-                    textarea.value = dados[index].annotation || '';
-                    modal.style.display = 'flex';
+            } catch (error) {
+                console.error('Erro ao atualizar dado:', error);
+                renderDadosCards();
+            } finally {
+                if (card) {
+                    card.classList.remove('loading');
+                    card.style.opacity = '1';
                 }
-                
-                function closeAnnotationModal() {
-                    document.getElementById('annotation-modal').style.display = 'none';
-                    currentAnnotationIndex = null;
+            }
+        }
+        
+        function validateCard(globalIndex) {
+            const validation = validateDadoByIndex(globalIndex);
+            if (!validation.valid) {
+                console.warn(`Validação falhou para o índice ${globalIndex}:`, validation.invalidFields);
+            }
+        
+            const filteredDados = dados
+                .filter(item => item && item.unitId === selectedUnitId)
+                .sort((a, b) => {
+                    const dateA = new Date(a.data);
+                    const dateB = new Date(b.data);
+                    dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
+                    dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
+                    const dateComparison = dateB - dateA;
+                    if (dateComparison !== 0) return dateComparison;
+                    const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
+                    const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
+                    return mnemonicoA.localeCompare(mnemonicoB);
+                });
+        
+            const start = (currentPage - 1) * itemsPerPage;
+            const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
+            const cardIndex = paginatedDados.findIndex(d => 
+                d && 
+                d.data === dados[globalIndex].data &&
+                d.mnemonicoId === dados[globalIndex].mnemonicoId &&
+                d.responsavelId === dados[globalIndex].responsavelId &&
+                d.unitId === dados[globalIndex].unitId
+            );
+        
+            if (cardIndex !== -1) {
+                const cards = document.querySelectorAll('.dados-card');
+                if (cardIndex < cards.length) {
+                    const card = cards[cardIndex];
+        
+                    const fieldSelectors = {
+                        manhaMin: 'input[onchange*="\'manhaMin\'"]',
+                        manhaMax: 'input[onchange*="\'manhaMax\'"]',
+                        manhaAtual: 'input[onchange*="\'manhaAtual\'"]',
+                        tardeMin: 'input[onchange*="\'tardeMin\'"]',
+                        tardeMax: 'input[onchange*="\'tardeMax\'"]',
+                        tardeAtual: 'input[onchange*="\'tardeAtual\'"]'
+                    };
+        
+                    Object.values(fieldSelectors).forEach(selector => {
+                        const input = card.querySelector(selector);
+                        if (input) input.classList.remove('invalid');
+                    });
+        
+                    validation.invalidFields.forEach(field => {
+                        const input = card.querySelector(fieldSelectors[field]);
+                        if (input) input.classList.add('invalid');
+                    });
                 }
-                
-                async function saveAnnotation() {
-                    if (currentAnnotationIndex === null) return;
-                    const textarea = document.getElementById('annotation-text');
-                    const addButton = document.querySelector('#annotation-modal button[onclick="saveAnnotation()"]');
-                    addButton.classList.add('loading');
-                    addButton.disabled = true;
-                    addButton.textContent = 'Adicionando';
-                
-                    try {
-                        const annotation = textarea.value.trim();
-                        dados[currentAnnotationIndex].annotation = annotation || null;
-                        await saveToJsonBin();
-                        renderDadosCards();
-                        renderDashboardTable();
-                        closeAnnotationModal();
-                        // Redirecionar para a aba Dashboard
-                        redirectToDashboard();
-                    } catch (error) {
-                        console.error('Erro ao salvar anotação:', error);
-                        alert('Erro ao salvar a anotação no servidor.');
-                    } finally {
-                        addButton.classList.remove('loading');
-                        addButton.disabled = false;
-                        addButton.textContent = 'Adicionar';
+            }
+        
+            return validation.valid;
+        }
+        
+        async function deleteDado(index) {
+            const button = document.querySelectorAll('.dados-card .delete-card')[index % itemsPerPage];
+            if (button) {
+                button.classList.add('loading');
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner"></span>';
+            }
+        
+            try {
+                dados.splice(index, 1);
+                if (currentPage > Math.ceil(dados.filter(item => item.unitId === selectedUnitId).length / itemsPerPage)) {
+                    currentPage = Math.max(1, Math.ceil(dados.filter(item => item.unitId === selectedUnitId).length / itemsPerPage));
+                }
+                dados.sort((a, b) => new Date(b.data) - new Date(a.data));
+                await saveToJsonBin();
+                renderDadosCards();
+                renderPagination();
+                renderDashboardTable();
+                redirectToDashboard();
+            } catch (error) {
+                console.error('Erro ao deletar dado:', error);
+                alert('Erro ao deletar o dado no servidor.');
+            } finally {
+                if (button) {
+                    button.classList.remove('loading');
+                    button.disabled = false;
+                    button.innerHTML = '&#10006;';
+                }
+            }
+        }
+        
+        function renderPagination() {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+            const filteredDados = dados.filter(item => item.unitId === selectedUnitId);
+            const totalPages = Math.ceil(filteredDados.length / itemsPerPage);
+        
+            if (totalPages <= 1) return;
+        
+            const firstButton = document.createElement('button');
+            firstButton.textContent = '<';
+            firstButton.className = 'first-page';
+            firstButton.disabled = currentPage === 1;
+            firstButton.addEventListener('click', () => {
+                currentPage = 1;
+                renderDadosCards();
+                renderPagination();
+            });
+            paginationContainer.appendChild(firstButton);
+        
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesDisplayed / 2));
+            let endPage = Math.min(totalPages, startPage + maxPagesDisplayed - 1);
+        
+            if (endPage - startPage + 1 < maxPagesDisplayed) {
+                startPage = Math.max(1, endPage - maxPagesDisplayed + 1);
+            }
+        
+            for (let i = startPage; i <= endPage; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.className = i === currentPage ? 'active' : '';
+                button.addEventListener('click', () => {
+                    currentPage = i;
+                    renderDadosCards();
+                    renderPagination();
+                });
+                paginationContainer.appendChild(button);
+            }
+        
+            const lastButton = document.createElement('button');
+            lastButton.textContent = '>';
+            lastButton.disabled = currentPage === totalPages;
+            lastButton.addEventListener('click', () => {
+                currentPage = totalPages;
+                renderDadosCards();
+                renderPagination();
+            });
+            paginationContainer.appendChild(lastButton);
+        }
+        
+        function saveDashboardFilters() {
+            const filters = {
+                mes: document.getElementById('filter-mes').value,
+                ano: document.getElementById('filter-ano').value,
+                mnemonicoId: document.getElementById('filter-mnemonico').value
+            };
+            localStorage.setItem(`dashboardFilters_${selectedUnitId}`, JSON.stringify(filters));
+        }
+        
+        function loadDashboardFilters() {
+            const savedFilters = localStorage.getItem(`dashboardFilters_${selectedUnitId}`);
+            if (savedFilters) {
+                const filters = JSON.parse(savedFilters);
+                document.getElementById('filter-mes').value = filters.mes || '';
+                document.getElementById('filter-ano').value = filters.ano || '';
+                document.getElementById('filter-mnemonico').value = filters.mnemonicoId || '';
+        
+                if (filters.mnemonicoId) {
+                    const mnemonicoData = mnemonicos.find(item => item.id === parseInt(filters.mnemonicoId) && item.unitId === selectedUnitId);
+                    if (mnemonicoData) {
+                        document.getElementById('mnemonico-tipo').textContent = mnemonicoData.tipo;
+                        document.getElementById('mnemonico-legenda').textContent = mnemonicoData.legenda;
+                        document.getElementById('mnemonico-min').textContent = mnemonicoData.min.toFixed(1);
+                        document.getElementById('mnemonico-max').textContent = mnemonicoData.max.toFixed(1);
                     }
                 }
-                
-                async function deleteAnnotation() {
-                    if (currentAnnotationIndex === null) return;
-                    const deleteButton = document.querySelector('#annotation-modal button[onclick="deleteAnnotation()"]');
-                    deleteButton.classList.add('loading');
-                    deleteButton.disabled = true;
-                    deleteButton.textContent = 'Apagando';
-                
-                    try {
-                        dados[currentAnnotationIndex].annotation = null;
-                        await saveToJsonBin();
-                        renderDadosCards();
-                        renderDashboardTable();
-                        closeAnnotationModal();
-                        // Redirecionar para a aba Dashboard
-                        redirectToDashboard();
-                    } catch (error) {
-                        console.error('Erro ao deletar anotação:', error);
-                        alert('Erro ao deletar a anotação no servidor.');
-                    } finally {
-                        deleteButton.classList.remove('loading');
-                        deleteButton.disabled = false;
-                        deleteButton.textContent = 'Apagar';
+            }
+        }
+        
+        function toggleCadastroSection(section) {
+            document.getElementById('mnemonicos-section').classList.add('hidden');
+            document.getElementById('responsaveis-section').classList.add('hidden');
+        
+            document.querySelectorAll('.toggle-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        
+            const sectionElement = document.getElementById(`${section}-section`);
+            sectionElement.classList.remove('hidden');
+        
+            const button = event.target.closest('.toggle-button');
+            button.classList.add('active');
+        }
+        
+        function formatDateBR(dateString) {
+            const [year, month, day] = dateString.split('-').map(Number);
+            return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+        }
+        
+        function createCharts() {
+            createManhaChart();
+            createTardeChart();
+        }
+        
+        function createManhaChart() {
+            const ctx = document.getElementById('manhaChart').getContext('2d');
+            if (manhaChart) {
+                manhaChart.destroy();
+            }
+        
+            const filteredDados = getFilteredDataForCharts();
+            const mnemonicoData = getCurrentMnemonicoData();
+        
+            const validDados = filteredDados.filter(item => 
+                item.manhaMin !== null || item.manhaMax !== null || item.manhaAtual !== null
+            );
+        
+            manhaChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: validDados.map(item => formatDateBR(item.data)),
+                    datasets: [
+                        {
+                            label: 'Min ºC',
+                            data: validDados.map(item => item.manhaMin !== null ? item.manhaMin : null),
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            tension: 0.4,
+                            spanGaps: true
+                        },
+                        {
+                            label: 'Max ºC',
+                            data: validDados.map(item => item.manhaMax !== null ? item.manhaMax : null),
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            tension: 0.4,
+                            spanGaps: true
+                        },
+                        {
+                            label: 'Atual ºC',
+                            data: validDados.map(item => item.manhaAtual !== null ? item.manhaAtual : null),
+                            borderColor: '#2ecc71',
+                            backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                            tension: 0.4,
+                            spanGaps: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        annotation: {
+                            annotations: mnemonicoData ? [
+                                {
+                                    type: 'line',
+                                    yMin: mnemonicoData.min,
+                                    yMax: mnemonicoData.min,
+                                    borderColor: '#bf0000',
+                                    borderWidth: 2,
+                                    borderDash: [],
+                                    label: {
+                                        content: `Min Ideal: ${mnemonicoData.min}ºC`,
+                                        enabled: true,
+                                        position: 'start',
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        color: '#fff',
+                                        padding: 6,
+                                        font: {
+                                            size: 12
+                                        }
+                                    }
+                                },
+                                {
+                                    type: 'line',
+                                    yMin: mnemonicoData.max,
+                                    yMax: mnemonicoData.max,
+                                    borderColor: '#bf0000',
+                                    borderWidth: 2,
+                                    borderDash: [],
+                                    label: {
+                                        content: `Max Ideal: ${mnemonicoData.max}ºC`,
+                                        enabled: true,
+                                        position: 'start',
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        color: '#fff',
+                                        padding: 6,
+                                        font: {
+                                            size: 12
+                                        }
+                                    }
+                                }
+                            ] : []
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Temperatura (ºC)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Data'
+                            },
+                            ticks: {
+                                autoSkip: false
+                            }
+                        }
                     }
                 }
-                
-                function openAnnotationViewModal(index) {
-                    const modal = document.getElementById('annotation-view-modal');
-                    const textDiv = document.getElementById('annotation-view-text');
-                    const annotationText = dados[index] ? (dados[index].annotation || 'Nenhuma anotação disponível.') : 'Nenhuma anotação disponível.';
-                    textDiv.textContent = annotationText;
-                    modal.style.display = 'flex';
+            });
+        }
+        
+        function createTardeChart() {
+            const ctx = document.getElementById('tardeChart').getContext('2d');
+            if (tardeChart) {
+                tardeChart.destroy();
+            }
+        
+            const filteredDados = getFilteredDataForCharts();
+            const mnemonicoData = getCurrentMnemonicoData();
+        
+            const validDados = filteredDados.filter(item => 
+                item.tardeMin !== null || item.tardeMax !== null || item.tardeAtual !== null
+            );
+        
+            tardeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: validDados.map(item => formatDateBR(item.data)),
+                    datasets: [
+                        {
+                            label: 'Min ºC',
+                            data: validDados.map(item => item.tardeMin !== null ? item.tardeMin : null),
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            tension: 0.4,
+                            spanGaps: true
+                        },
+                        {
+                            label: 'Max ºC',
+                            data: validDados.map(item => item.tardeMax !== null ? item.tardeMax : null),
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            tension: 0.4,
+                            spanGaps: true
+                        },
+                        {
+                            label: 'Atual ºC',
+                            data: validDados.map(item => item.tardeAtual !== null ? item.tardeAtual : null),
+                            borderColor: '#2ecc71',
+                            backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                            tension: 0.4,
+                            spanGaps: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        annotation: {
+                            annotations: mnemonicoData ? [
+                                {
+                                    type: 'line',
+                                    yMin: mnemonicoData.min,
+                                    yMax: mnemonicoData.min,
+                                    borderColor: '#bf0000',
+                                    borderWidth: 2,
+                                    borderDash: [],
+                                    label: {
+                                        content: `Min Ideal: ${mnemonicoData.min}ºC`,
+                                        enabled: true,
+                                        position: 'start',
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        color: '#fff',
+                                        padding: 6,
+                                        font: {
+                                            size: 12
+                                        }
+                                    }
+                                },
+                                {
+                                    type: 'line',
+                                    yMin: mnemonicoData.max,
+                                    yMax: mnemonicoData.max,
+                                    borderColor: '#bf0000',
+                                    borderWidth: 2,
+                                    borderDash: [],
+                                    label: {
+                                        content: `Max Ideal: ${mnemonicoData.max}ºC`,
+                                        enabled: true,
+                                        position: 'start',
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        color: '#fff',
+                                        padding: 6,
+                                        font: {
+                                            size: 12
+                                        }
+                                    }
+                                }
+                            ] : []
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Temperatura (ºC)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Data'
+                            },
+                            ticks: {
+                                autoSkip: false
+                            }
+                        }
+                    }
                 }
-                
-                function closeAnnotationViewModal() {
-                    document.getElementById('annotation-view-modal').style.display = 'none';
+            });
+        }
+        
+        function getFilteredDataForCharts() {
+            const mes = document.getElementById('filter-mes').value;
+            const ano = document.getElementById('filter-ano').value;
+            const mnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
+        
+            if (!mes || !ano || !mnemonicoId || !selectedUnitId) {
+                return [];
+            }
+        
+            return dados.filter(item => {
+                const [itemYear, itemMonth] = item.data.split('-').map(Number);
+                return itemMonth === parseInt(mes) &&
+                       itemYear === parseInt(ano) &&
+                       item.mnemonicoId === mnemonicoId &&
+                       item.unitId === selectedUnitId;
+            }).sort((a, b) => a.data.localeCompare(b.data));
+        }
+        
+        function getCurrentMnemonicoData() {
+            const mnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
+            return mnemonicos.find(m => m.id === mnemonicoId && m.unitId === selectedUnitId);
+        }
+        
+        function updateCharts() {
+            if (manhaChart && tardeChart) {
+                createManhaChart();
+                createTardeChart();
+            }
+        }
+        
+        function renderDashboardFilters() {
+            const anoSelect = document.getElementById('filter-ano');
+            const currentYear = new Date().getFullYear();
+            anoSelect.innerHTML = '<option value="">Selecione</option>';
+            for (let i = currentYear; i >= currentYear - 2; i--) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                anoSelect.appendChild(option);
+            }
+        
+            const savedFilters = localStorage.getItem(`dashboardFilters_${selectedUnitId}`);
+            if (!savedFilters) {
+                anoSelect.value = currentYear;
+                saveDashboardFilters();
+            }
+        
+            document.getElementById('filter-mnemonico').addEventListener('change', function() {
+                const mnemonicoId = parseInt(this.value);
+                const mnemonicoData = mnemonicos.find(item => item.id === mnemonicoId && item.unitId === selectedUnitId);
+                document.getElementById('mnemonico-tipo').textContent = mnemonicoData ? mnemonicoData.tipo : '';
+                document.getElementById('mnemonico-legenda').textContent = mnemonicoData ? mnemonicoData.legenda : '';
+                document.getElementById('mnemonico-min').textContent = mnemonicoData ? mnemonicoData.min.toFixed(1) : '';
+                document.getElementById('mnemonico-max').textContent = mnemonicoData ? mnemonicoData.max.toFixed(1) : '';
+                saveDashboardFilters();
+                renderDashboardTable();
+            });
+        
+            document.getElementById('filter-mes').addEventListener('change', function() {
+                saveDashboardFilters();
+                renderDashboardTable();
+            });
+        
+            document.getElementById('filter-ano').addEventListener('change', function() {
+                saveDashboardFilters();
+                renderDashboardTable();
+            });
+        }
+        
+        function renderDashboardTable() {
+            const mes = document.getElementById('filter-mes').value;
+            const ano = document.getElementById('filter-ano').value;
+            const mnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
+            const tbody = document.querySelector('#dashboard-table tbody');
+            tbody.innerHTML = '';
+        
+            if (!mes || !ano || !mnemonicoId || !selectedUnitId) {
+                return;
+            }
+        
+            const filteredDados = dados.filter(item => {
+                const [itemYear, itemMonth] = item.data.split('-').map(Number);
+                return itemMonth === parseInt(mes) &&
+                       itemYear === parseInt(ano) &&
+                       item.mnemonicoId === mnemonicoId &&
+                       item.unitId === selectedUnitId;
+            }).sort((a, b) => {
+                const dateComparison = b.data.localeCompare(a.data);
+                if (dateComparison !== 0) return dateComparison;
+                const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
+                const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
+                return mnemonicoA.localeCompare(mnemonicoB);
+            });
+        
+            filteredDados.forEach((item, index) => {
+                const globalIndex = dados.findIndex(d => 
+                    d.data === item.data &&
+                    d.mnemonicoId === item.mnemonicoId &&
+                    d.responsavelId === item.responsavelId &&
+                    d.unitId === item.unitId
+                );
+        
+                if (globalIndex === -1) {
+                    console.error('Índice global não encontrado para o item:', item);
+                    return;
                 }
-                
-                async function init() {
-                    const today = new Date().toISOString().split('T')[0];
-                    document.getElementById('data').value = today;
-                
-                    selectedUnitId = parseInt(localStorage.getItem('selectedUnitId')) || null;
-                    updateUnitDisplay();
-                
-                    // Mostrar tela de carregamento
+        
+                const row = document.createElement('tr');
+        
+                const mnemonicoData = mnemonicos.find(m => m.id === item.mnemonicoId && m.unitId === selectedUnitId);
+                const responsavel = responsaveis.find(r => r.id === item.responsavelId)?.name || 'Desconhecido';
+                const mnemonico = mnemonicoData ? mnemonicoData.mnemonico : 'Desconhecido';
+        
+                let manhaMinClass = '', manhaMaxClass = '', manhaAtualClass = '';
+                let tardeMinClass = '', tardeMaxClass = '', tardeAtualClass = '';
+                if (mnemonicoData) {
+                    if (item.manhaMin !== null) {
+                        if (item.manhaMin < mnemonicoData.min - 1 || item.manhaMin > mnemonicoData.max + 1) {
+                            manhaMinClass = 'out-of-range';
+                        } else if (item.manhaMin >= mnemonicoData.min - 1 && item.manhaMin <= mnemonicoData.min ||
+                                   item.manhaMin >= mnemonicoData.max && item.manhaMin <= mnemonicoData.max + 1) {
+                            manhaMinClass = 'at-limit';
+                        }
+                    }
+        
+                    if (item.manhaMax !== null) {
+                        if (item.manhaMax < mnemonicoData.min - 1 || item.manhaMax > mnemonicoData.max + 1) {
+                            manhaMaxClass = 'out-of-range';
+                        } else if (item.manhaMax >= mnemonicoData.min - 1 && item.manhaMax <= mnemonicoData.min ||
+                                   item.manhaMax >= mnemonicoData.max && item.manhaMax <= mnemonicoData.max + 1) {
+                            manhaMaxClass = 'at-limit';
+                        }
+                    }
+        
+                    if (item.manhaAtual !== null) {
+                        if (item.manhaAtual < mnemonicoData.min - 1 || item.manhaAtual > mnemonicoData.max + 1) {
+                            manhaAtualClass = 'out-of-range';
+                        } else if (item.manhaAtual >= mnemonicoData.min - 1 && item.manhaAtual <= mnemonicoData.min ||
+                                   item.manhaAtual >= mnemonicoData.max && item.manhaAtual <= mnemonicoData.max + 1) {
+                            manhaAtualClass = 'at-limit';
+                        }
+                    }
+        
+                    if (item.tardeMin !== null) {
+                        if (item.tardeMin < mnemonicoData.min - 1 || item.tardeMin > mnemonicoData.max + 1) {
+                            tardeMinClass = 'out-of-range';
+                        } else if (item.tardeMin >= mnemonicoData.min - 1 && item.tardeMin <= mnemonicoData.min ||
+                                   item.tardeMin >= mnemonicoData.max && item.tardeMin <= mnemonicoData.max + 1) {
+                            tardeMinClass = 'at-limit';
+                        }
+                    }
+        
+                    if (item.tardeMax !== null) {
+                        if (item.tardeMax < mnemonicoData.min - 1 || item.tardeMax > mnemonicoData.max + 1) {
+                            tardeMaxClass = 'out-of-range';
+                        } else if (item.tardeMax >= mnemonicoData.min - 1 && item.tardeMax <= mnemonicoData.min ||
+                                   item.tardeMax >= mnemonicoData.max && item.tardeMax <= mnemonicoData.max + 1) {
+                            tardeMaxClass = 'at-limit';
+                        }
+                    }
+        
+                    if (item.tardeAtual !== null) {
+                        if (item.tardeAtual < mnemonicoData.min - 1 || item.tardeAtual > mnemonicoData.max + 1) {
+                            tardeAtualClass = 'out-of-range';
+                        } else if (item.tardeAtual >= mnemonicoData.min - 1 && item.tardeAtual <= mnemonicoData.min ||
+                                   item.tardeAtual >= mnemonicoData.max && item.tardeAtual <= mnemonicoData.max + 1) {
+                            tardeAtualClass = 'at-limit';
+                        }
+                    }
+                }
+        
+                row.innerHTML = `
+                    <td>
+                        ${formatDateBR(item.data)}
+                        ${item.annotation ? `<span><i class="fas fa-sticky-note annotation-icon-table has-note" onclick="openAnnotationViewModal(${globalIndex})"></i></span>` : ''}
+                    </td>
+                    <td>${mnemonico}</td>
+                    <td>${responsavel}</td>
+                    <td class="${manhaMinClass}">${item.manhaMin !== null ? item.manhaMin.toFixed(1) : '-'}</td>
+                    <td class="${manhaMaxClass}">${item.manhaMax !== null ? item.manhaMax.toFixed(1) : '-'}</td>
+                    <td class="${manhaAtualClass}">${item.manhaAtual !== null ? item.manhaAtual.toFixed(1) : '-'}</td>
+                    <td class="${tardeMinClass}">${item.tardeMin !== null ? item.tardeMin.toFixed(1) : '-'}</td>
+                    <td class="${tardeMaxClass}">${item.tardeMax !== null ? item.tardeMax.toFixed(1) : '-'}</td>
+                    <td class="${tardeAtualClass}">${item.tardeAtual !== null ? item.tardeAtual.toFixed(1) : '-'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        
+            updateCharts();
+        }
+        
+        let currentAnnotationIndex = null;
+        
+        function openAnnotationModal(index) {
+            currentAnnotationIndex = index;
+            const modal = document.getElementById('annotation-modal');
+            const textarea = document.getElementById('annotation-text');
+            textarea.value = dados[index].annotation || '';
+            modal.style.display = 'flex';
+        }
+        
+        function closeAnnotationModal() {
+            document.getElementById('annotation-modal').style.display = 'none';
+            currentAnnotationIndex = null;
+        }
+        
+        async function saveAnnotation() {
+            if (currentAnnotationIndex === null) return;
+            const textarea = document.getElementById('annotation-text');
+            const addButton = document.querySelector('#annotation-modal button[onclick="saveAnnotation()"]');
+            addButton.classList.add('loading');
+            addButton.disabled = true;
+            addButton.textContent = 'Adicionando';
+        
+            try {
+                const annotation = textarea.value.trim();
+                dados[currentAnnotationIndex].annotation = annotation || null;
+                await saveToJsonBin();
+                renderDadosCards();
+                renderDashboardTable();
+                closeAnnotationModal();
+                redirectToDashboard();
+            } catch (error) {
+                console.error('Erro ao salvar anotação:', error);
+                alert('Erro ao salvar a anotação no servidor.');
+            } finally {
+                addButton.classList.remove('loading');
+                addButton.disabled = false;
+                addButton.textContent = 'Adicionar';
+            }
+        }
+        
+        async function deleteAnnotation() {
+            if (currentAnnotationIndex === null) return;
+            const deleteButton = document.querySelector('#annotation-modal button[onclick="deleteAnnotation()"]');
+            deleteButton.classList.add('loading');
+            deleteButton.disabled = true;
+            deleteButton.textContent = 'Apagando';
+        
+            try {
+                dados[currentAnnotationIndex].annotation = null;
+                await saveToJsonBin();
+                renderDadosCards();
+                renderDashboardTable();
+                closeAnnotationModal();
+                redirectToDashboard();
+            } catch (error) {
+                console.error('Erro ao deletar anotação:', error);
+                alert('Erro ao deletar a anotação no servidor.');
+            } finally {
+                deleteButton.classList.remove('loading');
+                deleteButton.disabled = false;
+                deleteButton.textContent = 'Apagar';
+            }
+        }
+        
+        function openAnnotationViewModal(index) {
+            const modal = document.getElementById('annotation-view-modal');
+            const textDiv = document.getElementById('annotation-view-text');
+            const annotationText = dados[index] ? (dados[index].annotation || 'Nenhuma anotação disponível.') : 'Nenhuma anotação disponível.';
+            textDiv.textContent = annotationText;
+            modal.style.display = 'flex';
+        }
+        
+        function closeAnnotationViewModal() {
+            document.getElementById('annotation-view-modal').style.display = 'none';
+        }
+        
+        async function init() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('data').value = today;
+        
+            toggleLoadingScreen(true);
+        
+            try {
+                await loadFromJsonBin();
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                alert('Erro ao carregar os dados do servidor.');
+            } finally {
+                toggleLoadingScreen(false);
+                document.getElementById('responsaveis-section').classList.add('hidden');
+                document.querySelector('.toggle-button').classList.add('active');
+                renderDashboardFilters();
+                loadDashboardFilters();
+                renderDashboardTable();
+                createCharts();
+            }
+        }
+        
+        init();
+        
+        const tabs = document.querySelectorAll('.tab-button');
+        const contents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', async (e) => {
+                clearDadosTabTimer();
+                if (tab.dataset.tab === 'dados') {
+                    e.preventDefault();
                     toggleLoadingScreen(true);
-                
                     try {
                         await loadFromJsonBin();
+                        tabs.forEach(t => t.classList.remove('active'));
+                        contents.forEach(c => c.classList.remove('active'));
+                        tab.classList.add('active');
+                        document.getElementById('dados').classList.add('active');
+                        renderDropdowns();
+                        renderPagination();
+                        startDadosTabTimer();
                     } catch (error) {
                         console.error('Erro ao carregar dados:', error);
                         alert('Erro ao carregar os dados do servidor.');
                     } finally {
-                        // Ocultar tela de carregamento e abrir modal de unidades
                         toggleLoadingScreen(false);
-                        document.getElementById('responsaveis-section').classList.add('hidden');
-                        document.querySelector('.toggle-button').classList.add('active');
+                    }
+                } else if (tab.dataset.tab === 'cadastro') {
+                    e.preventDefault();
+                    if (isCadastroAccessible) {
+                        tabs.forEach(t => t.classList.remove('active'));
+                        contents.forEach(c => c.classList.remove('active'));
+                        tab.classList.add('active');
+                        document.getElementById('cadastro').classList.add('active');
+                        renderMnemonicos();
+                        renderResponsaveis();
+                    } else {
+                        openPasswordModal();
+                    }
+                } else {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    const target = document.getElementById(tab.dataset.tab);
+                    target.classList.add('active');
+        
+                    if (tab.dataset.tab === 'dashboard') {
                         renderDashboardFilters();
                         loadDashboardFilters();
                         renderDashboardTable();
                         createCharts();
-                        openUnitModal();
                     }
                 }
-                
-                init();
-                
-                const tabs = document.querySelectorAll('.tab-button');
-                const contents = document.querySelectorAll('.tab-content');
-                
-                tabs.forEach(tab => {
-                    tab.addEventListener('click', async (e) => {
-                        clearDadosTabTimer(); // Limpar temporizador ao clicar em qualquer aba
-                        if (tab.dataset.tab === 'dados') {
-                            e.preventDefault();
-                            // Mostrar tela de carregamento
-                            toggleLoadingScreen(true);
-                            try {
-                                await loadFromJsonBin();
-                                // Prosseguir com a ativação da aba
-                                tabs.forEach(t => t.classList.remove('active'));
-                                contents.forEach(c => c.classList.remove('active'));
-                                tab.classList.add('active');
-                                document.getElementById('dados').classList.add('active');
-                                renderDropdowns();
-                                renderPagination();
-                                startDadosTabTimer(); // Iniciar temporizador para a aba Dados
-                            } catch (error) {
-                                console.error('Erro ao carregar dados:', error);
-                                alert('Erro ao carregar os dados do servidor.');
-                            } finally {
-                                toggleLoadingScreen(false);
-                            }
-                        } else if (tab.dataset.tab === 'cadastro') {
-                            e.preventDefault();
-                            if (isCadastroAccessible) {
-                                // Comportamento padrão da aba
-                                tabs.forEach(t => t.classList.remove('active'));
-                                contents.forEach(c => c.classList.remove('active'));
-                                tab.classList.add('active');
-                                document.getElementById('cadastro').classList.add('active');
-                                renderMnemonicos();
-                                renderResponsaveis();
-                            } else {
-                                openPasswordModal();
-                            }
-                        } else {
-                            tabs.forEach(t => t.classList.remove('active'));
-                            contents.forEach(c => c.classList.remove('active'));
-                            tab.classList.add('active');
-                            const target = document.getElementById(tab.dataset.tab);
-                            target.classList.add('active');
-                
-                            if (tab.dataset.tab === 'dashboard') {
-                                renderDashboardFilters();
-                                loadDashboardFilters();
-                                renderDashboardTable();
-                                createCharts();
-                            }
-                        }
-                    });
-                });
-                
-                function validateForm() {
-                    const manhaMin = document.getElementById('manha-min').value.trim() === '' ? null : parseFloat(document.getElementById('manha-min').value);
-                    const manhaMax = document.getElementById('manha-max').value.trim() === '' ? null : parseFloat(document.getElementById('manha-max').value);
-                    const manhaAtual = document.getElementById('manha-atual').value.trim() === '' ? null : parseFloat(document.getElementById('manha-atual').value);
-                    const tardeMin = document.getElementById('tarde-min').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-min').value);
-                    const tardeMax = document.getElementById('tarde-max').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-max').value);
-                    const tardeAtual = document.getElementById('tarde-atual').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-atual').value);
-                    validateDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeAtual);
-                }
-                
-                function showAlert() {
-                    const alertElement = document.getElementById('alert-message');
-                    alertElement.classList.remove('hidden');
-                    alertElement.classList.add('visible');
-                
-                    setTimeout(() => {
-                        alertElement.classList.remove('visible');
-                        setTimeout(() => {
-                            alertElement.classList.add('hidden');
-                        }, 1500);
-                    }, 5000);
-                }
-                
-                function showSuccessAlert() {
-                    const alertElement = document.getElementById('alert-message-success');
-                    alertElement.classList.remove('hidden');
-                    alertElement.classList.add('visible');
-                
-                    setTimeout(() => {
-                        alertElement.classList.remove('visible');
-                        setTimeout(() => {
-                            alertElement.classList.add('hidden');
-                        }, 1500);
-                    }, 5000);
-                }
-                
-                // Função para gerenciar a tela de carregamento
-                function toggleLoadingScreen(show) {
-                    const loadingScreen = document.getElementById('loading-screen');
-                    if (show) {
-                        loadingScreen.style.display = 'flex';
-                        loadingScreen.classList.remove('hidden');
-                    } else {
-                        loadingScreen.classList.add('hidden');
-                        setTimeout(() => {
-                            loadingScreen.style.display = 'none';
-                        }, 500); // Aguarda a transição de opacidade
-                    }
-                }
-                
-                const CORRECT_PASSWORD = 'Lamic6530@';
-                let isCadastroAccessible = false;
-                
-                // Função para abrir a modal de senha
-                function openPasswordModal() {
-                    const modal = document.getElementById('password-modal');
-                    const input = document.getElementById('password-input');
-                    const confirmButton = document.querySelector('#password-modal button:not(.close-modal)');
-                
-                    input.value = '';
-                    input.classList.remove('invalid');
-                    confirmButton.classList.remove('invalid');
-                    modal.querySelector('.password-modal-content').classList.remove('shake');
-                    modal.style.display = 'flex';
-                    input.focus();
-                }
-                
-                // Função para fechar a modal de senha
-                function closePasswordModal() {
-                    document.getElementById('password-modal').style.display = 'none';
-                    
-                    // Voltar para a aba Dashboard
-                    redirectToDashboard();
-                }
-                
-                // Função para verificar a senha
-                function checkPassword() {
-                    const input = document.getElementById('password-input');
-                    const confirmButton = document.querySelector('#password-modal button:not(.close-modal)');
-                    const modalContent = document.querySelector('.password-modal-content');
-                    const password = input.value.trim();
-                
-                    if (password === CORRECT_PASSWORD) {
-                        isCadastroAccessible = true;
-                        closePasswordModal();
-                        // Ativar a aba Cadastro
-                        document.querySelector('.tab-button[data-tab="cadastro"]').classList.add('active');
-                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                        document.getElementById('cadastro').classList.add('active');
-                        // Atualizar exibições
-                        renderMnemonicos();
-                        renderResponsaveis();
-                    } else {
-                        input.classList.add('invalid');
-                        confirmButton.classList.add('invalid');
-                        modalContent.classList.add('shake');
-                        setTimeout(() => {
-                            modalContent.classList.remove('shake');
-                        }, 500);
-                    }
-                }
-                
-                // Adicionar evento de tecla Enter no input de senha
-                document.addEventListener('DOMContentLoaded', () => {
-                    const passwordInput = document.getElementById('password-input');
-                    if (passwordInput) {
-                        passwordInput.addEventListener('keypress', (e) => {
-                            if (e.key === 'Enter') {
-                                checkPassword();
-                            }
-                        });
+            });
+        });
+        
+        function validateForm() {
+            const manhaMin = document.getElementById('manha-min').value.trim() === '' ? null : parseFloat(document.getElementById('manha-min').value);
+            const manhaMax = document.getElementById('manha-max').value.trim() === '' ? null : parseFloat(document.getElementById('manha-max').value);
+            const manhaAtual = document.getElementById('manha-atual').value.trim() === '' ? null : parseFloat(document.getElementById('manha-atual').value);
+            const tardeMin = document.getElementById('tarde-min').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-min').value);
+            const tardeMax = document.getElementById('tarde-max').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-max').value);
+            const tardeAtual = document.getElementById('tarde-atual').value.trim() === '' ? null : parseFloat(document.getElementById('tarde-atual').value);
+            validateDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeAtual);
+        }
+        
+        function showAlert() {
+            const alertElement = document.getElementById('alert-message');
+            alertElement.classList.remove('hidden');
+            alertElement.classList.add('visible');
+        
+            setTimeout(() => {
+                alertElement.classList.remove('visible');
+                setTimeout(() => {
+                    alertElement.classList.add('hidden');
+                }, 1500);
+            }, 5000);
+        }
+        
+        function showSuccessAlert() {
+            const alertElement = document.getElementById('alert-message-success');
+            alertElement.classList.remove('hidden');
+            alertElement.classList.add('visible');
+        
+            setTimeout(() => {
+                alertElement.classList.remove('visible');
+                setTimeout(() => {
+                    alertElement.classList.add('hidden');
+                }, 1500);
+            }, 5000);
+        }
+        
+        function toggleLoadingScreen(show) {
+            const loadingScreen = document.getElementById('loading-screen');
+            if (show) {
+                loadingScreen.style.display = 'flex';
+                loadingScreen.classList.remove('hidden');
+            } else {
+                loadingScreen.classList.add('hidden');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }
+        }
+        
+        const CORRECT_PASSWORD = 'Lamic6530@';
+        let isCadastroAccessible = false;
+        
+        function openPasswordModal() {
+            const modal = document.getElementById('password-modal');
+            const input = document.getElementById('password-input');
+            const confirmButton = document.querySelector('#password-modal button:not(.close-modal)');
+        
+            input.value = '';
+            input.classList.remove('invalid');
+            confirmButton.classList.remove('invalid');
+            modal.querySelector('.password-modal-content').classList.remove('shake');
+            modal.style.display = 'flex';
+            input.focus();
+        }
+        
+        function closePasswordModal() {
+            document.getElementById('password-modal').style.display = 'none';
+            redirectToDashboard();
+        }
+        
+        function checkPassword() {
+            const input = document.getElementById('password-input');
+            const confirmButton = document.querySelector('#password-modal button:not(.close-modal)');
+            const modalContent = document.querySelector('.password-modal-content');
+            const password = input.value.trim();
+        
+            if (password === CORRECT_PASSWORD) {
+                isCadastroAccessible = true;
+                closePasswordModal();
+                document.querySelector('.tab-button[data-tab="cadastro"]').classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById('cadastro').classList.add('active');
+                renderMnemonicos();
+                renderResponsaveis();
+            } else {
+                input.classList.add('invalid');
+                confirmButton.classList.add('invalid');
+                modalContent.classList.add('shake');
+                setTimeout(() => {
+                    modalContent.classList.remove('shake');
+                }, 500);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordInput = document.getElementById('password-input');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        checkPassword();
                     }
                 });
-                
-                document.getElementById('manha-min').addEventListener('input', validateForm);
-                document.getElementById('manha-max').addEventListener('input', validateForm);
-                document.getElementById('manha-atual').addEventListener('input', validateForm);
-                document.getElementById('tarde-min').addEventListener('input', validateForm);
-                document.getElementById('tarde-max').addEventListener('input', validateForm);
-                document.getElementById('tarde-atual').addEventListener('input', validateForm);
-                document.getElementById('dados-mnemonico').addEventListener('change', validateForm);
-                document.getElementById('dados-responsavel').addEventListener('change', validateForm);
+            }
+        });
+        
+        document.getElementById('manha-min').addEventListener('input', validateForm);
+        document.getElementById('manha-max').addEventListener('input', validateForm);
+        document.getElementById('manha-atual').addEventListener('input', validateForm);
+        document.getElementById('tarde-min').addEventListener('input', validateForm);
+        document.getElementById('tarde-max').addEventListener('input', validateForm);
+        document.getElementById('tarde-atual').addEventListener('input', validateForm);
+        document.getElementById('dados-mnemonico').addEventListener('change', validateForm);
+        document.getElementById('dados-responsavel').addEventListener('change', validateForm);
         </script>
 </body>
 </html>
