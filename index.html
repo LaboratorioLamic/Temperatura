@@ -1338,6 +1338,105 @@
 .password-modal-content .close-modal:hover {
     color: #ffffff;
 }
+/* Estilo para o botão de arquivar */
+.archive-button {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 5px;
+    top: 45px;
+    right: 10px;
+    position: absolute;
+}
+
+.archive-button:hover {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo para a seção de itens arquivados */
+.archived-section {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.archived-section h4 {
+    color: #001f3f;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.archived-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.archived-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.archived-item:hover {
+    background-color: #e6f0fa;
+}
+
+.archived-item span {
+    font-size: 14px;
+    color: #333;
+}
+
+.unarchive-button {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.unarchive-button:hover {
+    background: linear-gradient(135deg, #27ae60, #219653);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.list-item .archive-responsavel-button {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+.list-item .archive-responsavel-button:hover {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
 
     </style>
 </head>
@@ -1347,25 +1446,26 @@
     <div class="loading-text">Carregando dados...</div>
 </div>
     <header class="header">
-        <img src="https://raw.githubusercontent.com/LaboratorioLamic/Dados/889745f5320300e54e3c1de1f8255a95f7e4b5bc/assents/logo.png" alt="Logo" class="header-logo">
-        <h1>Controle de Temperatura</h1>
-        <div class="unit-subtitle">01 - Unidade NTO</div>
-        <div id="alert-message" class="alert hidden">
-            Aguardando preenchimento correto
-            <span class="loader"></span>
+    <img src="https://raw.githubusercontent.com/LaboratorioLamic/Dados/889745f5320300e54e3c1de1f8255a95f7e4b5bc/assents/logo.png" alt="Logo" class="header-logo">
+    <h1>Controle de Temperatura</h1>
+    <div class="unit-subtitle" id="selected-unit">Selecione uma Unidade</div>
+    <button class="change-unit-button" onclick="openUnitModal()">Trocar Unidade</button>
+    <div id="alert-message" class="alert hidden">
+        Aguardando preenchimento correto
+        <span class="loader"></span>
+    </div>
+    <div id="alert-message-success" class="alert-success hidden">
+        Dados atualizados com sucesso ✔
         </div>
-        <div id="alert-message-success" class="alert-success hidden">
-            Dados atualizados com sucesso ✔
+    <div class="password-modal" id="password-modal">
+        <div class="password-modal-content">
+            <h3>Inserir Senha</h3>
+            <button class="close-modal" onclick="closePasswordModal()">&#10006;</button>
+            <input type="password" id="password-input" placeholder="Digite a senha">
+            <button onclick="checkPassword()">Confirmar</button>
         </div>
-        <div class="password-modal" id="password-modal">
-            <div class="password-modal-content">
-                <h3>Inserir Senha</h3>
-                <button class="close-modal" onclick="closePasswordModal()">&#10006;</button>
-                <input type="password" id="password-input" placeholder="Digite a senha">
-                <button onclick="checkPassword()">Confirmar</button>
-            </div>
-        </div>
-    </header>
+    </div>
+</header>
 
 <nav>
     <div class="tabs">
@@ -1374,6 +1474,31 @@
         <button class="tab-button" data-tab="dados">Dados</button>
     </div>
 </nav>
+
+    <div class="modal" id="unit-modal">
+        <div class="modal-content">
+            <h3>Selecionar Unidade</h3>
+            <select id="unit-select">
+                <option value="">Selecione uma Unidade</option>
+                <option value="Caixas de Transporte">📦 Caixas de Transporte</option>
+                <option value="01 - Unidade NTO">01 - Unidade NTO</option>
+                <option value="03 - Unidade Crato">03 - Unidade Crato</option>
+                <option value="05 - Unidade Novo Juazeiro">05 - Unidade Novo Juazeiro</option>
+                <option value="06 - Unidade Milagres">06 - Unidade Milagres</option>
+                <option value="09 - Unidade Barro">09 - Unidade Barro</option>
+                <option value="10 - Unidade Office Cariri">10 - Unidade Office Cariri</option>
+                <option value="12 - Unidade Caririaçu">12 - Unidade Caririaçu</option>
+                <option value="13 - Unidade Campos Sales">13 - Unidade Campos Sales</option>
+                <option value="14 - Unidade Nova Olinda">14 - Unidade Nova Olinda</option>
+                <option value="16 - Unidade Araripe">16 - Unidade Araripe</option>
+                <option value="23 - Unidade Salesianos">23 - Unidade Salesianos</option>
+                <option value="62 - Unidade Clemir Arrais">62 - Unidade Clemir Arrais</option>
+                <option value="88 - Unidade Unicardio">88 - Unidade Unicardio</option>
+                <option value="97 - Unidade Endoclinic">97 - Unidade Endoclinic</option>
+            </select>
+            <button onclick="selectUnit()">Confirmar</button>
+        </div>
+    </div>
 
     <div class="annotation-modal" id="annotation-modal">
         <div class="annotation-modal-content">
@@ -1583,16 +1708,51 @@
         // Configuração do JSONBin.io
         const JSONBIN_API_KEY = '$2a$10$cREwumm/vr2Mj149sDZkKuXLp.pxT0D6PMgkf.yMEWR7YmIlrHJtm';
         const JSONBIN_BASE_URL = 'https://api.jsonbin.io/v3/b';
-        const JSONBIN_ID = '68c9bcb8d0ea881f40803435';
+        const JSONBIN_IDS = {
+            1: '68c9bcb8d0ea881f40803435',
+            2: '68c9bcc7d0ea881f40803447',
+            3: '68cd2dc0ae596e708ff3cd30',
+            5: '68cd2dcd43b1c97be9480ef6',
+            6: '68cd2ddbd0ea881f4082ff8c',
+            9: '68cd2de4d0ea881f4082ff91',
+            10: '68cd2dedae596e708ff3cd44',
+            12: '68cd2df8ae596e708ff3cd4f',
+            13: '68cd2e03ae596e708ff3cd57',
+            14: '68cd2e0eae596e708ff3cd69',
+            16: '68cd2e1c43b1c97be9480f31',
+            23: '68cd2e27d0ea881f4082ffb7',
+            62: '68cd2e30d0ea881f4082ffbd',
+            88: '68cd2e3c43b1c97be9480f47',
+            97: '68cd2e4543b1c97be9480f53'
+        };
         
         // Dados em memória
         let mnemonicos = [];
+        let archivedMnemonicos = [];
         let responsaveis = [];
+        let archivedResponsaveis = [];
         let dados = [];
-        const selectedUnitId = 1; // Unidade fixa: 01 - Unidade NTO
+        let unidades = [
+            { id: 2, name: "Caixas de Transporte" },
+            { id: 1, name: "01 - Unidade NTO" },
+            { id: 3, name: "03 - Unidade Crato" },
+            { id: 5, name: "05 - Unidade Novo Juazeiro" },
+            { id: 6, name: "06 - Unidade Milagres" },
+            { id: 9, name: "09 - Unidade Barro" },
+            { id: 10, name: "10 - Unidade Office Cariri" },
+            { id: 12, name: "12 - Unidade Caririaçu" },
+            { id: 13, name: "13 - Unidade Campos Sales" },
+            { id: 14, name: "14 - Unidade Nova Olinda" },
+            { id: 16, name: "16 - Unidade Araripe" },
+            { id: 23, name: "23 - Unidade Salesianos" },
+            { id: 62, name: "62 - Unidade Clemir Arrais" },
+            { id: 88, name: "88 - Unidade Unicardio" },
+            { id: 97, name: "97 - Unidade Endoclinic" }
+        ];
         let currentPage = 1;
         const itemsPerPage = 40;
         const maxPagesDisplayed = 5;
+        let selectedUnitId = null;
         
         // Variáveis para os gráficos
         let manhaChart = null;
@@ -1603,10 +1763,10 @@
         
         // Função para iniciar o temporizador de redirecionamento
         function startDadosTabTimer() {
-            clearDadosTabTimer(); // Limpa qualquer temporizador existente
+            clearDadosTabTimer();
             dadosTabTimeout = setTimeout(() => {
                 redirectToDashboard();
-            }, 60000); // 60 segundos
+            }, 60000);
         }
         
         // Função para limpar o temporizador
@@ -1629,11 +1789,18 @@
             updateCharts();
         }
         
+        // Função para determinar o binID com base na unidade
+        function getBinIdForUnit(unitId) {
+            return JSONBIN_IDS[unitId];
+        }
+        
         // Funções para comunicação com JSONBin.io
         async function saveToJsonBin() {
-            const data = { mnemonicos, responsaveis, dados };
+            if (!selectedUnitId) return;
+            const binId = getBinIdForUnit(selectedUnitId);
+            const data = { mnemonicos, archivedMnemonicos, responsaveis, archivedResponsaveis, dados };
             try {
-                const response = await fetch(`${JSONBIN_BASE_URL}/${JSONBIN_ID}`, {
+                const response = await fetch(`${JSONBIN_BASE_URL}/${binId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1651,8 +1818,11 @@
         }
         
         async function loadFromJsonBin() {
+            if (!selectedUnitId) return;
+            const binId = getBinIdForUnit(selectedUnitId);
+            toggleLoadingScreen(true);
             try {
-                const response = await fetch(`${JSONBIN_BASE_URL}/${JSONBIN_ID}/latest`, {
+                const response = await fetch(`${JSONBIN_BASE_URL}/${binId}/latest`, {
                     headers: {
                         'X-Master-Key': JSONBIN_API_KEY
                     }
@@ -1660,7 +1830,9 @@
                 if (response.ok) {
                     const result = await response.json();
                     mnemonicos = result.record.mnemonicos || [];
+                    archivedMnemonicos = result.record.archivedMnemonicos || [];
                     responsaveis = result.record.responsaveis || [];
+                    archivedResponsaveis = result.record.archivedResponsaveis || [];
                     dados = result.record.dados || [];
                     renderMnemonicos();
                     renderResponsaveis();
@@ -1674,11 +1846,46 @@
                 }
             } catch (error) {
                 console.error('Erro ao carregar:', error);
+                alert('Erro ao carregar os dados do servidor.');
+            } finally {
+                toggleLoadingScreen(false);
             }
+        }
+        
+        // Função para abrir a janela modal
+        function openUnitModal() {
+            const modal = document.getElementById('unit-modal');
+            modal.style.display = 'flex';
+            const select = document.getElementById('unit-select');
+            select.value = '';
+        }
+        
+        // Função para selecionar a unidade
+        async function selectUnit() {
+            const select = document.getElementById('unit-select');
+            const selectedUnit = unidades.find(u => u.name === select.value);
+            selectedUnitId = selectedUnit ? selectedUnit.id : null;
+            localStorage.setItem('selectedUnitId', selectedUnitId);
+            updateUnitDisplay();
+            document.getElementById('unit-modal').style.display = 'none';
+            if (selectedUnitId) {
+                await loadFromJsonBin();
+            }
+        }
+        
+        // Função para atualizar a exibição da unidade selecionada
+        function updateUnitDisplay() {
+            const unitDisplay = document.getElementById('selected-unit');
+            const selectedUnit = unidades.find(u => u.id === selectedUnitId);
+            unitDisplay.textContent = selectedUnit ? selectedUnit.name : 'Selecione uma Unidade';
         }
         
         // Funções para Cadastro de Mnemonicos
         async function addMnemonico() {
+            if (!selectedUnitId) {
+                alert('Por favor, selecione uma unidade antes de adicionar um mnemonico.');
+                return;
+            }
             const button = document.querySelector('#mnemonicos-section button');
             button.classList.add('loading');
             button.disabled = true;
@@ -1692,7 +1899,7 @@
                 const max = parseFloat(document.getElementById('max').value);
                 if (mnemonico && tipo && legenda && !isNaN(min) && !isNaN(max)) {
                     const newId = mnemonicos.length > 0 ? Math.max(...mnemonicos.map(m => m.id || 0)) + 1 : 1;
-                    mnemonicos.push({ id: newId, mnemonico, tipo, legenda, min, max, unitId: selectedUnitId });
+                    mnemonicos.push({ id: newId, mnemonico, tipo, legenda, min, max });
                     await saveToJsonBin();
                     renderMnemonicos();
                     renderDropdowns();
@@ -1725,53 +1932,131 @@
         }
         
         async function deleteMnemonico(index) {
-            mnemonicos.splice(index, 1);
-            await saveToJsonBin();
-            renderMnemonicos();
-            renderDropdowns();
-            renderDashboardTable();
+    if (!confirm('Tem certeza que deseja excluir este mnemonico?')) {
+        return;
+    }
+    mnemonicos.splice(index, 1);
+    await saveToJsonBin();
+    renderMnemonicos();
+    renderDropdowns();
+    renderDashboardTable();
+}
+
+        async function archiveMnemonico(index) {
+            const button = document.querySelectorAll('.mnemonico-card .archive-button')[index];
+            if (button) {
+                button.classList.add('loading');
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner"></span>';
+            }
+        
+            try {
+                const mnemonico = mnemonicos.splice(index, 1)[0];
+                archivedMnemonicos.push(mnemonico);
+                await saveToJsonBin();
+                renderMnemonicos();
+                renderDropdowns();
+                renderDashboardTable();
+            } catch (error) {
+                console.error('Erro ao arquivar mnemonico:', error);
+                alert('Erro ao arquivar o mnemonico no servidor.');
+            } finally {
+                if (button) {
+                    button.classList.remove('loading');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-archive"></i>';
+                }
+            }
+        }
+        
+        async function unarchiveMnemonico(index) {
+            const button = document.querySelectorAll('.archived-mnemonicos .unarchive-button')[index];
+            if (button) {
+                button.classList.add('loading');
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner"></span>';
+            }
+        
+            try {
+                const mnemonico = archivedMnemonicos.splice(index, 1)[0];
+                mnemonicos.push(mnemonico);
+                await saveToJsonBin();
+                renderMnemonicos();
+                renderDropdowns();
+                renderDashboardTable();
+            } catch (error) {
+                console.error('Erro ao desarquivar mnemonico:', error);
+                alert('Erro ao desarquivar o mnemonico no servidor.');
+            } finally {
+                if (button) {
+                    button.classList.remove('loading');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-undo"></i>';
+                }
+            }
         }
         
         function renderMnemonicos() {
             const list = document.getElementById('mnemonicos-list');
             list.innerHTML = '';
-            const filteredMnemonicos = mnemonicos.filter(item => item.unitId === selectedUnitId)
-                .sort((a, b) => a.mnemonico.localeCompare(b.mnemonico));
+            const filteredMnemonicos = mnemonicos.sort((a, b) => a.mnemonico.localeCompare(b.mnemonico));
             filteredMnemonicos.forEach((item, index) => {
-                const globalIndex = mnemonicos.findIndex(m => m.id === item.id);
                 const card = document.createElement('div');
                 card.className = 'mnemonico-card';
                 card.innerHTML = `
                     <div class="card-content">
                         <div class="card-field">
                             <label>Mnemonico</label>
-                            <input type="text" value="${item.mnemonico}" onchange="updateMnemonico(${globalIndex}, 'mnemonico', this.value)">
+                            <input type="text" value="${item.mnemonico}" onchange="updateMnemonico(${index}, 'mnemonico', this.value)">
                         </div>
                         <div class="card-field">
                             <label>Tipo</label>
-                            <input type="text" value="${item.tipo}" onchange="updateMnemonico(${globalIndex}, 'tipo', this.value)">
+                            <input type="text" value="${item.tipo}" onchange="updateMnemonico(${index}, 'tipo', this.value)">
                         </div>
                         <div class="card-field">
                             <label>Legenda</label>
-                            <input type="text" value="${item.legenda}" onchange="updateMnemonico(${globalIndex}, 'legenda', this.value)">
+                            <input type="text" value="${item.legenda}" onchange="updateMnemonico(${index}, 'legenda', this.value)">
                         </div>
                         <div class="card-field">
                             <label>Min</label>
-                            <input type="number" step="0.1" value="${item.min}" onchange="updateMnemonico(${globalIndex}, 'min', parseFloat(this.value))">
+                            <input type="number" step="0.1" value="${item.min}" onchange="updateMnemonico(${index}, 'min', parseFloat(this.value))">
                         </div>
                         <div class="card-field">
                             <label>Max</label>
-                            <input type="number" step="0.1" value="${item.max}" onchange="updateMnemonico(${globalIndex}, 'max', parseFloat(this.value))">
+                            <input type="number" step="0.1" value="${item.max}" onchange="updateMnemonico(${index}, 'max', parseFloat(this.value))">
                         </div>
                     </div>
-                    <button class="delete-card" onclick="deleteMnemonico(${globalIndex})">Excluir</button>
+                    <button class="delete-card" onclick="deleteMnemonico(${index})">Excluir</button>
+                    <button class="archive-button" onclick="archiveMnemonico(${index})"><i class="fas fa-archive"></i></button>
                 `;
                 list.appendChild(card);
+            });
+        
+            // Renderizar mnemonicos arquivados
+            const archivedList = document.createElement('div');
+            archivedList.className = 'archived-section';
+            archivedList.innerHTML = '<h4>Mnemonicos Arquivados</h4><div class="archived-list" id="archived-mnemonicos"></div>';
+            list.appendChild(archivedList);
+            const archivedMnemonicosList = document.getElementById('archived-mnemonicos');
+            archivedMnemonicosList.innerHTML = '';
+            const filteredArchivedMnemonicos = archivedMnemonicos.sort((a, b) => a.mnemonico.localeCompare(b.mnemonico));
+            filteredArchivedMnemonicos.forEach((item, index) => {
+                const archivedItem = document.createElement('div');
+                archivedItem.className = 'archived-item';
+                archivedItem.innerHTML = `
+                    <span>${item.mnemonico} (${item.tipo})</span>
+                    <button class="unarchive-button" onclick="unarchiveMnemonico(${index})"><i class="fas fa-undo"></i></button>
+                `;
+                archivedMnemonicosList.appendChild(archivedItem);
             });
         }
         
         // Funções para Cadastro de Responsáveis
         async function addResponsavel() {
+            if (!selectedUnitId) {
+                alert('Por favor, selecione uma unidade antes de adicionar um responsável.');
+                return;
+            }
             const button = document.querySelector('#responsaveis-section button');
             button.classList.add('loading');
             button.disabled = true;
@@ -1781,7 +2066,7 @@
                 const responsavel = document.getElementById('responsavel').value.trim();
                 if (responsavel) {
                     const newId = responsaveis.length > 0 ? Math.max(...responsaveis.map(r => r.id || 0)) + 1 : 1;
-                    responsaveis.push({ id: newId, name: responsavel, unitId: selectedUnitId });
+                    responsaveis.push({ id: newId, name: responsavel });
                     await saveToJsonBin();
                     renderResponsaveis();
                     renderDropdowns();
@@ -1813,26 +2098,100 @@
         }
         
         async function deleteResponsavel(index) {
-            responsaveis.splice(index, 1);
-            await saveToJsonBin();
-            renderResponsaveis();
-            renderDropdowns();
+    if (!confirm('Tem certeza que deseja excluir este responsável?')) {
+        return;
+    }
+    responsaveis.splice(index, 1);
+    await saveToJsonBin();
+    renderResponsaveis();
+    renderDropdowns();
+}
+
+        async function archiveResponsavel(index) {
+            const button = document.querySelectorAll('.list-item .archive-responsavel-button')[index];
+            if (button) {
+                button.classList.add('loading');
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner"></span>';
+            }
+        
+            try {
+                const responsavel = responsaveis.splice(index, 1)[0];
+                archivedResponsaveis.push(responsavel);
+                await saveToJsonBin();
+                renderResponsaveis();
+                renderDropdowns();
+                renderDashboardTable();
+            } catch (error) {
+                console.error('Erro ao arquivar responsável:', error);
+                alert('Erro ao arquivar o responsável no servidor.');
+            } finally {
+                if (button) {
+                    button.classList.remove('loading');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-archive"></i>';
+                }
+            }
+        }
+        
+        async function unarchiveResponsavel(index) {
+            const button = document.querySelectorAll('.archived-responsaveis .unarchive-button')[index];
+            if (button) {
+                button.classList.add('loading');
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner"></span>';
+            }
+        
+            try {
+                const responsavel = archivedResponsaveis.splice(index, 1)[0];
+                responsaveis.push(responsavel);
+                await saveToJsonBin();
+                renderResponsaveis();
+                renderDropdowns();
+                renderDashboardTable();
+            } catch (error) {
+                console.error('Erro ao desarquivar responsável:', error);
+                alert('Erro ao desarquivar o responsável no servidor.');
+            } finally {
+                if (button) {
+                    button.classList.remove('loading');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-undo"></i>';
+                }
+            }
         }
         
         function renderResponsaveis() {
             const list = document.getElementById('responsaveis-list');
             list.innerHTML = '';
-            const filteredResponsaveis = responsaveis.filter(item => item.unitId === selectedUnitId)
-                .sort((a, b) => a.name.localeCompare(b.name));
+            const filteredResponsaveis = responsaveis.sort((a, b) => a.name.localeCompare(b.name));
             filteredResponsaveis.forEach((item, index) => {
-                const globalIndex = responsaveis.findIndex(r => r.id === item.id);
                 const div = document.createElement('div');
                 div.className = 'list-item';
                 div.innerHTML = `
-                    <input type="text" class="edit-input" value="${item.name}" onchange="updateResponsavel(${globalIndex}, this.value)">
-                    <button onclick="deleteResponsavel(${globalIndex})">Excluir</button>
+                    <input type="text" class="edit-input" value="${item.name}" onchange="updateResponsavel(${index}, this.value)">
+                    <button class="archive-responsavel-button" onclick="archiveResponsavel(${index})"><i class="fas fa-archive"></i></button>
+                    <button onclick="deleteResponsavel(${index})">Excluir</button>
                 `;
                 list.appendChild(div);
+            });
+        
+            // Renderizar responsáveis arquivados
+            const archivedList = document.createElement('div');
+            archivedList.className = 'archived-section';
+            archivedList.innerHTML = '<h4>Responsáveis Arquivados</h4><div class="archived-list" id="archived-responsaveis"></div>';
+            list.appendChild(archivedList);
+            const archivedResponsaveisList = document.getElementById('archived-responsaveis');
+            archivedResponsaveisList.innerHTML = '';
+            const filteredArchivedResponsaveis = archivedResponsaveis.sort((a, b) => a.name.localeCompare(b.name));
+            filteredArchivedResponsaveis.forEach((item, index) => {
+                const archivedItem = document.createElement('div');
+                archivedItem.className = 'archived-item';
+                archivedItem.innerHTML = `
+                    <span>${item.name}</span>
+                    <button class="unarchive-button" onclick="unarchiveResponsavel(${index})"><i class="fas fa-undo"></i></button>
+                `;
+                archivedResponsaveisList.appendChild(archivedItem);
             });
         }
         
@@ -1842,8 +2201,7 @@
             mnemonicoSelect.innerHTML = '<option value="">Selecione</option>';
             const filterMnemonicoSelect = document.getElementById('filter-mnemonico');
             filterMnemonicoSelect.innerHTML = '<option value="">Selecione</option>';
-            const filteredMnemonicos = mnemonicos.filter(item => item.unitId === selectedUnitId)
-                .sort((a, b) => a.mnemonico.localeCompare(b.mnemonico));
+            const filteredMnemonicos = mnemonicos.sort((a, b) => a.mnemonico.localeCompare(b.mnemonico));
             filteredMnemonicos.forEach(item => {
                 const option = document.createElement('option');
                 option.value = item.id;
@@ -1854,8 +2212,7 @@
         
             const responsavelSelect = document.getElementById('dados-responsavel');
             responsavelSelect.innerHTML = '<option value="">Selecione</option>';
-            const filteredResponsaveis = responsaveis.filter(item => item.unitId === selectedUnitId)
-                .sort((a, b) => a.name.localeCompare(b.name));
+            const filteredResponsaveis = responsaveis.sort((a, b) => a.name.localeCompare(b.name));
             filteredResponsaveis.forEach(item => {
                 const option = document.createElement('option');
                 option.value = item.id;
@@ -1934,6 +2291,10 @@
         
         // Funções para Dados
         async function addDado() {
+            if (!selectedUnitId) {
+                alert('Por favor, selecione uma unidade antes de adicionar dados.');
+                return;
+            }
             const button = document.querySelector('#dados button');
             button.classList.add('loading');
             button.disabled = true;
@@ -1961,13 +2322,12 @@
                         tardeMin,
                         tardeMax,
                         tardeAtual,
-                        unitId: selectedUnitId,
                         annotation: null
                     };
                     dados.unshift(newDado);
                     dados.sort((a, b) => new Date(b.data) - new Date(a.data));
-                    if (dados.filter(item => item.unitId === selectedUnitId).length > 50) {
-                        const oldest = dados.filter(item => item.unitId === selectedUnitId).slice(-1)[0];
+                    if (dados.length > 50) {
+                        const oldest = dados.slice(-1)[0];
                         const index = dados.findIndex(item => item === oldest);
                         dados.splice(index, 1);
                     }
@@ -1981,15 +2341,13 @@
                         const globalIndex = dados.findIndex(d =>
                             d.data === newDado.data &&
                             d.mnemonicoId === newDado.mnemonicoId &&
-                            d.responsavelId === newDado.responsavelId &&
-                            d.unitId === newDado.unitId
+                            d.responsavelId === newDado.responsavelId
                         );
                         if (globalIndex !== -1) {
                             openAnnotationModal(globalIndex);
                         }
                     }
                     clearDadosForm();
-                    // Redirecionar para a aba Dashboard
                     redirectToDashboard();
                 } else {
                     alert('Por favor, corrija os campos inválidos (data, mnemonico e responsável são obrigatórios).');
@@ -2006,7 +2364,7 @@
         
         // Função para validar dados puramente no modelo
         function validateDadoByIndex(index) {
-            if (index < 0 || index >= dados.length || !dados[index] || dados[index].unitId !== selectedUnitId) {
+            if (index < 0 || index >= dados.length || !dados[index]) {
                 return { valid: false, invalidFields: [] };
             }
         
@@ -2086,18 +2444,17 @@
         function renderDadosCards() {
             const cardsContainer = document.getElementById('dados-cards');
             cardsContainer.innerHTML = '';
-            const filteredDados = dados.filter(item => item.unitId === selectedUnitId)
-                .sort((a, b) => {
-                    const dateA = new Date(a.data);
-                    const dateB = new Date(b.data);
-                    dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
-                    dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
-                    const dateComparison = dateB - dateA;
-                    if (dateComparison !== 0) return dateComparison;
-                    const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
-                    const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
-                    return mnemonicoA.localeCompare(mnemonicoB);
-                });
+            const filteredDados = dados.sort((a, b) => {
+                const dateA = new Date(a.data);
+                const dateB = new Date(b.data);
+                dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
+                dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
+                const dateComparison = dateB - dateA;
+                if (dateComparison !== 0) return dateComparison;
+                const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
+                const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
+                return mnemonicoA.localeCompare(mnemonicoB);
+            });
             const start = (currentPage - 1) * itemsPerPage;
             const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
         
@@ -2105,8 +2462,7 @@
                 const globalIndex = dados.findIndex(d => 
                     d.data === item.data &&
                     d.mnemonicoId === item.mnemonicoId &&
-                    d.responsavelId === item.responsavelId &&
-                    d.unitId === item.unitId
+                    d.responsavelId === item.responsavelId
                 );
         
                 if (globalIndex === -1) {
@@ -2167,27 +2523,24 @@
         }
         
         async function updateDado(index, field, value) {
-            const filteredDados = dados
-                .filter(item => item.unitId === selectedUnitId)
-                .sort((a, b) => {
-                    const dateA = new Date(a.data);
-                    const dateB = new Date(b.data);
-                    dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
-                    dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
-                    const dateComparison = dateB - dateA;
-                    if (dateComparison !== 0) return dateComparison;
-                    const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
-                    const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
-                    return mnemonicoA.localeCompare(mnemonicoB);
-                });
+            const filteredDados = dados.sort((a, b) => {
+                const dateA = new Date(a.data);
+                const dateB = new Date(b.data);
+                dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
+                dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
+                const dateComparison = dateB - dateA;
+                if (dateComparison !== 0) return dateComparison;
+                const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
+                const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
+                return mnemonicoA.localeCompare(mnemonicoB);
+            });
         
             const start = (currentPage - 1) * itemsPerPage;
             const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
             const cardIndex = paginatedDados.findIndex(d => 
                 d.data === dados[index].data &&
                 d.mnemonicoId === dados[index].mnemonicoId &&
-                d.responsavelId === dados[index].responsavelId &&
-                d.unitId === dados[index].unitId
+                d.responsavelId === dados[index].responsavelId
             );
         
             let card = null;
@@ -2254,19 +2607,17 @@
                 console.warn(`Validação falhou para o índice ${globalIndex}:`, validation.invalidFields);
             }
         
-            const filteredDados = dados
-                .filter(item => item && item.unitId === selectedUnitId)
-                .sort((a, b) => {
-                    const dateA = new Date(a.data);
-                    const dateB = new Date(b.data);
-                    dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
-                    dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
-                    const dateComparison = dateB - dateA;
-                    if (dateComparison !== 0) return dateComparison;
-                    const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
-                    const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
-                    return mnemonicoA.localeCompare(mnemonicoB);
-                });
+            const filteredDados = dados.sort((a, b) => {
+                const dateA = new Date(a.data);
+                const dateB = new Date(b.data);
+                dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
+                dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
+                const dateComparison = dateB - dateA;
+                if (dateComparison !== 0) return dateComparison;
+                const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
+                const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
+                return mnemonicoA.localeCompare(mnemonicoB);
+            });
         
             const start = (currentPage - 1) * itemsPerPage;
             const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
@@ -2274,8 +2625,7 @@
                 d && 
                 d.data === dados[globalIndex].data &&
                 d.mnemonicoId === dados[globalIndex].mnemonicoId &&
-                d.responsavelId === dados[globalIndex].responsavelId &&
-                d.unitId === dados[globalIndex].unitId
+                d.responsavelId === dados[globalIndex].responsavelId
             );
         
             if (cardIndex !== -1) {
@@ -2308,41 +2658,52 @@
         }
         
         async function deleteDado(index) {
-            const button = document.querySelectorAll('.dados-card .delete-card')[index % itemsPerPage];
-            if (button) {
-                button.classList.add('loading');
-                button.disabled = true;
-                button.innerHTML = '<span class="spinner"></span>';
-            }
-        
-            try {
-                dados.splice(index, 1);
-                if (currentPage > Math.ceil(dados.filter(item => item.unitId === selectedUnitId).length / itemsPerPage)) {
-                    currentPage = Math.max(1, Math.ceil(dados.filter(item => item.unitId === selectedUnitId).length / itemsPerPage));
-                }
-                dados.sort((a, b) => new Date(b.data) - new Date(a.data));
-                await saveToJsonBin();
-                renderDadosCards();
-                renderPagination();
-                renderDashboardTable();
-                redirectToDashboard();
-            } catch (error) {
-                console.error('Erro ao deletar dado:', error);
-                alert('Erro ao deletar o dado no servidor.');
-            } finally {
-                if (button) {
-                    button.classList.remove('loading');
-                    button.disabled = false;
-                    button.innerHTML = '&#10006;';
-                }
-            }
+    const cards = document.querySelectorAll('.dados-card');
+    const localIndex = index % itemsPerPage;
+    const card = cards[localIndex];
+    const button = card ? card.querySelector('.delete-card') : null;
+
+    if (card) {
+        card.classList.add('loading');
+        card.style.opacity = '0.7';
+        card.style.transition = 'opacity 0.3s ease';
+    }
+
+    if (button) {
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner"></span>';
+    }
+
+    try {
+        dados.splice(index, 1);
+        if (currentPage > Math.ceil(dados.length / itemsPerPage)) {
+            currentPage = Math.max(1, Math.ceil(dados.length / itemsPerPage));
         }
-        
+        dados.sort((a, b) => new Date(b.data) - new Date(a.data));
+        await saveToJsonBin();
+        renderDadosCards();
+        renderPagination();
+        renderDashboardTable();
+        redirectToDashboard();
+    } catch (error) {
+        console.error('Erro ao deletar dado:', error);
+        alert('Erro ao deletar o dado no servidor.');
+    } finally {
+        if (card) {
+            card.classList.remove('loading');
+            card.style.opacity = '1';
+        }
+        if (button) {
+            button.disabled = false;
+            button.innerHTML = '&#10006;';
+        }
+    }
+}
+
         function renderPagination() {
             const paginationContainer = document.getElementById('pagination');
             paginationContainer.innerHTML = '';
-            const filteredDados = dados.filter(item => item.unitId === selectedUnitId);
-            const totalPages = Math.ceil(filteredDados.length / itemsPerPage);
+            const totalPages = Math.ceil(dados.length / itemsPerPage);
         
             if (totalPages <= 1) return;
         
@@ -2405,7 +2766,7 @@
                 document.getElementById('filter-mnemonico').value = filters.mnemonicoId || '';
         
                 if (filters.mnemonicoId) {
-                    const mnemonicoData = mnemonicos.find(item => item.id === parseInt(filters.mnemonicoId) && item.unitId === selectedUnitId);
+                    const mnemonicoData = mnemonicos.find(item => item.id === parseInt(filters.mnemonicoId));
                     if (mnemonicoData) {
                         document.getElementById('mnemonico-tipo').textContent = mnemonicoData.tipo;
                         document.getElementById('mnemonico-legenda').textContent = mnemonicoData.legenda;
@@ -2678,7 +3039,7 @@
             const ano = document.getElementById('filter-ano').value;
             const mnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
         
-            if (!mes || !ano || !mnemonicoId || !selectedUnitId) {
+            if (!mes || !ano || !mnemonicoId) {
                 return [];
             }
         
@@ -2686,14 +3047,13 @@
                 const [itemYear, itemMonth] = item.data.split('-').map(Number);
                 return itemMonth === parseInt(mes) &&
                        itemYear === parseInt(ano) &&
-                       item.mnemonicoId === mnemonicoId &&
-                       item.unitId === selectedUnitId;
+                       item.mnemonicoId === mnemonicoId;
             }).sort((a, b) => a.data.localeCompare(b.data));
         }
         
         function getCurrentMnemonicoData() {
             const mnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
-            return mnemonicos.find(m => m.id === mnemonicoId && m.unitId === selectedUnitId);
+            return mnemonicos.find(m => m.id === mnemonicoId);
         }
         
         function updateCharts() {
@@ -2722,7 +3082,7 @@
         
             document.getElementById('filter-mnemonico').addEventListener('change', function() {
                 const mnemonicoId = parseInt(this.value);
-                const mnemonicoData = mnemonicos.find(item => item.id === mnemonicoId && item.unitId === selectedUnitId);
+                const mnemonicoData = mnemonicos.find(item => item.id === mnemonicoId);
                 document.getElementById('mnemonico-tipo').textContent = mnemonicoData ? mnemonicoData.tipo : '';
                 document.getElementById('mnemonico-legenda').textContent = mnemonicoData ? mnemonicoData.legenda : '';
                 document.getElementById('mnemonico-min').textContent = mnemonicoData ? mnemonicoData.min.toFixed(1) : '';
@@ -2749,7 +3109,7 @@
             const tbody = document.querySelector('#dashboard-table tbody');
             tbody.innerHTML = '';
         
-            if (!mes || !ano || !mnemonicoId || !selectedUnitId) {
+            if (!mes || !ano || !mnemonicoId) {
                 return;
             }
         
@@ -2757,8 +3117,7 @@
                 const [itemYear, itemMonth] = item.data.split('-').map(Number);
                 return itemMonth === parseInt(mes) &&
                        itemYear === parseInt(ano) &&
-                       item.mnemonicoId === mnemonicoId &&
-                       item.unitId === selectedUnitId;
+                       item.mnemonicoId === mnemonicoId;
             }).sort((a, b) => {
                 const dateComparison = b.data.localeCompare(a.data);
                 if (dateComparison !== 0) return dateComparison;
@@ -2771,8 +3130,7 @@
                 const globalIndex = dados.findIndex(d => 
                     d.data === item.data &&
                     d.mnemonicoId === item.mnemonicoId &&
-                    d.responsavelId === item.responsavelId &&
-                    d.unitId === item.unitId
+                    d.responsavelId === item.responsavelId
                 );
         
                 if (globalIndex === -1) {
@@ -2782,7 +3140,7 @@
         
                 const row = document.createElement('tr');
         
-                const mnemonicoData = mnemonicos.find(m => m.id === item.mnemonicoId && m.unitId === selectedUnitId);
+                const mnemonicoData = mnemonicos.find(m => m.id === item.mnemonicoId);
                 const responsavel = responsaveis.find(r => r.id === item.responsavelId)?.name || 'Desconhecido';
                 const mnemonico = mnemonicoData ? mnemonicoData.mnemonico : 'Desconhecido';
         
@@ -2945,22 +3303,15 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('data').value = today;
         
-            toggleLoadingScreen(true);
+            selectedUnitId = null;
+            localStorage.removeItem('selectedUnitId');
+            updateUnitDisplay();
         
-            try {
-                await loadFromJsonBin();
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                alert('Erro ao carregar os dados do servidor.');
-            } finally {
-                toggleLoadingScreen(false);
-                document.getElementById('responsaveis-section').classList.add('hidden');
-                document.querySelector('.toggle-button').classList.add('active');
-                renderDashboardFilters();
-                loadDashboardFilters();
-                renderDashboardTable();
-                createCharts();
-            }
+            document.getElementById('responsaveis-section').classList.add('hidden');
+            document.querySelector('.toggle-button').classList.add('active');
+            renderDashboardFilters();
+            toggleLoadingScreen(false);
+            openUnitModal();
         }
         
         init();
@@ -2973,8 +3324,13 @@
                 clearDadosTabTimer();
                 if (tab.dataset.tab === 'dados') {
                     e.preventDefault();
-                    toggleLoadingScreen(true);
+                    if (!selectedUnitId) {
+                        alert('Por favor, selecione uma unidade antes de acessar a aba Dados.');
+                        openUnitModal();
+                        return;
+                    }
                     try {
+                        toggleLoadingScreen(true);
                         await loadFromJsonBin();
                         tabs.forEach(t => t.classList.remove('active'));
                         contents.forEach(c => c.classList.remove('active'));
@@ -2991,6 +3347,11 @@
                     }
                 } else if (tab.dataset.tab === 'cadastro') {
                     e.preventDefault();
+                    if (!selectedUnitId) {
+                        alert('Por favor, selecione uma unidade antes de acessar a aba Cadastro.');
+                        openUnitModal();
+                        return;
+                    }
                     if (isCadastroAccessible) {
                         tabs.forEach(t => t.classList.remove('active'));
                         contents.forEach(c => c.classList.remove('active'));
@@ -3009,6 +3370,10 @@
                     target.classList.add('active');
         
                     if (tab.dataset.tab === 'dashboard') {
+                        if (!selectedUnitId) {
+                            openUnitModal();
+                            return;
+                        }
                         renderDashboardFilters();
                         loadDashboardFilters();
                         renderDashboardTable();
@@ -3067,70 +3432,70 @@
             }
         }
         
-        const CORRECT_PASSWORD = 'Lamic6530@';
-        let isCadastroAccessible = false;
-        
-        function openPasswordModal() {
-            const modal = document.getElementById('password-modal');
-            const input = document.getElementById('password-input');
-            const confirmButton = document.querySelector('#password-modal button:not(.close-modal)');
-        
-            input.value = '';
-            input.classList.remove('invalid');
-            confirmButton.classList.remove('invalid');
-            modal.querySelector('.password-modal-content').classList.remove('shake');
-            modal.style.display = 'flex';
-            input.focus();
-        }
-        
-        function closePasswordModal() {
-            document.getElementById('password-modal').style.display = 'none';
-            redirectToDashboard();
-        }
-        
-        function checkPassword() {
-            const input = document.getElementById('password-input');
-            const confirmButton = document.querySelector('#password-modal button:not(.close-modal)');
-            const modalContent = document.querySelector('.password-modal-content');
-            const password = input.value.trim();
-        
-            if (password === CORRECT_PASSWORD) {
-                isCadastroAccessible = true;
-                closePasswordModal();
-                document.querySelector('.tab-button[data-tab="cadastro"]').classList.add('active');
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                document.getElementById('cadastro').classList.add('active');
-                renderMnemonicos();
-                renderResponsaveis();
-            } else {
-                input.classList.add('invalid');
-                confirmButton.classList.add('invalid');
-                modalContent.classList.add('shake');
-                setTimeout(() => {
-                    modalContent.classList.remove('shake');
-                }, 500);
-            }
-        }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            const passwordInput = document.getElementById('password-input');
-            if (passwordInput) {
-                passwordInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        checkPassword();
+                const CORRECT_PASSWORD = 'Lamic6530@';
+                let isCadastroAccessible = false;
+                
+                function openPasswordModal() {
+                    const modal = document.getElementById('password-modal');
+                    const input = document.getElementById('password-input');
+                    const confirmButton = document.querySelector('#password-modal button:not(.close-modal)');
+                
+                    input.value = '';
+                    input.classList.remove('invalid');
+                    confirmButton.classList.remove('invalid');
+                    modal.querySelector('.password-modal-content').classList.remove('shake');
+                    modal.style.display = 'flex';
+                    input.focus();
+                }
+                
+                function closePasswordModal() {
+                    document.getElementById('password-modal').style.display = 'none';
+                    redirectToDashboard();
+                }
+                
+                function checkPassword() {
+                    const input = document.getElementById('password-input');
+                    const confirmButton = document.querySelector('#password-modal button:not(.close-modal)');
+                    const modalContent = document.querySelector('.password-modal-content');
+                    const password = input.value.trim();
+                
+                    if (password === CORRECT_PASSWORD) {
+                        isCadastroAccessible = true;
+                        closePasswordModal();
+                        document.querySelector('.tab-button[data-tab="cadastro"]').classList.add('active');
+                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        document.getElementById('cadastro').classList.add('active');
+                        renderMnemonicos();
+                        renderResponsaveis();
+                    } else {
+                        input.classList.add('invalid');
+                        confirmButton.classList.add('invalid');
+                        modalContent.classList.add('shake');
+                        setTimeout(() => {
+                            modalContent.classList.remove('shake');
+                        }, 500);
+                    }
+                }
+                
+                document.addEventListener('DOMContentLoaded', () => {
+                    const passwordInput = document.getElementById('password-input');
+                    if (passwordInput) {
+                        passwordInput.addEventListener('keypress', (e) => {
+                            if (e.key === 'Enter') {
+                                checkPassword();
+                            }
+                        });
                     }
                 });
-            }
-        });
-        
-        document.getElementById('manha-min').addEventListener('input', validateForm);
-        document.getElementById('manha-max').addEventListener('input', validateForm);
-        document.getElementById('manha-atual').addEventListener('input', validateForm);
-        document.getElementById('tarde-min').addEventListener('input', validateForm);
-        document.getElementById('tarde-max').addEventListener('input', validateForm);
-        document.getElementById('tarde-atual').addEventListener('input', validateForm);
-        document.getElementById('dados-mnemonico').addEventListener('change', validateForm);
-        document.getElementById('dados-responsavel').addEventListener('change', validateForm);
+                
+                document.getElementById('manha-min').addEventListener('input', validateForm);
+                document.getElementById('manha-max').addEventListener('input', validateForm);
+                document.getElementById('manha-atual').addEventListener('input', validateForm);
+                document.getElementById('tarde-min').addEventListener('input', validateForm);
+                document.getElementById('tarde-max').addEventListener('input', validateForm);
+                document.getElementById('tarde-atual').addEventListener('input', validateForm);
+                document.getElementById('dados-mnemonico').addEventListener('change', validateForm);
+                document.getElementById('dados-responsavel').addEventListener('change', validateForm);
         </script>
 </body>
 </html>
