@@ -1870,6 +1870,7 @@
             document.getElementById('unit-modal').style.display = 'none';
             if (selectedUnitId) {
                 await loadFromJsonBin();
+                document.querySelector('.tab-button[data-tab="dashboard"]').click();
             }
         }
         
