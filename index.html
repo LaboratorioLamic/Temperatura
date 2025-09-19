@@ -1932,6 +1932,12 @@
         }
         
         async function deleteMnemonico(index) {
+    const mnemonicoId = mnemonicos[index].id;
+    const isUsed = dados.some(d => d.mnemonicoId === mnemonicoId);
+    if (isUsed) {
+        alert("Não é possivel excluir, pois há dados emitidos");
+        return;
+    }
     if (!confirm('Tem certeza que deseja excluir este mnemonico?')) {
         return;
     }
@@ -2098,6 +2104,12 @@
         }
         
         async function deleteResponsavel(index) {
+    const responsavelId = responsaveis[index].id;
+    const isUsed = dados.some(d => d.responsavelId === responsavelId);
+    if (isUsed) {
+        alert("Não é possivel excluir, pois há dados emitidos");
+        return;
+    }
     if (!confirm('Tem certeza que deseja excluir este responsável?')) {
         return;
     }
