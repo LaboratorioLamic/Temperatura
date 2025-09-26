@@ -3670,7 +3670,9 @@ async function downloadBackup() {
     XLSX.utils.book_append_sheet(workbook, worksheet, `Backup_${year}`);
 
     // Exportar para XLSX
-    XLSX.writeFile(workbook, `Temperaturas - Backup_${year}.xlsx`);
+    const selectedUnit = unidades.find(u => u.id === selectedUnitId);
+    const unitName = selectedUnit ? selectedUnit.name.replace(/[^a-zA-Z0-9]/g, ' ') : 'Sem_Unidade';
+    XLSX.writeFile(workbook, `Temperatura - ${unitName} - ${year}.xlsx`);
   } catch (error) {
     console.error('Erro ao baixar backup:', error);
     alert('Erro ao baixar o backup do servidor.');
