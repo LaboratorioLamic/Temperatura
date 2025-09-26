@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         /* Reset básico e configurações gerais */
         * {
@@ -1437,7 +1438,45 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
+/* Estilo para o contêiner do botão Backup e Download */
+.backup-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
 
+/* Estilo para o select de anos */
+.year-select {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+/* Estilo para o botão Download */
+.download-btn {
+  padding: 8px 16px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #08407c;
+  color: white;
+  cursor: pointer;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.download-btn.enabled {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.download-btn:hover.enabled {
+  background-color: #003064;
+}
     </style>
 </head>
 <body>
@@ -1609,6 +1648,11 @@
                     <button class="toggle-button" onclick="toggleCadastroSection('responsaveis')">
                         <span id="responsaveis-toggle-text">Responsáveis</span>
                     </button>
+                    <button id="downloadBtn" class="download-btn">Download Backup</button>
+                    <select id="yearSelect" class="year-select">
+                        <option value="">Selecione o ano</option>
+                      </select>
+                      
                 </div>
                 <div class="cadastro-sections">
                     <div class="cadastro-section" id="mnemonicos-section">
@@ -3529,6 +3573,120 @@ document.onkeydown = function(event) {
     }
 };
                 
+
+function populateYearSelect() {
+  const yearSelect = document.getElementById('yearSelect');
+  const currentYear = new Date().getFullYear();
+  for (let year = currentYear; year >= currentYear - 2; year--) {
+    const option = document.createElement('option');
+    option.value = year;
+    option.textContent = year;
+    yearSelect.appendChild(option);
+  }
+}
+
+function enableDownloadButton() {
+  const yearSelect = document.getElementById('yearSelect');
+  const downloadBtn = document.getElementById('downloadBtn');
+  if (yearSelect.value) {
+    downloadBtn.classList.add('enabled');
+  } else {
+    downloadBtn.classList.remove('enabled');
+  }
+}
+
+async function downloadBackup() {
+  const year = document.getElementById('yearSelect').value;
+  if (!year) {
+    alert('Por favor, selecione um ano.');
+    return;
+  }
+
+  if (!selectedUnitId) {
+    alert('Por favor, selecione uma unidade antes de baixar o backup.');
+    return;
+  }
+
+  toggleLoadingScreen(true);
+  try {
+    const binId = getBinIdForUnit(selectedUnitId);
+    const response = await fetch(`${JSONBIN_BASE_URL}/${binId}/latest`, {
+      headers: {
+        'X-Master-Key': JSONBIN_API_KEY
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao carregar dados do JSONBin');
+    }
+
+    const result = await response.json();
+    const data = result.record.dados || [];
+
+    // Filtrar dados pelo ano selecionado
+    const filteredData = data.filter(item => item.data.startsWith(year));
+
+    // Mapear os dados para incluir nomes em vez de IDs
+    const formattedData = filteredData.map(item => {
+      const mnemonico = mnemonicos.find(m => m.id === item.mnemonicoId)?.mnemonico || 'Desconhecido';
+      const responsavel = responsaveis.find(r => r.id === item.responsavelId)?.name || 'Desconhecido';
+      return {
+        Data: formatDateBR(item.data),
+        Mnemonico: mnemonico,
+        Responsável: responsavel,
+        'Min Manhã ºC': item.manhaMin !== null ? item.manhaMin.toFixed(1) : '-',
+        'Max Manhã ºC': item.manhaMax !== null ? item.manhaMax.toFixed(1) : '-',
+        'Atual Manhã ºC': item.manhaAtual !== null ? item.manhaAtual.toFixed(1) : '-',
+        'Min Tarde ºC': item.tardeMin !== null ? item.tardeMin.toFixed(1) : '-',
+        'Max Tarde ºC': item.tardeMax !== null ? item.tardeMax.toFixed(1) : '-',
+        'Atual Tarde ºC': item.tardeAtual !== null ? item.tardeAtual.toFixed(1) : '-',
+        'Anotação': item.annotation || '-'
+      };
+    });
+
+    // Criar planilha
+    const worksheet = XLSX.utils.json_to_sheet(formattedData, {
+      header: ['Data', 'Mnemonico', 'Responsável', 'Min Manhã ºC', 'Max Manhã ºC', 'Atual Manhã ºC', 'Min Tarde ºC', 'Max Tarde ºC', 'Atual Tarde ºC', 'Anotação'],
+      skipHeader: false
+    });
+
+    // Ajustar largura das colunas
+    const colWidths = [
+      { wch: 12 }, // Data
+      { wch: 15 }, // Mnemonico
+      { wch: 20 }, // Responsável
+      { wch: 12 }, // Min Manhã
+      { wch: 12 }, // Max Manhã
+      { wch: 12 }, // Atual Manhã
+      { wch: 12 }, // Min Tarde
+      { wch: 12 }, // Max Tarde
+      { wch: 12 }, // Atual Tarde
+      { wch: 30 }  // Anotação
+    ];
+    worksheet['!cols'] = colWidths;
+
+    // Criar workbook
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, `Backup_${year}`);
+
+    // Exportar para XLSX
+    XLSX.writeFile(workbook, `Temperaturas - Backup_${year}.xlsx`);
+  } catch (error) {
+    console.error('Erro ao baixar backup:', error);
+    alert('Erro ao baixar o backup do servidor.');
+  } finally {
+    toggleLoadingScreen(false);
+  }
+}
+
+// Inicializar select ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+  populateYearSelect();
+  document.getElementById('yearSelect').addEventListener('change', enableDownloadButton);
+  document.getElementById('downloadBtn').addEventListener('click', downloadBackup);
+});
+
+
                 document.getElementById('manha-min').addEventListener('input', validateForm);
                 document.getElementById('manha-max').addEventListener('input', validateForm);
                 document.getElementById('manha-atual').addEventListener('input', validateForm);
