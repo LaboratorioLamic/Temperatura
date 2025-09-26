@@ -2346,7 +2346,7 @@
                     };
                     dados.unshift(newDado);
                     dados.sort((a, b) => new Date(b.data) - new Date(a.data));
-                    if (dados.length > 50) {
+                    if (dados.length > 5000) {
                         const oldest = dados.slice(-1)[0];
                         const index = dados.findIndex(item => item === oldest);
                         dados.splice(index, 1);
