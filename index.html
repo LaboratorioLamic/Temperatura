@@ -2350,6 +2350,7 @@
                         const oldest = dados.slice(-1)[0];
                         const index = dados.findIndex(item => item === oldest);
                         dados.splice(index, 1);
+                        console.log(`Registro mais antigo removido. Novo total de registros: ${dados.length}`);
                     }
                     await saveToJsonBin();
                     currentPage = 1;
@@ -2462,6 +2463,7 @@
         }
         
         function renderDadosCards() {
+            console.log(`Total de registros em dados: ${dados.length}/5000`);
             const cardsContainer = document.getElementById('dados-cards');
             cardsContainer.innerHTML = '';
             const filteredDados = dados.sort((a, b) => {
