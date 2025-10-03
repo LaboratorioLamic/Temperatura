@@ -1647,8 +1647,11 @@
                     </button>
                     <button id="downloadBtn" class="download-btn">Download Backup</button>
                     <select id="yearSelect" class="year-select">
-                        <option value="">Selecione o ano</option>
+                        <option value="">Ano</option>
                       </select>
+                      <select id="formatSelect" class="year-select">
+                        <option value="">Tipo</option>
+                    </select>
                       
                 </div>
                 <div class="cadastro-sections">
@@ -3574,6 +3577,7 @@ document.onkeydown = function(event) {
 function populateYearSelect() {
   const yearSelect = document.getElementById('yearSelect');
   const currentYear = new Date().getFullYear();
+  yearSelect.innerHTML = '<option value="">Ano</option>';
   for (let year = currentYear; year >= currentYear - 2; year--) {
     const option = document.createElement('option');
     option.value = year;
@@ -3582,10 +3586,26 @@ function populateYearSelect() {
   }
 }
 
+function populateFormatSelect() {
+  const formatSelect = document.getElementById('formatSelect');
+  formatSelect.innerHTML = '<option value="">Tipo</option>';
+  const options = [
+    { value: 'excel', text: 'Excel' },
+    { value: 'json', text: 'JSON' }
+  ];
+  options.forEach(opt => {
+    const option = document.createElement('option');
+    option.value = opt.value;
+    option.textContent = opt.text;
+    formatSelect.appendChild(option);
+  });
+}
+
 function enableDownloadButton() {
   const yearSelect = document.getElementById('yearSelect');
+  const formatSelect = document.getElementById('formatSelect');
   const downloadBtn = document.getElementById('downloadBtn');
-  if (yearSelect.value) {
+  if (yearSelect.value && formatSelect.value) {
     downloadBtn.classList.add('enabled');
   } else {
     downloadBtn.classList.remove('enabled');
@@ -3594,8 +3614,9 @@ function enableDownloadButton() {
 
 async function downloadBackup() {
   const year = document.getElementById('yearSelect').value;
-  if (!year) {
-    alert('Por favor, selecione um ano.');
+  const format = document.getElementById('formatSelect').value;
+  if (!year || !format) {
+    alert('Por favor, selecione um ano e um formato.');
     return;
   }
 
@@ -3621,55 +3642,87 @@ async function downloadBackup() {
     const data = result.record.dados || [];
 
     // Filtrar dados pelo ano selecionado
-    const filteredData = data.filter(item => item.data.startsWith(year));
+    const filteredData = data.filter(item => item.data.startsWith(year.toString()));
 
-    // Mapear os dados para incluir nomes em vez de IDs
-    const formattedData = filteredData.map(item => {
-      const mnemonico = mnemonicos.find(m => m.id === item.mnemonicoId)?.mnemonico || 'Desconhecido';
-      const responsavel = responsaveis.find(r => r.id === item.responsavelId)?.name || 'Desconhecido';
-      return {
-        Data: formatDateBR(item.data),
-        Mnemonico: mnemonico,
-        Responsável: responsavel,
-        'Min Manhã ºC': item.manhaMin !== null ? item.manhaMin.toFixed(1) : '-',
-        'Max Manhã ºC': item.manhaMax !== null ? item.manhaMax.toFixed(1) : '-',
-        'Atual Manhã ºC': item.manhaAtual !== null ? item.manhaAtual.toFixed(1) : '-',
-        'Min Tarde ºC': item.tardeMin !== null ? item.tardeMin.toFixed(1) : '-',
-        'Max Tarde ºC': item.tardeMax !== null ? item.tardeMax.toFixed(1) : '-',
-        'Atual Tarde ºC': item.tardeAtual !== null ? item.tardeAtual.toFixed(1) : '-',
-        'Anotação': item.annotation || '-'
-      };
-    });
+    if (format === 'excel') {
+      // Mapear os dados para incluir nomes em vez de IDs para Excel
+      const formattedData = filteredData.map(item => {
+        const mnemonico = mnemonicos.find(m => m.id === item.mnemonicoId)?.mnemonico || 'Desconhecido';
+        const responsavel = responsaveis.find(r => r.id === item.responsavelId)?.name || 'Desconhecido';
+        return {
+          Data: formatDateBR(item.data),
+          Mnemonico: mnemonico,
+          Responsável: responsavel,
+          'Min Manhã ºC': item.manhaMin !== null ? item.manhaMin.toFixed(1) : '-',
+          'Max Manhã ºC': item.manhaMax !== null ? item.manhaMax.toFixed(1) : '-',
+          'Atual Manhã ºC': item.manhaAtual !== null ? item.manhaAtual.toFixed(1) : '-',
+          'Min Tarde ºC': item.tardeMin !== null ? item.tardeMin.toFixed(1) : '-',
+          'Max Tarde ºC': item.tardeMax !== null ? item.tardeMax.toFixed(1) : '-',
+          'Atual Tarde ºC': item.tardeAtual !== null ? item.tardeAtual.toFixed(1) : '-',
+          'Anotação': item.annotation || '-'
+        };
+      });
 
-    // Criar planilha
-    const worksheet = XLSX.utils.json_to_sheet(formattedData, {
-      header: ['Data', 'Mnemonico', 'Responsável', 'Min Manhã ºC', 'Max Manhã ºC', 'Atual Manhã ºC', 'Min Tarde ºC', 'Max Tarde ºC', 'Atual Tarde ºC', 'Anotação'],
-      skipHeader: false
-    });
+      // Criar planilha para Excel
+      const worksheet = XLSX.utils.json_to_sheet(formattedData, {
+        header: ['Data', 'Mnemonico', 'Responsável', 'Min Manhã ºC', 'Max Manhã ºC', 'Atual Manhã ºC', 'Min Tarde ºC', 'Max Tarde ºC', 'Atual Tarde ºC', 'Anotação'],
+        skipHeader: false
+      });
 
-    // Ajustar largura das colunas
-    const colWidths = [
-      { wch: 12 }, // Data
-      { wch: 15 }, // Mnemonico
-      { wch: 20 }, // Responsável
-      { wch: 12 }, // Min Manhã
-      { wch: 12 }, // Max Manhã
-      { wch: 12 }, // Atual Manhã
-      { wch: 12 }, // Min Tarde
-      { wch: 12 }, // Max Tarde
-      { wch: 12 }, // Atual Tarde
-      { wch: 30 }  // Anotação
-    ];
-    worksheet['!cols'] = colWidths;
+      // Ajustar largura das colunas
+      const colWidths = [
+        { wch: 12 }, // Data
+        { wch: 15 }, // Mnemonico
+        { wch: 20 }, // Responsável
+        { wch: 12 }, // Min Manhã
+        { wch: 12 }, // Max Manhã
+        { wch: 12 }, // Atual Manhã
+        { wch: 12 }, // Min Tarde
+        { wch: 12 }, // Max Tarde
+        { wch: 12 }, // Atual Tarde
+        { wch: 30 }  // Anotação
+      ];
+      worksheet['!cols'] = colWidths;
 
-    // Criar workbook
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, `Backup_${year}`);
+      // Criar workbook
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, `Backup_${year}`);
 
-    // Exportar para XLSX
-    const selectedUnit = unidades.find(u => u.id === selectedUnitId);
-    const unitName = selectedUnit ? selectedUnit.name.replace(/[^a-zA-Z0-9]/g, ' ') : 'Sem_Unidade';
-    XLSX.writeFile(workbook, `Temperatura - ${unitName} - ${year}.xlsx`);
+      // Exportar para XLSX
+      const selectedUnit = unidades.find(u => u.id === selectedUnitId);
+      const unitName = selectedUnit ? selectedUnit.name.replace(/[^a-zA-Z0-9]/g, ' ') : 'Sem_Unidade';
+      XLSX.writeFile(workbook, `Temperatura - ${unitName} - ${year}.xlsx`);
+    } else if (format === 'json') {
+      // Para JSON, usar estrutura original com IDs e data no formato americano (YYYY-MM-DD)
+      const jsonData = filteredData.map(item => ({
+        data: item.data,
+        mnemonicoId: item.mnemonicoId,
+        responsavelId: item.responsavelId,
+        manhaMin: item.manhaMin,
+        manhaMax: item.manhaMax,
+        manhaAtual: item.manhaAtual,
+        tardeMin: item.tardeMin,
+        tardeMax: item.tardeMax,
+        tardeAtual: item.tardeAtual,
+        annotation: item.annotation
+      }));
+
+      // Criar JSON
+      const jsonString = JSON.stringify(jsonData, null, 2);
+
+      // Criar blob e download
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const selectedUnit = unidades.find(u => u.id === selectedUnitId);
+      const unitName = selectedUnit ? selectedUnit.name.replace(/[^a-zA-Z0-9]/g, ' ') : 'Sem_Unidade';
+      a.download = `Temperatura - ${unitName} - ${year}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
   } catch (error) {
     console.error('Erro ao baixar backup:', error);
     alert('Erro ao baixar o backup do servidor.');
@@ -3678,10 +3731,12 @@ async function downloadBackup() {
   }
 }
 
-// Inicializar select ao carregar a página
+// Inicializar selects ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
   populateYearSelect();
+  populateFormatSelect();
   document.getElementById('yearSelect').addEventListener('change', enableDownloadButton);
+  document.getElementById('formatSelect').addEventListener('change', enableDownloadButton);
   document.getElementById('downloadBtn').addEventListener('click', downloadBackup);
 });
 
