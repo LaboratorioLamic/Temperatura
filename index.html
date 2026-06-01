@@ -5427,7 +5427,7 @@ function renderNotifications() {
         const dateDisplay = `${d}/${mo}/${y}`;
         const cls = n.isToday ? 'notif-item yellow' : 'notif-item red';
         const icon = n.isToday ? '🟡' : '🔴';
-        const label = n.isToday ? 'Hoje — dados incompletos' : 'Atrasado — dados incompletos';
+        const label = n.isToday ? 'Hoje — incluir dados' : 'Pendente — dados incompletos';
         return `<div class="${cls}" onclick="openNotifAddModal('${n.dateStr}', ${n.mnemonicoId})">
             <span class="notif-icon">${icon}</span>
             <div class="notif-info">
