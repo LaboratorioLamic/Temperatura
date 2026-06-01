@@ -605,9 +605,11 @@
 
         /* ─── DASHBOARD FILTER ───────────────────────────── */
         .dashboard-filter {
-            background: #f8fafd;
+            background: linear-gradient(135deg, #f0f5fc 0%, #ffffff 100%);
             border: 1.5px solid var(--border);
-            border-radius: 10px;
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(13,43,94,0.08);
             padding: 16px 20px;
             margin-bottom: 22px;
             display: flex;
@@ -1383,6 +1385,649 @@
         .backup-modal-content::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
         .backup-modal-content::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 8px; }
 
+        /* ─── NOTIFICATION BELL ─────────────────────────── */
+        .notification-bell-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            margin-right: 110px;
+        }
+        .bell-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            padding: 8px 10px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            font-size: 19px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bell-btn:hover { background: rgba(0,0,0,0.07); }
+        .bell-btn .fa-bell { color: var(--primary); }
+        .bell-badge {
+            position: absolute;
+            top: 2px; right: 2px;
+            color: white;
+            font-size: 9px;
+            font-weight: 800;
+            border-radius: 50%;
+            min-width: 15px;
+            height: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 3px;
+            border: 1.5px solid white;
+        }
+        .bell-btn.bell-red .bell-badge   { background: #e53e3e; }
+        .bell-btn.bell-yellow .bell-badge { background: #d69e2e; }
+        .notification-panel {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 6px);
+            width: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+            z-index: 9000;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .notification-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .notification-header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 4px;
+        }
+        .notification-list { max-height: 340px; overflow-y: auto; }
+        .notif-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-bottom: 1px solid #f0f4f8;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item:hover { background: #f8fafc; }
+        .notif-item.red { border-left: 3px solid #e53e3e; }
+        .notif-item.yellow { border-left: 3px solid #d69e2e; }
+        .notif-icon { font-size: 15px; flex-shrink: 0; }
+        .notif-info { flex: 1; min-width: 0; }
+        .notif-date { font-size: 13px; font-weight: 700; color: var(--text); }
+        .notif-label { font-size: 11px; color: var(--text-muted); }
+        .notif-arrow { font-size: 11px; color: var(--text-muted); }
+        .notif-empty { padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 13px; }
+
+        /* ─── NOTIFICATION ADD MODAL ─────────────────────── */
+        .notif-add-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(8,18,46,0.62);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        .notif-add-modal-content {
+            background: #fff;
+            border-radius: 16px;
+            width: 92%;
+            max-width: 620px;
+            max-height: 92vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 24px 64px rgba(8,18,60,0.28);
+            animation: notifModalIn 0.22s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes notifModalIn {
+            from { transform: translateY(-18px) scale(0.97); opacity: 0; }
+            to   { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        /* Header */
+        .notif-modal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-mid) 100%);
+            color: #fff;
+            padding: 22px 24px 18px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .notif-modal-tag {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 5px;
+        }
+        .notif-modal-title-date {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            line-height: 1.15;
+        }
+        .notif-modal-sub {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 3px;
+            font-weight: 500;
+        }
+        .notif-modal-close {
+            background: rgba(255,255,255,0.13);
+            border: none;
+            color: #fff;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.18s;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .notif-modal-close:hover { background: rgba(255,255,255,0.24); }
+        /* Body */
+        .notif-modal-body { padding: 22px 24px 20px; }
+        .notif-meta-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        /* Field groups */
+        .notif-field-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 130px;
+        }
+        .notif-field-group label {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            margin-bottom: 5px;
+        }
+        .notif-field-group .req { color: var(--danger); }
+        .notif-field-group input,
+        .notif-field-group select {
+            padding: 9px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            background: #f8fafc;
+            color: var(--text);
+            transition: border-color 0.17s, background 0.17s, box-shadow 0.17s;
+            font-family: inherit;
+        }
+        .notif-field-group input:focus,
+        .notif-field-group select:focus {
+            border-color: var(--accent);
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(30,115,212,0.10);
+        }
+        .notif-field-group input.invalid,
+        .notif-field-group select.invalid {
+            border-color: var(--danger) !important;
+            background: #fff5f5 !important;
+            box-shadow: 0 0 0 3px rgba(229,62,62,0.10) !important;
+        }
+        .notif-field-group input[readonly] {
+            background: #edf2f7;
+            color: var(--text-muted);
+            cursor: default;
+            border-color: transparent;
+        }
+        /* Temp grid */
+        .notif-temp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        @media (max-width: 520px) { .notif-temp-grid { grid-template-columns: 1fr; } }
+        .notif-temp-card {
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .notif-temp-card-header {
+            padding: 9px 14px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .notif-temp-card-header.manha {
+            background: linear-gradient(90deg, #dbeafe 0%, #c8dffa 100%);
+            color: #1557a8;
+            border-bottom: 1px solid #b8d5f5;
+        }
+        .notif-temp-card-header.tarde {
+            background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+            color: #854d0e;
+            border-bottom: 1px solid #f0c63a;
+        }
+        .notif-temp-fields {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+        .notif-temp-fields .notif-field-group { min-width: unset; }
+        /* Annotation */
+        .notif-annotation-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .notif-annot-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: none;
+            border: 1.5px dashed #c3cfe2;
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.17s;
+        }
+        .notif-annot-btn:hover { border-color: var(--accent); color: var(--accent); background: #f0f6ff; }
+        .notif-annot-btn.active { border-style: solid; border-color: #d69e2e; color: #92711a; background: #fffbeb; }
+        .notif-annot-btn.notif-annot-req { border-style: solid; border-color: var(--danger); color: var(--danger); background: #fff5f5; }
+        .notif-annot-required-msg { font-size: 11px; color: var(--danger); font-weight: 700; }
+        .notif-annotation-area {
+            display: none;
+            margin-bottom: 16px;
+        }
+        .notif-annotation-textarea {
+            width: 100%;
+            min-height: 76px;
+            padding: 10px 12px;
+            border: 1.5px solid #d69e2e;
+            border-radius: 8px;
+            font-size: 13px;
+            resize: vertical;
+            font-family: inherit;
+            background: #fffbeb;
+            color: var(--text);
+            transition: border-color 0.17s, box-shadow 0.17s;
+        }
+        .notif-annotation-textarea:focus {
+            outline: none;
+            border-color: #b7791f;
+            box-shadow: 0 0 0 3px rgba(214,158,46,0.12);
+        }
+        .notif-annotation-textarea.invalid {
+            border-color: var(--danger) !important;
+            background: #fff5f5 !important;
+            box-shadow: 0 0 0 3px rgba(229,62,62,0.10) !important;
+        }
+        /* Action row */
+        .notif-action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .notif-cancel-btn {
+            flex: 1;
+            padding: 11px 16px;
+            background: #fff;
+            color: var(--text-muted);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.17s;
+            font-family: inherit;
+        }
+        .notif-cancel-btn:hover { background: #f8fafc; border-color: #a0aec0; color: var(--text); }
+        .notif-save-btn {
+            flex: 2;
+            padding: 11px 16px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: background 0.17s;
+            font-family: inherit;
+        }
+        .notif-save-btn:hover { background: var(--accent-hover); }
+        .notif-save-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+        /* ─── DADOS FILTERS ─────────────────────────────── */
+        .dados-header-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .dados-header-row h2 { margin-bottom: 0; flex-shrink: 0; }
+        .dados-filter-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 15px;
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .dados-filter-toggle-btn:hover { border-color: var(--accent); color: var(--accent); background: #f0f6ff; }
+        .dados-filter-toggle-btn.active { border-color: var(--accent); color: var(--accent); background: #f0f6ff; }
+        .dados-filter-toggle-btn.has-filter { border-color: var(--accent); background: var(--accent); color: #fff; }
+        .dados-filter-toggle-btn.has-filter:hover { background: var(--accent-hover); }
+        .dados-filter-badge {
+            display: none;
+            position: absolute;
+            top: -7px; right: -7px;
+            background: var(--danger);
+            color: white;
+            font-size: 9px;
+            font-weight: 800;
+            border-radius: 50%;
+            min-width: 15px;
+            height: 15px;
+            align-items: center;
+            justify-content: center;
+            border: 1.5px solid white;
+        }
+        /* Filter panel — card that slides down below header row */
+        .dados-filter-bar {
+            width: 100%;
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(13,43,94,0.09);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: flex-end;
+            padding: 0 20px;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            pointer-events: none;
+            margin-bottom: 0;
+            transition: max-height 0.36s cubic-bezier(.4,0,.2,1),
+                        opacity 0.28s ease,
+                        padding 0.36s cubic-bezier(.4,0,.2,1),
+                        margin-bottom 0.28s ease;
+        }
+        .dados-filter-bar.open {
+            max-height: 220px;
+            opacity: 1;
+            pointer-events: auto;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+        .dados-filter-bar > div {
+            display: flex;
+            flex-direction: column;
+            min-width: 130px;
+            flex-shrink: 0;
+        }
+        .dados-filter-bar label {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 5px;
+            white-space: nowrap;
+        }
+        .dados-filter-bar select {
+            padding: 8px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 7px;
+            font-size: 12px;
+            background: #f8fafc;
+            color: var(--text);
+            transition: border-color 0.17s;
+            font-family: inherit;
+        }
+        .dados-filter-bar select:focus { border-color: var(--accent); outline: none; background: #fff; }
+        /* Month picker */
+        .dados-month-picker-wrap {
+            flex: 1;
+            min-width: 160px;
+            max-width: 210px;
+            display: flex;
+            flex-direction: column;
+        }
+        .dados-month-picker-btn {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 7px;
+            font-size: 12px;
+            background: #f8fafc;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            font-family: inherit;
+            font-weight: 600;
+            transition: border-color 0.17s, background 0.17s;
+            text-align: left;
+        }
+        .dados-month-picker-btn:hover { border-color: var(--accent); background: #fff; }
+        .dados-month-picker-btn.active { border-color: var(--accent); background: #f0f6ff; }
+        .dados-month-picker-dropdown {
+            display: none;
+            position: fixed;
+            z-index: 5000;
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 12px 36px rgba(13,43,94,0.18);
+            width: 240px;
+            padding: 14px;
+        }
+        .dados-month-picker-dropdown.open { display: block; }
+        .mp-year-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            gap: 4px;
+        }
+        .mp-year-nav button {
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 26px;
+            height: 26px;
+            cursor: pointer;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+        .mp-year-nav button:hover { background: var(--accent); }
+        .mp-year-label { font-weight: 800; font-size: 14px; color: var(--primary); }
+        .mp-months-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+        .mp-month-btn {
+            padding: 8px 2px;
+            border: 1.5px solid transparent;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #f8fafc;
+            color: var(--text);
+            transition: all 0.15s;
+            text-align: center;
+            font-family: inherit;
+        }
+        .mp-month-btn:hover { background: #e2ecf8; border-color: var(--accent); color: var(--accent); }
+        .mp-month-btn.selected { background: var(--accent); color: white; border-color: var(--accent); }
+        .mp-clear-btn {
+            margin-top: 8px;
+            width: 100%;
+            padding: 6px;
+            background: none;
+            border: 1.5px dashed var(--border);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        .mp-clear-btn:hover { border-color: var(--danger); color: var(--danger); background: #fff5f5; }
+        .dados-filter-actions {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+        .dados-filter-reset-btn {
+            padding: 8px 12px;
+            background: white;
+            color: var(--text-muted);
+            border: 1.5px solid var(--border);
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.17s;
+            font-family: inherit;
+        }
+        .dados-filter-reset-btn:hover { border-color: var(--danger); color: var(--danger); background: #fff5f5; }
+
+        /* ─── HOLIDAY CALENDAR ───────────────────────────── */
+        .holiday-calendar-wrap { margin-top: 16px; max-width: 400px; }
+        .holiday-cal-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+        .holiday-cal-nav button {
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .holiday-cal-nav button:hover { background: var(--accent); }
+        .holiday-cal-nav span {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 14px;
+            text-transform: capitalize;
+        }
+        .hcal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+        }
+        .hcal-header {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 5px 0;
+            text-transform: uppercase;
+        }
+        .hcal-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            border: 2px solid transparent;
+            transition: all 0.15s;
+            background: #f8fafc;
+            user-select: none;
+        }
+        .hcal-day:hover { background: #e2ecf8; border-color: var(--accent); }
+        .hcal-day.sunday { color: var(--text-muted); cursor: default; opacity: 0.45; }
+        .hcal-day.sunday:hover { background: #f8fafc; border-color: transparent; }
+        .hcal-day.feriado { background: #fff0f0; border-color: #e53e3e; color: #c53030; }
+        .hcal-day.feriado:hover { background: #ffe5e5; }
+        .feriado-dot { font-size: 7px; color: #e53e3e; line-height: 1; }
+        .feriados-count {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .feriados-count strong { color: var(--danger); }
+
         /* ─── RESPONSIVE ─────────────────────────────────── */
         @media (max-width: 768px) {
             .sidebar { width: 58px; }
@@ -1448,6 +2093,19 @@
     <header class="topbar">
         <h1 class="topbar-title"><i class="fas fa-thermometer-half topbar-icon"></i>Controle de Temperatura</h1>
         <div class="topbar-right">
+            <div class="notification-bell-wrap" id="notification-bell-container" style="display:none">
+                <button class="bell-btn bell-red" id="bell-btn" onclick="toggleNotificationPanel()">
+                    <i class="fas fa-bell"></i>
+                    <span class="bell-badge" id="bell-badge">0</span>
+                </button>
+                <div class="notification-panel" id="notification-panel" style="display:none">
+                    <div class="notification-header">
+                        <span>Pendências</span>
+                        <button onclick="toggleNotificationPanel()">&#10006;</button>
+                    </div>
+                    <div class="notification-list" id="notification-list"></div>
+                </div>
+            </div>
             <div id="alert-message" class="alert hidden">
                 Aguardando preenchimento correto
                 <span class="loader"></span>
@@ -1583,6 +2241,103 @@
         </div>
     </div>
 
+    <!-- Notification Add Modal -->
+    <div class="notif-add-modal" id="notif-add-modal" onclick="if(event.target===this)closeNotifModal()">
+        <div class="notif-add-modal-content">
+            <!-- Header -->
+            <div class="notif-modal-header">
+                <div>
+                    <div class="notif-modal-tag">Registro de Temperatura</div>
+                    <div class="notif-modal-title-date" id="notif-modal-date"></div>
+                    <div class="notif-modal-sub" id="notif-modal-sub"></div>
+                </div>
+                <button class="notif-modal-close" onclick="closeNotifModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="notif-modal-body">
+                <!-- Meta -->
+                <div class="notif-meta-row">
+                    <div class="notif-field-group">
+                        <label>Mnemonico</label>
+                        <input type="text" id="notif-mnemonico-name" readonly>
+                    </div>
+                    <div class="notif-field-group">
+                        <label>Responsável <span class="req">*</span></label>
+                        <select id="notif-responsavel">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Temperature grid -->
+                <div class="notif-temp-grid">
+                    <div class="notif-temp-card">
+                        <div class="notif-temp-card-header manha">
+                            <i class="fas fa-cloud-sun"></i> Manhã
+                        </div>
+                        <div class="notif-temp-fields">
+                            <div class="notif-field-group">
+                                <label>Min ºC</label>
+                                <input type="number" id="notif-manha-min" step="0.1" placeholder="—" oninput="validateNotifLive()">
+                            </div>
+                            <div class="notif-field-group">
+                                <label>Max ºC</label>
+                                <input type="number" id="notif-manha-max" step="0.1" placeholder="—" oninput="validateNotifLive()">
+                            </div>
+                            <div class="notif-field-group">
+                                <label>Atual ºC</label>
+                                <input type="number" id="notif-manha-atual" step="0.1" placeholder="—" oninput="validateNotifLive()">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notif-temp-card">
+                        <div class="notif-temp-card-header tarde">
+                            <i class="fas fa-sun"></i> Tarde
+                        </div>
+                        <div class="notif-temp-fields">
+                            <div class="notif-field-group">
+                                <label>Min ºC</label>
+                                <input type="number" id="notif-tarde-min" step="0.1" placeholder="—" oninput="validateNotifLive()">
+                            </div>
+                            <div class="notif-field-group">
+                                <label>Max ºC</label>
+                                <input type="number" id="notif-tarde-max" step="0.1" placeholder="—" oninput="validateNotifLive()">
+                            </div>
+                            <div class="notif-field-group">
+                                <label>Atual ºC</label>
+                                <input type="number" id="notif-tarde-atual" step="0.1" placeholder="—" oninput="validateNotifLive()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Annotation -->
+                <div class="notif-annotation-row">
+                    <button class="notif-annot-btn" id="notif-annot-btn" onclick="toggleNotifAnnotation()">
+                        <i class="fas fa-sticky-note"></i>
+                        <span id="notif-annot-label">Adicionar anotação</span>
+                    </button>
+                    <span class="notif-annot-required-msg" id="notif-annot-required-msg" style="display:none">
+                        * Obrigatória quando sem dados de temperatura
+                    </span>
+                </div>
+                <div class="notif-annotation-area" id="notif-annotation-area">
+                    <textarea class="notif-annotation-textarea" id="notif-annotation-text"
+                        placeholder="Descreva a justificativa ou observação..."></textarea>
+                </div>
+                <!-- Actions -->
+                <div class="notif-action-row">
+                    <button class="notif-cancel-btn" onclick="closeNotifModal()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button class="notif-save-btn" id="notif-add-btn" onclick="addDadoFromNotification()">
+                        <i class="fas fa-check"></i> Adicionar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="content">
         <div class="content-frame">
             <div id="dashboard" class="tab-content active">
@@ -1673,6 +2428,9 @@
                     <button class="toggle-button" onclick="toggleCadastroSection('responsaveis')">
                         <span id="responsaveis-toggle-text">Responsáveis</span>
                     </button>
+                    <button class="toggle-button" onclick="toggleCadastroSection('feriados')">
+                        <span>Feriados</span>
+                    </button>
                     <button id="downloadBtn" class="download-btn">Download Backup</button>
                     <select id="yearSelect" class="year-select">
                         <option value="">Ano</option>
@@ -1715,6 +2473,21 @@
                         </div>
                         <div class="mnemonico-cards" id="mnemonicos-list"></div>
                     </div>
+                    <div class="cadastro-section hidden" id="feriados-section">
+                        <h3>Feriados</h3>
+                        <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">
+                            Clique em um dia para marcá-lo como feriado. Dias feriados não aparecem nas notificações de pendências. Domingos são automaticamente excluídos.
+                        </p>
+                        <div class="holiday-calendar-wrap">
+                            <div class="holiday-cal-nav">
+                                <button onclick="changeHolidayMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                                <span id="holiday-cal-month-label"></span>
+                                <button onclick="changeHolidayMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                            <div id="holiday-calendar"></div>
+                            <div class="feriados-count" id="feriados-count"></div>
+                        </div>
+                    </div>
                     <div class="cadastro-section" id="responsaveis-section">
                         <h3>Cadastro de Responsáveis</h3>
                         <div class="form-group">
@@ -1729,7 +2502,51 @@
                 </div>
             </div>
             <div id="dados" class="tab-content">
-                <h2>Dados de Temperatura</h2>
+                <div class="dados-header-row">
+                    <h2>Dados de Temperatura</h2>
+                    <button class="dados-filter-toggle-btn" id="dados-filter-toggle-btn" onclick="toggleDadosFilters()">
+                        <i class="fas fa-filter"></i> Filtros
+                        <span class="dados-filter-badge" id="dados-filter-badge">0</span>
+                    </button>
+                </div><!-- /dados-header-row -->
+                <!-- Filter panel — card below header row -->
+                <div class="dados-filter-bar" id="dados-filter-bar">
+                    <div class="dados-month-picker-wrap">
+                        <label>Período</label>
+                        <button class="dados-month-picker-btn" id="dados-month-picker-btn" onclick="toggleDadosMonthPicker()">
+                            <span id="dados-month-picker-label">Selecione o período</span>
+                            <i class="fas fa-calendar-alt" style="font-size:11px;opacity:.6"></i>
+                        </button>
+                        <div class="dados-month-picker-dropdown" id="dados-month-picker-dropdown">
+                            <div class="mp-year-nav">
+                                <button onclick="changeDadosPickerYear(-1);event.stopPropagation()"><i class="fas fa-chevron-left"></i></button>
+                                <span class="mp-year-label" id="mp-year-label"></span>
+                                <button onclick="changeDadosPickerYear(1);event.stopPropagation()"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                            <div class="mp-months-grid" id="mp-months-grid"></div>
+                            <button class="mp-clear-btn" onclick="clearDadosMonthFilter();event.stopPropagation()">
+                                <i class="fas fa-times"></i> Limpar período
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Mnemonico</label>
+                        <select id="dados-filter-mnemonico" onchange="applyDadosFilter()">
+                            <option value="">Todos os mnemonicos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Responsável</label>
+                        <select id="dados-filter-responsavel" onchange="applyDadosFilter()">
+                            <option value="">Todos os responsáveis</option>
+                        </select>
+                    </div>
+                    <div class="dados-filter-actions">
+                        <button class="dados-filter-reset-btn" onclick="resetDadosFilters()">
+                            <i class="fas fa-times"></i> Limpar
+                        </button>
+                    </div>
+                </div><!-- /dados-filter-bar -->
                 <div class="form-group">
                     <div>
                         <label>Data</label>
@@ -1821,6 +2638,11 @@
             { id: 88, name: "88 - Unidade Unicardio" },
             { id: 97, name: "97 - Unidade Endoclinic" }
         ];
+        let feriados = [];
+        let holidayCalendarYear = new Date().getFullYear();
+        let holidayCalendarMonth = new Date().getMonth();
+        let notifCurrentDate = null;
+        let notifCurrentMnemonicoId = null;
         let currentPage = 1;
         const itemsPerPage = 40;
         const maxPagesDisplayed = 5;
@@ -1829,25 +2651,6 @@
         // Variáveis para os gráficos
         let manhaChart = null;
         let tardeChart = null;
-        
-        // Temporizador para redirecionamento automático da aba Dados para Dashboard
-        let dadosTabTimeout = null;
-        
-        // Função para iniciar o temporizador de redirecionamento
-        function startDadosTabTimer() {
-            clearDadosTabTimer();
-            dadosTabTimeout = setTimeout(() => {
-                redirectToDashboard();
-            }, 60000);
-        }
-        
-        // Função para limpar o temporizador
-        function clearDadosTabTimer() {
-            if (dadosTabTimeout) {
-                clearTimeout(dadosTabTimeout);
-                dadosTabTimeout = null;
-            }
-        }
         
         // Função para redirecionar para a aba Dashboard
         function redirectToDashboard() {
@@ -1878,7 +2681,11 @@
             startLoadingBar();
             toggleLoadingScreen(true);
             try {
-                const snapshot = await database.ref(`unidades/${selectedUnitId}`).once('value');
+                const [snapshot, feriadosSnap] = await Promise.all([
+                    database.ref(`unidades/${selectedUnitId}`).once('value'),
+                    database.ref('feriados').once('value')
+                ]);
+                feriados = feriadosSnap.val() || [];
                 const data = snapshot.val();
                 if (data) {
                     mnemonicos = data.mnemonicos || [];
@@ -1893,9 +2700,9 @@
                     renderPagination();
                     renderDashboardTable();
                     updateCharts();
+                    renderNotifications();
                     completeLoadingBar();
                 } else {
-                    // Se não houver dados, inicializar arrays vazios
                     mnemonicos = [];
                     archivedMnemonicos = [];
                     responsaveis = [];
@@ -1908,6 +2715,7 @@
                     renderPagination();
                     renderDashboardTable();
                     updateCharts();
+                    renderNotifications();
                     completeLoadingBar();
                 }
             } catch (error) {
@@ -2389,6 +3197,8 @@
                 option.textContent = item.name;
                 responsavelSelect.appendChild(option);
             });
+
+            populateDadosFilterDropdowns();
         }
         
         // Função de validação para o formulário de dados
@@ -2606,20 +3416,9 @@
         }
         
         function renderDadosCards() {
-            console.log(`Total de registros em dados: ${dados.length}`);
             const cardsContainer = document.getElementById('dados-cards');
             cardsContainer.innerHTML = '';
-            const filteredDados = dados.sort((a, b) => {
-                const dateA = new Date(a.data);
-                const dateB = new Date(b.data);
-                dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
-                dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
-                const dateComparison = dateB - dateA;
-                if (dateComparison !== 0) return dateComparison;
-                const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
-                const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
-                return mnemonicoA.localeCompare(mnemonicoB);
-            });
+            const filteredDados = getDadosFiltered();
             const start = (currentPage - 1) * itemsPerPage;
             const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
         
@@ -2688,18 +3487,7 @@
         }
         
         async function updateDado(index, field, value) {
-            const filteredDados = dados.sort((a, b) => {
-                const dateA = new Date(a.data);
-                const dateB = new Date(b.data);
-                dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
-                dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
-                const dateComparison = dateB - dateA;
-                if (dateComparison !== 0) return dateComparison;
-                const mnemonicoA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
-                const mnemonicoB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
-                return mnemonicoA.localeCompare(mnemonicoB);
-            });
-        
+            const filteredDados = getDadosFiltered();
             const start = (currentPage - 1) * itemsPerPage;
             const paginatedDados = filteredDados.slice(start, start + itemsPerPage);
             const cardIndex = paginatedDados.findIndex(d => 
@@ -2866,7 +3654,7 @@
         function renderPagination() {
             const paginationContainer = document.getElementById('pagination');
             paginationContainer.innerHTML = '';
-            const totalPages = Math.ceil(dados.length / itemsPerPage);
+            const totalPages = Math.ceil(getDadosFiltered().length / itemsPerPage);
         
             if (totalPages <= 1) return;
         
@@ -2943,16 +3731,21 @@
         function toggleCadastroSection(section) {
             document.getElementById('mnemonicos-section').classList.add('hidden');
             document.getElementById('responsaveis-section').classList.add('hidden');
-        
+            document.getElementById('feriados-section').classList.add('hidden');
+
             document.querySelectorAll('.toggle-button').forEach(btn => {
                 btn.classList.remove('active');
             });
-        
+
             const sectionElement = document.getElementById(`${section}-section`);
             sectionElement.classList.remove('hidden');
-        
+
             const button = event.target.closest('.toggle-button');
             button.classList.add('active');
+
+            if (section === 'feriados') {
+                renderHolidayCalendar();
+            }
         }
         
         function formatDateBR(dateString) {
@@ -3252,16 +4045,19 @@
                 document.getElementById('mnemonico-max').textContent = (mnemonicoData && mnemonicoData.max !== undefined) ? mnemonicoData.max.toFixed(1) : '';
                 saveDashboardFilters();
                 renderDashboardTable();
+                renderNotifications();
             });
-        
+
             document.getElementById('filter-mes').addEventListener('change', function() {
                 saveDashboardFilters();
                 renderDashboardTable();
+                renderNotifications();
             });
-        
+
             document.getElementById('filter-ano').addEventListener('change', function() {
                 saveDashboardFilters();
                 renderDashboardTable();
+                renderNotifications();
             });
         }
         
@@ -3381,10 +4177,11 @@
                 `;
                 tbody.appendChild(row);
             });
-        
+
             updateCharts();
+            renderNotifications();
         }
-        
+
         let currentAnnotationIndex = null;
         
         function openAnnotationModal(index) {
@@ -3482,7 +4279,6 @@
         
         tabs.forEach(tab => {
             tab.addEventListener('click', async (e) => {
-                clearDadosTabTimer();
                 if (tab.dataset.tab === 'dados') {
                     e.preventDefault();
                     if (!selectedUnitId) {
@@ -3496,7 +4292,6 @@
                     document.getElementById('dados').classList.add('active');
                     renderDropdowns();
                     renderPagination();
-                    startDadosTabTimer();
                 } else if (tab.dataset.tab === 'cadastro') {
                     e.preventDefault();
                     if (!selectedUnitId) {
@@ -4367,14 +5162,617 @@ function showBackupStatus(message, type) {
     statusDiv.className = `backup-status ${type}`;
     statusDiv.textContent = message;
     statusDiv.style.display = 'block';
-    
-    // Auto esconder após 5 segundos para mensagens de sucesso
+
     if (type === 'success') {
         setTimeout(() => {
             statusDiv.style.display = 'none';
         }, 5000);
     }
 }
+
+// ─── FERIADOS ────────────────────────────────────────────────────
+async function saveFeriados() {
+    try {
+        await database.ref('feriados').set(feriados);
+    } catch (e) {
+        console.error('Erro ao salvar feriados:', e);
+    }
+}
+
+async function toggleFeriado(dateStr) {
+    const idx = feriados.indexOf(dateStr);
+    if (idx === -1) {
+        feriados.push(dateStr);
+    } else {
+        feriados.splice(idx, 1);
+    }
+    await saveFeriados();
+    renderHolidayCalendar();
+    renderNotifications();
+}
+
+function changeHolidayMonth(delta) {
+    holidayCalendarMonth += delta;
+    if (holidayCalendarMonth > 11) { holidayCalendarMonth = 0; holidayCalendarYear++; }
+    if (holidayCalendarMonth < 0)  { holidayCalendarMonth = 11; holidayCalendarYear--; }
+    renderHolidayCalendar();
+}
+
+function renderHolidayCalendar() {
+    const calendar = document.getElementById('holiday-calendar');
+    if (!calendar) return;
+
+    const year = holidayCalendarYear;
+    const month = holidayCalendarMonth;
+
+    const label = document.getElementById('holiday-cal-month-label');
+    if (label) {
+        label.textContent = new Date(year, month, 1)
+            .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    }
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+    let html = '<div class="hcal-grid">';
+    dayNames.forEach(d => { html += `<div class="hcal-header">${d}</div>`; });
+    for (let i = 0; i < firstDay; i++) html += '<div></div>';
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const isSunday = new Date(year, month, day).getDay() === 0;
+        const isFeriado = feriados.includes(dateStr);
+        let cls = 'hcal-day';
+        if (isSunday) cls += ' sunday';
+        else if (isFeriado) cls += ' feriado';
+        const onclick = isSunday ? '' : `onclick="toggleFeriado('${dateStr}')"`;
+        html += `<div class="${cls}" ${onclick} title="${dateStr}">${day}${isFeriado ? '<span class="feriado-dot">●</span>' : ''}</div>`;
+    }
+    html += '</div>';
+    calendar.innerHTML = html;
+
+    const countEl = document.getElementById('feriados-count');
+    if (countEl) {
+        const monthFeriados = feriados.filter(f => f.startsWith(`${year}-${String(month + 1).padStart(2, '0')}`));
+        countEl.innerHTML = monthFeriados.length > 0
+            ? `<strong>${monthFeriados.length}</strong> feriado(s) marcado(s) neste mês`
+            : 'Nenhum feriado marcado neste mês';
+    }
+}
+
+// ─── NOTIFICATIONS ───────────────────────────────────────────────
+function getNotifications() {
+    if (selectedUnitId === 2) return [];
+
+    const filterMes = parseInt(document.getElementById('filter-mes').value);
+    const filterAno = parseInt(document.getElementById('filter-ano').value);
+    const filterMnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
+
+    if (!filterMes || !filterAno || !filterMnemonicoId) return [];
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const isCurrentMonth = filterAno === today.getFullYear() && filterMes === today.getMonth() + 1;
+    const daysInMonth = new Date(filterAno, filterMes, 0).getDate();
+    const lastDay = isCurrentMonth ? today.getDate() : daysInMonth;
+
+    const notifications = [];
+
+    for (let day = 1; day <= lastDay; day++) {
+        const date = new Date(filterAno, filterMes - 1, day);
+        date.setHours(0, 0, 0, 0);
+        if (date.getDay() === 0) continue; // Domingo
+
+        const dateStr = `${filterAno}-${String(filterMes).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        if (feriados.includes(dateStr)) continue; // Feriado
+
+        const entry = dados.find(d => d.data === dateStr && d.mnemonicoId === filterMnemonicoId);
+        const isComplete = entry &&
+            entry.manhaMin !== null && entry.manhaMax !== null && entry.manhaAtual !== null &&
+            entry.tardeMin !== null && entry.tardeMax !== null && entry.tardeAtual !== null;
+
+        if (!isComplete) {
+            const isToday = date.getTime() === today.getTime();
+            notifications.push({ dateStr, mnemonicoId: filterMnemonicoId, isToday });
+        }
+    }
+
+    return notifications;
+}
+
+function renderNotifications() {
+    const bellContainer = document.getElementById('notification-bell-container');
+    if (!bellContainer) return;
+
+    if (selectedUnitId === 2) {
+        bellContainer.style.display = 'none';
+        return;
+    }
+
+    const filterMnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
+    if (!filterMnemonicoId) {
+        bellContainer.style.display = 'none';
+        return;
+    }
+
+    const notifications = getNotifications();
+
+    if (notifications.length === 0) {
+        bellContainer.style.display = 'none';
+        return;
+    }
+
+    bellContainer.style.display = 'inline-flex';
+
+    const badge = document.getElementById('bell-badge');
+    if (badge) badge.textContent = notifications.length;
+
+    const bellBtn = document.getElementById('bell-btn');
+    if (bellBtn) {
+        const hasOverdue = notifications.some(n => !n.isToday);
+        bellBtn.className = 'bell-btn ' + (hasOverdue ? 'bell-red' : 'bell-yellow');
+    }
+
+    const list = document.getElementById('notification-list');
+    if (!list) return;
+
+    const mnemonico = mnemonicos.find(m => m.id === filterMnemonicoId);
+    const mnemonicoName = mnemonico ? mnemonico.mnemonico : '';
+
+    list.innerHTML = notifications.map(n => {
+        const [y, mo, d] = n.dateStr.split('-');
+        const dateDisplay = `${d}/${mo}/${y}`;
+        const cls = n.isToday ? 'notif-item yellow' : 'notif-item red';
+        const icon = n.isToday ? '🟡' : '🔴';
+        const label = n.isToday ? 'Hoje — dados incompletos' : 'Atrasado — dados incompletos';
+        return `<div class="${cls}" onclick="openNotifAddModal('${n.dateStr}', ${n.mnemonicoId})">
+            <span class="notif-icon">${icon}</span>
+            <div class="notif-info">
+                <div class="notif-date">${dateDisplay} &mdash; ${mnemonicoName}</div>
+                <div class="notif-label">${label}</div>
+            </div>
+            <i class="fas fa-chevron-right notif-arrow"></i>
+        </div>`;
+    }).join('');
+}
+
+function toggleNotificationPanel() {
+    const panel = document.getElementById('notification-panel');
+    if (!panel) return;
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+document.addEventListener('click', function(e) {
+    const container = document.getElementById('notification-bell-container');
+    const panel = document.getElementById('notification-panel');
+    if (container && panel && !container.contains(e.target)) {
+        panel.style.display = 'none';
+    }
+});
+
+// ─── NOTIFICATION ADD MODAL ──────────────────────────────────────
+function openNotifAddModal(dateStr, mnemonicoId) {
+    notifCurrentDate = dateStr;
+    notifCurrentMnemonicoId = mnemonicoId;
+
+    const panel = document.getElementById('notification-panel');
+    if (panel) panel.style.display = 'none';
+
+    const [y, mo, d] = dateStr.split('-');
+    const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const dateEl = document.getElementById('notif-modal-date');
+    if (dateEl) dateEl.textContent = `${d} de ${monthNames[parseInt(mo)-1]} de ${y}`;
+
+    const mnemonico = mnemonicos.find(m => m.id === mnemonicoId);
+    const nameEl = document.getElementById('notif-mnemonico-name');
+    if (nameEl) nameEl.value = mnemonico ? mnemonico.mnemonico : '';
+
+    const subEl = document.getElementById('notif-modal-sub');
+    if (subEl && mnemonico) subEl.textContent = `${mnemonico.tipo} · ${mnemonico.legenda}`;
+
+    // Populate responsavel dropdown
+    const respSel = document.getElementById('notif-responsavel');
+    respSel.innerHTML = '<option value="">Selecione...</option>';
+    responsaveis.sort((a, b) => a.name.localeCompare(b.name)).forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.id;
+        opt.textContent = r.name;
+        respSel.appendChild(opt);
+    });
+
+    // Clear all fields and states
+    const tempFields = ['notif-manha-min','notif-manha-max','notif-manha-atual','notif-tarde-min','notif-tarde-max','notif-tarde-atual'];
+    tempFields.forEach(id => {
+        const el = document.getElementById(id);
+        el.value = '';
+        el.classList.remove('invalid');
+    });
+    respSel.classList.remove('invalid');
+    respSel.value = '';
+
+    // Reset annotation area
+    const annotArea = document.getElementById('notif-annotation-area');
+    const annotBtn  = document.getElementById('notif-annot-btn');
+    const annotText = document.getElementById('notif-annotation-text');
+    const annotMsg  = document.getElementById('notif-annot-required-msg');
+    const annotLabel = document.getElementById('notif-annot-label');
+    if (annotArea)  annotArea.style.display = 'none';
+    if (annotBtn)   { annotBtn.classList.remove('active','notif-annot-req'); }
+    if (annotText)  { annotText.value = ''; annotText.classList.remove('invalid'); }
+    if (annotMsg)   annotMsg.style.display = 'none';
+    if (annotLabel) annotLabel.textContent = 'Adicionar anotação';
+
+    // Pre-fill with existing data if any
+    const existing = dados.find(item => item.data === dateStr && item.mnemonicoId === mnemonicoId);
+    if (existing) {
+        if (existing.responsavelId) respSel.value = existing.responsavelId;
+        if (existing.manhaMin  !== null) document.getElementById('notif-manha-min').value  = existing.manhaMin;
+        if (existing.manhaMax  !== null) document.getElementById('notif-manha-max').value  = existing.manhaMax;
+        if (existing.manhaAtual!== null) document.getElementById('notif-manha-atual').value= existing.manhaAtual;
+        if (existing.tardeMin  !== null) document.getElementById('notif-tarde-min').value  = existing.tardeMin;
+        if (existing.tardeMax  !== null) document.getElementById('notif-tarde-max').value  = existing.tardeMax;
+        if (existing.tardeAtual!== null) document.getElementById('notif-tarde-atual').value= existing.tardeAtual;
+        if (existing.annotation) {
+            if (annotText)  annotText.value = existing.annotation;
+            if (annotArea)  annotArea.style.display = 'block';
+            if (annotBtn)   { annotBtn.classList.add('active'); }
+            if (annotLabel) annotLabel.textContent = 'Anotação adicionada';
+        }
+    }
+
+    document.getElementById('notif-add-modal').style.display = 'flex';
+}
+
+function closeNotifModal() {
+    const modal = document.getElementById('notif-add-modal');
+    if (modal) modal.style.display = 'none';
+    notifCurrentDate = null;
+    notifCurrentMnemonicoId = null;
+}
+
+function toggleNotifAnnotation() {
+    const area  = document.getElementById('notif-annotation-area');
+    const btn   = document.getElementById('notif-annot-btn');
+    const label = document.getElementById('notif-annot-label');
+    const msg   = document.getElementById('notif-annot-required-msg');
+    const text  = document.getElementById('notif-annotation-text');
+    const isOpen = area.style.display !== 'none';
+    area.style.display = isOpen ? 'none' : 'block';
+    btn.classList.toggle('active', !isOpen);
+    btn.classList.remove('notif-annot-req');
+    if (text) text.classList.remove('invalid');
+    if (msg) msg.style.display = 'none';
+    label.textContent = !isOpen ? 'Anotação adicionada' : 'Adicionar anotação';
+    if (!isOpen) text.focus();
+}
+
+// Real-time live validation on temp inputs
+function validateNotifLive() {
+    const getVal = id => {
+        const v = document.getElementById(id).value.trim();
+        return v === '' ? null : parseFloat(v);
+    };
+    const mark = (id, bad) => document.getElementById(id).classList.toggle('invalid', bad);
+    const clear = ids => ids.forEach(id => document.getElementById(id).classList.remove('invalid'));
+
+    // Manhã
+    const mm = getVal('notif-manha-min'), mM = getVal('notif-manha-max'), ma = getVal('notif-manha-atual');
+    clear(['notif-manha-min','notif-manha-max','notif-manha-atual']);
+    if (mm !== null && mM !== null && ma !== null) {
+        mark('notif-manha-min',  mm > ma || mm > mM);
+        mark('notif-manha-max',  mM < ma || mM < mm);
+        mark('notif-manha-atual', ma < mm || ma > mM);
+    }
+
+    // Tarde
+    const tm = getVal('notif-tarde-min'), tM = getVal('notif-tarde-max'), ta = getVal('notif-tarde-atual');
+    clear(['notif-tarde-min','notif-tarde-max','notif-tarde-atual']);
+    if (tm !== null && tM !== null && ta !== null) {
+        mark('notif-tarde-min',  tm > ta || tm > tM);
+        mark('notif-tarde-max',  tM < ta || tM < tm);
+        mark('notif-tarde-atual', ta < tm || ta > tM);
+    }
+
+    // If all blanks → hint annotation required
+    const allBlank = [mm, mM, ma, tm, tM, ta].every(v => v === null);
+    const msg = document.getElementById('notif-annot-required-msg');
+    const btn = document.getElementById('notif-annot-btn');
+    if (msg) msg.style.display = allBlank ? 'inline' : 'none';
+    if (btn && allBlank && !btn.classList.contains('active')) btn.classList.add('notif-annot-req');
+    if (btn && !allBlank) btn.classList.remove('notif-annot-req');
+}
+
+function validateNotifDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeAtual) {
+    let valid = true;
+    const tempFields = ['notif-manha-min','notif-manha-max','notif-manha-atual','notif-tarde-min','notif-tarde-max','notif-tarde-atual'];
+    tempFields.forEach(id => document.getElementById(id).classList.remove('invalid'));
+    document.getElementById('notif-responsavel').classList.remove('invalid');
+
+    if (!document.getElementById('notif-responsavel').value) {
+        document.getElementById('notif-responsavel').classList.add('invalid');
+        valid = false;
+    }
+
+    const markInvalid = id => { document.getElementById(id).classList.add('invalid'); valid = false; };
+
+    if (manhaMin !== null && manhaMax !== null && manhaAtual !== null) {
+        if (manhaMin > manhaAtual || manhaMin > manhaMax) markInvalid('notif-manha-min');
+        if (manhaMax < manhaAtual || manhaMax < manhaMin) markInvalid('notif-manha-max');
+        if (manhaAtual < manhaMin || manhaAtual > manhaMax) markInvalid('notif-manha-atual');
+    } else if (manhaMin !== null && manhaAtual === null) markInvalid('notif-manha-min');
+      else if (manhaMax !== null && manhaAtual === null) markInvalid('notif-manha-max');
+
+    if (tardeMin !== null && tardeMax !== null && tardeAtual !== null) {
+        if (tardeMin > tardeAtual || tardeMin > tardeMax) markInvalid('notif-tarde-min');
+        if (tardeMax < tardeAtual || tardeMax < tardeMin) markInvalid('notif-tarde-max');
+        if (tardeAtual < tardeMin || tardeAtual > tardeMax) markInvalid('notif-tarde-atual');
+    } else if (tardeMin !== null && tardeAtual === null) markInvalid('notif-tarde-min');
+      else if (tardeMax !== null && tardeAtual === null) markInvalid('notif-tarde-max');
+
+    return valid;
+}
+
+async function addDadoFromNotification() {
+    if (!notifCurrentDate || !notifCurrentMnemonicoId) return;
+
+    const responsavelId = parseInt(document.getElementById('notif-responsavel').value);
+    const getVal = id => {
+        const v = document.getElementById(id).value.trim();
+        return v === '' ? null : parseFloat(v);
+    };
+    const manhaMin   = getVal('notif-manha-min');
+    const manhaMax   = getVal('notif-manha-max');
+    const manhaAtual = getVal('notif-manha-atual');
+    const tardeMin   = getVal('notif-tarde-min');
+    const tardeMax   = getVal('notif-tarde-max');
+    const tardeAtual = getVal('notif-tarde-atual');
+    const annotText  = document.getElementById('notif-annotation-text');
+    const annotation = annotText ? annotText.value.trim() || null : null;
+
+    // Require annotation when all temps are blank
+    const allBlank = [manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeAtual].every(v => v === null);
+    if (allBlank && !annotation) {
+        // Force annotation open + highlight
+        const area  = document.getElementById('notif-annotation-area');
+        const btn   = document.getElementById('notif-annot-btn');
+        const label = document.getElementById('notif-annot-label');
+        const msg   = document.getElementById('notif-annot-required-msg');
+        if (area)   area.style.display = 'block';
+        if (btn)    { btn.classList.add('notif-annot-req'); btn.classList.remove('active'); }
+        if (label)  label.textContent = 'Adicionar anotação';
+        if (msg)    msg.style.display = 'inline';
+        if (annotText) { annotText.classList.add('invalid'); annotText.focus(); }
+        return;
+    }
+
+    if (!responsavelId || !validateNotifDado(manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeAtual)) return;
+
+    const btn = document.getElementById('notif-add-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+    try {
+        const existingIdx = dados.findIndex(item => item.data === notifCurrentDate && item.mnemonicoId === notifCurrentMnemonicoId);
+        if (existingIdx !== -1) {
+            dados[existingIdx].responsavelId = responsavelId;
+            dados[existingIdx].manhaMin   = manhaMin;
+            dados[existingIdx].manhaMax   = manhaMax;
+            dados[existingIdx].manhaAtual = manhaAtual;
+            dados[existingIdx].tardeMin   = tardeMin;
+            dados[existingIdx].tardeMax   = tardeMax;
+            dados[existingIdx].tardeAtual = tardeAtual;
+            if (annotation !== null) dados[existingIdx].annotation = annotation;
+        } else {
+            dados.unshift({
+                data: notifCurrentDate,
+                mnemonicoId: notifCurrentMnemonicoId,
+                responsavelId,
+                manhaMin, manhaMax, manhaAtual,
+                tardeMin, tardeMax, tardeAtual,
+                annotation
+            });
+            dados.sort((a, b) => new Date(b.data) - new Date(a.data));
+        }
+
+        await saveToFirebase();
+        currentPage = 1;
+        renderDadosCards();
+        renderPagination();
+        renderDashboardTable();
+        showSuccessAlert();
+        closeNotifModal();
+    } catch (e) {
+        console.error('Erro ao salvar:', e);
+        alert('Erro ao salvar os dados no servidor.');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i> Adicionar';
+    }
+}
+
+// ─── DADOS FILTERS ───────────────────────────────────────────────
+let dadosFilters = { mes: '', ano: '', mnemonicoId: '', responsavelId: '' };
+let dadosPickerYear = new Date().getFullYear();
+
+// ─── FILTER BAR TOGGLE ───────────────────────────────────────────
+function toggleDadosFilters() {
+    const bar = document.getElementById('dados-filter-bar');
+    const btn = document.getElementById('dados-filter-toggle-btn');
+    const isOpen = bar.classList.contains('open');
+    if (isOpen) {
+        // Close month picker dropdown before collapsing bar
+        const dropdown = document.getElementById('dados-month-picker-dropdown');
+        const pickerBtn = document.getElementById('dados-month-picker-btn');
+        if (dropdown) dropdown.classList.remove('open');
+        if (pickerBtn) pickerBtn.classList.remove('active');
+    }
+    bar.classList.toggle('open', !isOpen);
+    btn.classList.toggle('active', !isOpen);
+}
+
+// ─── MONTH PICKER ────────────────────────────────────────────────
+function toggleDadosMonthPicker() {
+    const dropdown = document.getElementById('dados-month-picker-dropdown');
+    const btn      = document.getElementById('dados-month-picker-btn');
+    const isOpen   = dropdown.classList.contains('open');
+    if (!isOpen) {
+        renderDadosMonthPickerGrid();
+        const rect = btn.getBoundingClientRect();
+        dropdown.style.top  = (rect.bottom + 6) + 'px';
+        dropdown.style.left = rect.left + 'px';
+    }
+    dropdown.classList.toggle('open', !isOpen);
+    btn.classList.toggle('active', !isOpen);
+}
+
+function renderDadosMonthPickerGrid() {
+    const label = document.getElementById('mp-year-label');
+    if (label) label.textContent = dadosPickerYear;
+    const grid = document.getElementById('mp-months-grid');
+    if (!grid) return;
+    const names = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    grid.innerHTML = names.map((m, i) => {
+        const sel = dadosFilters.mes == (i+1) && dadosFilters.ano == dadosPickerYear;
+        return `<button class="mp-month-btn${sel ? ' selected' : ''}"
+            onclick="selectDadosMonth(${dadosPickerYear},${i+1});event.stopPropagation()">${m}</button>`;
+    }).join('');
+}
+
+function changeDadosPickerYear(delta) {
+    dadosPickerYear += delta;
+    renderDadosMonthPickerGrid();
+}
+
+function selectDadosMonth(year, month) {
+    dadosFilters.mes = month;
+    dadosFilters.ano = year;
+    const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const lbl = document.getElementById('dados-month-picker-label');
+    if (lbl) lbl.textContent = `${monthNames[month-1]} ${year}`;
+    document.getElementById('dados-month-picker-dropdown').classList.remove('open');
+    document.getElementById('dados-month-picker-btn').classList.remove('active');
+    currentPage = 1;
+    renderDadosCards();
+    renderPagination();
+    updateDadosFilterBadge();
+}
+
+function clearDadosMonthFilter() {
+    dadosFilters.mes = '';
+    dadosFilters.ano = '';
+    const lbl = document.getElementById('dados-month-picker-label');
+    if (lbl) lbl.textContent = 'Selecione o período';
+    document.getElementById('dados-month-picker-dropdown').classList.remove('open');
+    document.getElementById('dados-month-picker-btn').classList.remove('active');
+    currentPage = 1;
+    renderDadosCards();
+    renderPagination();
+    updateDadosFilterBadge();
+}
+
+function populateDadosFilterDropdowns() {
+    // Mnemonico
+    const mnEl = document.getElementById('dados-filter-mnemonico');
+    if (mnEl) {
+        mnEl.innerHTML = '<option value="">Todos os mnemonicos</option>';
+        mnemonicos.sort((a,b) => a.mnemonico.localeCompare(b.mnemonico)).forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.id;
+            opt.textContent = m.mnemonico;
+            mnEl.appendChild(opt);
+        });
+        mnEl.value = dadosFilters.mnemonicoId;
+    }
+    // Responsável
+    const respEl = document.getElementById('dados-filter-responsavel');
+    if (respEl) {
+        respEl.innerHTML = '<option value="">Todos os responsáveis</option>';
+        responsaveis.sort((a,b) => a.name.localeCompare(b.name)).forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.id;
+            opt.textContent = r.name;
+            respEl.appendChild(opt);
+        });
+        respEl.value = dadosFilters.responsavelId;
+    }
+}
+
+function applyDadosFilter() {
+    dadosFilters.mnemonicoId   = document.getElementById('dados-filter-mnemonico').value;
+    dadosFilters.responsavelId = document.getElementById('dados-filter-responsavel').value;
+    currentPage = 1;
+    renderDadosCards();
+    renderPagination();
+    updateDadosFilterBadge();
+}
+
+function resetDadosFilters() {
+    dadosFilters = { mes: '', ano: '', mnemonicoId: '', responsavelId: '' };
+    const lbl = document.getElementById('dados-month-picker-label');
+    if (lbl) lbl.textContent = 'Selecione o período';
+    document.getElementById('dados-month-picker-btn')?.classList.remove('active');
+    document.getElementById('dados-month-picker-dropdown')?.classList.remove('open');
+    populateDadosFilterDropdowns();
+    currentPage = 1;
+    renderDadosCards();
+    renderPagination();
+    updateDadosFilterBadge();
+}
+
+function getDadosFiltered() {
+    return dados.filter(item => {
+        const [itemYear, itemMonth] = item.data.split('-').map(Number);
+        if (dadosFilters.mes && parseInt(dadosFilters.mes) !== itemMonth) return false;
+        if (dadosFilters.ano && parseInt(dadosFilters.ano) !== itemYear) return false;
+        if (dadosFilters.mnemonicoId && parseInt(dadosFilters.mnemonicoId) !== item.mnemonicoId) return false;
+        if (dadosFilters.responsavelId && parseInt(dadosFilters.responsavelId) !== item.responsavelId) return false;
+        return true;
+    }).sort((a, b) => {
+        const dateA = new Date(a.data), dateB = new Date(b.data);
+        dateA.setMinutes(dateA.getMinutes() + dateA.getTimezoneOffset());
+        dateB.setMinutes(dateB.getMinutes() + dateB.getTimezoneOffset());
+        const dc = dateB - dateA;
+        if (dc !== 0) return dc;
+        const mA = mnemonicos.find(m => m.id === a.mnemonicoId)?.mnemonico || '';
+        const mB = mnemonicos.find(m => m.id === b.mnemonicoId)?.mnemonico || '';
+        return mA.localeCompare(mB);
+    });
+}
+
+function updateDadosFilterBadge() {
+    // Count: mes+ano count as 1 together
+    let count = 0;
+    if (dadosFilters.mes || dadosFilters.ano) count++;
+    if (dadosFilters.mnemonicoId) count++;
+    if (dadosFilters.responsavelId) count++;
+    const badge = document.getElementById('dados-filter-badge');
+    if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'flex' : 'none'; }
+    const btn = document.getElementById('dados-filter-toggle-btn');
+    if (btn) btn.classList.toggle('has-filter', count > 0);
+}
+
+// Close month picker on outside click or scroll
+document.addEventListener('click', function(e) {
+    const wrap = document.querySelector('.dados-month-picker-wrap');
+    const dropdown = document.getElementById('dados-month-picker-dropdown');
+    if (wrap && dropdown && !wrap.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('open');
+        document.getElementById('dados-month-picker-btn')?.classList.remove('active');
+    }
+});
+window.addEventListener('scroll', function() {
+    const dropdown = document.getElementById('dados-month-picker-dropdown');
+    if (dropdown && dropdown.classList.contains('open')) {
+        const btn = document.getElementById('dados-month-picker-btn');
+        if (btn) {
+            const rect = btn.getBoundingClientRect();
+            dropdown.style.top  = (rect.bottom + 6) + 'px';
+            dropdown.style.left = rect.left + 'px';
+        }
+    }
+}, true);
         </script>
 </body>
 </html>
