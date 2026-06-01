@@ -692,6 +692,62 @@
             box-shadow: var(--shadow);
         }
 
+        /* ── Dashboard period picker overrides (resets button cascade) ── */
+        .dashboard-filter .dados-month-picker-btn {
+            background: #f8fafc;
+            color: var(--text);
+            padding: 8px 10px;
+            min-width: 150px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .dashboard-filter .dados-month-picker-btn:hover {
+            background: #fff;
+            border-color: var(--accent);
+            transform: none;
+            box-shadow: none;
+        }
+        .dashboard-filter .dados-month-picker-btn.active {
+            border-color: var(--accent);
+            background: #f0f6ff;
+            transform: none;
+            box-shadow: none;
+        }
+        .dashboard-filter .mp-year-nav button {
+            padding: 0;
+            background: var(--primary-light);
+            color: white;
+            width: 26px;
+            height: 26px;
+            font-size: 11px;
+            border-radius: 5px;
+            transform: none;
+            box-shadow: none;
+        }
+        .dashboard-filter .mp-year-nav button:hover {
+            background: var(--accent);
+            transform: none;
+            box-shadow: none;
+        }
+        .dashboard-filter .mp-clear-btn {
+            padding: 6px;
+            background: none;
+            border: 1.5px dashed var(--border);
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 400;
+            width: 100%;
+            transform: none;
+            box-shadow: none;
+        }
+        .dashboard-filter .mp-clear-btn:hover {
+            background: #fff5f5;
+            border-color: var(--danger);
+            color: var(--danger);
+            transform: none;
+            box-shadow: none;
+        }
+
         /* ─── DASHBOARD TABLE ────────────────────────────── */
         .dashboard-table {
             width: 100%;
@@ -2343,27 +2399,21 @@
             <div id="dashboard" class="tab-content active">
                 <h2>Dashboard - Dados de Temperatura</h2>
                 <div class="dashboard-filter">
-                    <div>
-                        <label>Mês</label>
-                        <select id="filter-mes">
-                            <option value="">Selecione</option>
-                            <option value="1">Janeiro</option>
-                            <option value="2">Fevereiro</option>
-                            <option value="3">Março</option>
-                            <option value="4">Abril</option>
-                            <option value="5">Maio</option>
-                            <option value="6">Junho</option>
-                            <option value="7">Julho</option>
-                            <option value="8">Agosto</option>
-                            <option value="9">Setembro</option>
-                            <option value="10">Outubro</option>
-                            <option value="11">Novembro</option>
-                            <option value="12">Dezembro</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Ano</label>
-                        <select id="filter-ano"></select>
+                    <div style="position:relative">
+                        <label>Período</label>
+                        <button class="dados-month-picker-btn" id="dash-month-picker-btn" onclick="toggleDashMonthPicker()">
+                            <span id="dash-month-picker-label">Selecione o período</span>
+                            <i class="fas fa-calendar-alt"></i>
+                        </button>
+                        <div class="dados-month-picker-dropdown" id="dash-month-picker-dropdown">
+                            <div class="mp-year-nav">
+                                <button onclick="changeDashPickerYear(-1);event.stopPropagation()"><i class="fas fa-chevron-left"></i></button>
+                                <span class="mp-year-label" id="dash-mp-year-label"></span>
+                                <button onclick="changeDashPickerYear(1);event.stopPropagation()"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                            <div class="mp-months-grid" id="dash-mp-months-grid"></div>
+                            <button class="mp-clear-btn" onclick="clearDashMonthFilter();event.stopPropagation()">Limpar período</button>
+                        </div>
                     </div>
                     <div>
                         <label>Mnemonico</label>
@@ -2643,6 +2693,8 @@
         let holidayCalendarMonth = new Date().getMonth();
         let notifCurrentDate = null;
         let notifCurrentMnemonicoId = null;
+        let dashFilters = { mes: '', ano: '' };
+        let dashPickerYear = new Date().getFullYear();
         let currentPage = 1;
         const itemsPerPage = 40;
         const maxPagesDisplayed = 5;
@@ -3701,21 +3753,27 @@
         
         function saveDashboardFilters() {
             const filters = {
-                mes: document.getElementById('filter-mes').value,
-                ano: document.getElementById('filter-ano').value,
+                mes: dashFilters.mes,
+                ano: dashFilters.ano,
                 mnemonicoId: document.getElementById('filter-mnemonico').value
             };
             localStorage.setItem(`dashboardFilters_${selectedUnitId}`, JSON.stringify(filters));
         }
-        
+
         function loadDashboardFilters() {
             const savedFilters = localStorage.getItem(`dashboardFilters_${selectedUnitId}`);
             if (savedFilters) {
                 const filters = JSON.parse(savedFilters);
-                document.getElementById('filter-mes').value = filters.mes || '';
-                document.getElementById('filter-ano').value = filters.ano || '';
+                dashFilters.mes = filters.mes || '';
+                dashFilters.ano = filters.ano || '';
                 document.getElementById('filter-mnemonico').value = filters.mnemonicoId || '';
-        
+                // Restore picker label
+                if (dashFilters.mes && dashFilters.ano) {
+                    const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                    const lbl = document.getElementById('dash-month-picker-label');
+                    if (lbl) lbl.textContent = `${monthNames[parseInt(dashFilters.mes)-1]} ${dashFilters.ano}`;
+                    dashPickerYear = parseInt(dashFilters.ano);
+                }
                 if (filters.mnemonicoId) {
                     const mnemonicoData = mnemonicos.find(item => item.id === parseInt(filters.mnemonicoId));
                     if (mnemonicoData && mnemonicoData.min !== undefined && mnemonicoData.max !== undefined) {
@@ -3991,14 +4049,14 @@
         }
         
         function getFilteredDataForCharts() {
-            const mes = document.getElementById('filter-mes').value;
-            const ano = document.getElementById('filter-ano').value;
+            const mes = dashFilters.mes;
+            const ano = dashFilters.ano;
             const mnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
-        
+
             if (!mes || !ano || !mnemonicoId) {
                 return [];
             }
-        
+
             return dados.filter(item => {
                 const [itemYear, itemMonth] = item.data.split('-').map(Number);
                 return itemMonth === parseInt(mes) &&
@@ -4019,23 +4077,78 @@
             }
         }
         
-        function renderDashboardFilters() {
-            const anoSelect = document.getElementById('filter-ano');
-            const currentYear = new Date().getFullYear();
-            anoSelect.innerHTML = '<option value="">Selecione</option>';
-            for (let i = currentYear; i >= currentYear - 2; i--) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i;
-                anoSelect.appendChild(option);
+        // ─── DASHBOARD PERIOD PICKER ────────────────────────────────────
+        function toggleDashMonthPicker() {
+            const dropdown = document.getElementById('dash-month-picker-dropdown');
+            const btn      = document.getElementById('dash-month-picker-btn');
+            const isOpen   = dropdown.classList.contains('open');
+            if (!isOpen) {
+                renderDashMonthPickerGrid();
+                const rect = btn.getBoundingClientRect();
+                dropdown.style.top  = (rect.bottom + 6) + 'px';
+                dropdown.style.left = rect.left + 'px';
             }
-        
+            dropdown.classList.toggle('open', !isOpen);
+            btn.classList.toggle('active', !isOpen);
+        }
+
+        function renderDashMonthPickerGrid() {
+            const label = document.getElementById('dash-mp-year-label');
+            if (label) label.textContent = dashPickerYear;
+            const grid = document.getElementById('dash-mp-months-grid');
+            if (!grid) return;
+            const names = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+            grid.innerHTML = names.map((m, i) => {
+                const sel = dashFilters.mes == (i+1) && dashFilters.ano == dashPickerYear;
+                return `<button class="mp-month-btn${sel ? ' selected' : ''}"
+                    onclick="selectDashMonth(${dashPickerYear},${i+1});event.stopPropagation()">${m}</button>`;
+            }).join('');
+        }
+
+        function changeDashPickerYear(delta) {
+            dashPickerYear += delta;
+            renderDashMonthPickerGrid();
+        }
+
+        function selectDashMonth(year, month) {
+            dashFilters.mes = month;
+            dashFilters.ano = year;
+            const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            const lbl = document.getElementById('dash-month-picker-label');
+            if (lbl) lbl.textContent = `${monthNames[month-1]} ${year}`;
+            document.getElementById('dash-month-picker-dropdown').classList.remove('open');
+            document.getElementById('dash-month-picker-btn').classList.remove('active');
+            saveDashboardFilters();
+            renderDashboardTable();
+            renderNotifications();
+        }
+
+        function clearDashMonthFilter() {
+            dashFilters.mes = '';
+            dashFilters.ano = '';
+            const lbl = document.getElementById('dash-month-picker-label');
+            if (lbl) lbl.textContent = 'Selecione o período';
+            document.getElementById('dash-month-picker-dropdown').classList.remove('open');
+            document.getElementById('dash-month-picker-btn').classList.remove('active');
+            saveDashboardFilters();
+            renderDashboardTable();
+            renderNotifications();
+        }
+
+        function renderDashboardFilters() {
+            // Set default period to current month/year if no saved filter
             const savedFilters = localStorage.getItem(`dashboardFilters_${selectedUnitId}`);
             if (!savedFilters) {
-                anoSelect.value = currentYear;
+                const now = new Date();
+                dashFilters.mes = now.getMonth() + 1;
+                dashFilters.ano = now.getFullYear();
+                dashPickerYear = now.getFullYear();
+                const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                const lbl = document.getElementById('dash-month-picker-label');
+                if (lbl) lbl.textContent = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
                 saveDashboardFilters();
             }
-        
+
             document.getElementById('filter-mnemonico').addEventListener('change', function() {
                 const mnemonicoId = parseInt(this.value);
                 const mnemonicoData = mnemonicos.find(item => item.id === mnemonicoId);
@@ -4047,27 +4160,15 @@
                 renderDashboardTable();
                 renderNotifications();
             });
-
-            document.getElementById('filter-mes').addEventListener('change', function() {
-                saveDashboardFilters();
-                renderDashboardTable();
-                renderNotifications();
-            });
-
-            document.getElementById('filter-ano').addEventListener('change', function() {
-                saveDashboardFilters();
-                renderDashboardTable();
-                renderNotifications();
-            });
         }
         
         function renderDashboardTable() {
-            const mes = document.getElementById('filter-mes').value;
-            const ano = document.getElementById('filter-ano').value;
+            const mes = dashFilters.mes;
+            const ano = dashFilters.ano;
             const mnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
             const tbody = document.querySelector('#dashboard-table tbody');
             tbody.innerHTML = '';
-        
+
             if (!mes || !ano || !mnemonicoId) {
                 return;
             }
@@ -5245,8 +5346,8 @@ function renderHolidayCalendar() {
 function getNotifications() {
     if (selectedUnitId === 2) return [];
 
-    const filterMes = parseInt(document.getElementById('filter-mes').value);
-    const filterAno = parseInt(document.getElementById('filter-ano').value);
+    const filterMes = parseInt(dashFilters.mes);
+    const filterAno = parseInt(dashFilters.ano);
     const filterMnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
 
     if (!filterMes || !filterAno || !filterMnemonicoId) return [];
@@ -5755,21 +5856,40 @@ function updateDadosFilterBadge() {
 
 // Close month picker on outside click or scroll
 document.addEventListener('click', function(e) {
-    const wrap = document.querySelector('.dados-month-picker-wrap');
-    const dropdown = document.getElementById('dados-month-picker-dropdown');
-    if (wrap && dropdown && !wrap.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.remove('open');
+    // Close dados month picker on outside click
+    const dadosWrap = document.querySelector('.dados-month-picker-wrap');
+    const dadosDropdown = document.getElementById('dados-month-picker-dropdown');
+    if (dadosWrap && dadosDropdown && !dadosWrap.contains(e.target) && !dadosDropdown.contains(e.target)) {
+        dadosDropdown.classList.remove('open');
         document.getElementById('dados-month-picker-btn')?.classList.remove('active');
+    }
+    // Close dashboard month picker on outside click
+    const dashBtn = document.getElementById('dash-month-picker-btn');
+    const dashDropdown = document.getElementById('dash-month-picker-dropdown');
+    if (dashBtn && dashDropdown && !dashBtn.contains(e.target) && !dashDropdown.contains(e.target)) {
+        dashDropdown.classList.remove('open');
+        dashBtn.classList.remove('active');
     }
 });
 window.addEventListener('scroll', function() {
-    const dropdown = document.getElementById('dados-month-picker-dropdown');
-    if (dropdown && dropdown.classList.contains('open')) {
+    // Reposition dados picker on scroll
+    const dadosDropdown = document.getElementById('dados-month-picker-dropdown');
+    if (dadosDropdown && dadosDropdown.classList.contains('open')) {
         const btn = document.getElementById('dados-month-picker-btn');
         if (btn) {
             const rect = btn.getBoundingClientRect();
-            dropdown.style.top  = (rect.bottom + 6) + 'px';
-            dropdown.style.left = rect.left + 'px';
+            dadosDropdown.style.top  = (rect.bottom + 6) + 'px';
+            dadosDropdown.style.left = rect.left + 'px';
+        }
+    }
+    // Reposition dashboard picker on scroll
+    const dashDropdown = document.getElementById('dash-month-picker-dropdown');
+    if (dashDropdown && dashDropdown.classList.contains('open')) {
+        const btn = document.getElementById('dash-month-picker-btn');
+        if (btn) {
+            const rect = btn.getBoundingClientRect();
+            dashDropdown.style.top  = (rect.bottom + 6) + 'px';
+            dashDropdown.style.left = rect.left + 'px';
         }
     }
 }, true);
