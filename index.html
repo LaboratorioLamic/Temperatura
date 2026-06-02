@@ -2321,9 +2321,10 @@
                     </div>
                     <div class="notif-field-group">
                         <label>Responsável <span class="req">*</span></label>
-                        <select id="notif-responsavel">
+                        <select id="notif-responsavel" onchange="document.getElementById('notif-responsavel-error').style.display='none';this.classList.remove('invalid');">
                             <option value="">Selecione...</option>
                         </select>
+                        <span id="notif-responsavel-error" style="display:none;font-size:11px;color:#e53e3e;font-weight:700;margin-top:4px;">Campo obrigatório</span>
                     </div>
                 </div>
                 <!-- Temperature grid -->
@@ -5359,6 +5360,9 @@ function getNotifications() {
     const daysInMonth = new Date(filterAno, filterMes, 0).getDate();
     const lastDay = isCurrentMonth ? today.getDate() : daysInMonth;
 
+    const mnemonico = mnemonicos.find(m => m.id === filterMnemonicoId);
+    const mnemonicoName = mnemonico ? mnemonico.mnemonico : '';
+
     const notifications = [];
 
     for (let day = 1; day <= lastDay; day++) {
@@ -5370,13 +5374,12 @@ function getNotifications() {
         if (feriados.includes(dateStr)) continue; // Feriado
 
         const entry = dados.find(d => d.data === dateStr && d.mnemonicoId === filterMnemonicoId);
-        const isComplete = entry &&
-            entry.manhaMin !== null && entry.manhaMax !== null && entry.manhaAtual !== null &&
-            entry.tardeMin !== null && entry.tardeMax !== null && entry.tardeAtual !== null;
+        const temManha = !!(entry && entry.manhaAtual !== null);
+        const temTarde = !!(entry && entry.tardeAtual !== null);
 
-        if (!isComplete) {
+        if (!temManha || !temTarde) {
             const isToday = date.getTime() === today.getTime();
-            notifications.push({ dateStr, mnemonicoId: filterMnemonicoId, isToday });
+            notifications.push({ dateStr, mnemonicoId: filterMnemonicoId, mnemonicoName, isToday, hasManhaAtual: temManha, hasTardeAtual: temTarde });
         }
     }
 
@@ -5393,7 +5396,7 @@ function renderNotifications() {
     }
 
     const filterMnemonicoId = parseInt(document.getElementById('filter-mnemonico').value);
-    if (!filterMnemonicoId) {
+    if (!filterMnemonicoId || !dashFilters.mes || !dashFilters.ano) {
         bellContainer.style.display = 'none';
         return;
     }
@@ -5419,19 +5422,22 @@ function renderNotifications() {
     const list = document.getElementById('notification-list');
     if (!list) return;
 
-    const mnemonico = mnemonicos.find(m => m.id === filterMnemonicoId);
-    const mnemonicoName = mnemonico ? mnemonico.mnemonico : '';
-
     list.innerHTML = notifications.map(n => {
         const [y, mo, d] = n.dateStr.split('-');
         const dateDisplay = `${d}/${mo}/${y}`;
         const cls = n.isToday ? 'notif-item yellow' : 'notif-item red';
         const icon = n.isToday ? '🟡' : '🔴';
-        const label = n.isToday ? 'Hoje — incluir dados' : 'Pendente — dados incompletos';
+        let missing = [];
+        if (!n.hasManhaAtual) missing.push('manhã');
+        if (!n.hasTardeAtual) missing.push('tarde');
+        const missingStr = missing.join(' e ');
+        const label = n.isToday
+            ? `Hoje — falta temperatura da ${missingStr}`
+            : `Pendente — falta temperatura da ${missingStr}`;
         return `<div class="${cls}" onclick="openNotifAddModal('${n.dateStr}', ${n.mnemonicoId})">
             <span class="notif-icon">${icon}</span>
             <div class="notif-info">
-                <div class="notif-date">${dateDisplay} &mdash; ${mnemonicoName}</div>
+                <div class="notif-date">${dateDisplay} &mdash; ${n.mnemonicoName}</div>
                 <div class="notif-label">${label}</div>
             </div>
             <i class="fas fa-chevron-right notif-arrow"></i>
@@ -5531,6 +5537,10 @@ function closeNotifModal() {
     if (modal) modal.style.display = 'none';
     notifCurrentDate = null;
     notifCurrentMnemonicoId = null;
+    const respSel = document.getElementById('notif-responsavel');
+    const respError = document.getElementById('notif-responsavel-error');
+    if (respSel) respSel.classList.remove('invalid');
+    if (respError) respError.style.display = 'none';
 }
 
 function toggleNotifAnnotation() {
@@ -5631,6 +5641,16 @@ async function addDadoFromNotification() {
     const tardeAtual = getVal('notif-tarde-atual');
     const annotText  = document.getElementById('notif-annotation-text');
     const annotation = annotText ? annotText.value.trim() || null : null;
+
+    // Validate responsável first
+    const respSel = document.getElementById('notif-responsavel');
+    const respError = document.getElementById('notif-responsavel-error');
+    if (!responsavelId) {
+        respSel.classList.add('invalid');
+        if (respError) { respError.style.display = 'block'; }
+        respSel.focus();
+        return;
+    }
 
     // Require annotation when all temps are blank
     const allBlank = [manhaMin, manhaMax, manhaAtual, tardeMin, tardeMax, tardeAtual].every(v => v === null);
