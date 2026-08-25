@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Sem cache: a pagina sempre revalida contra o servidor -->
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Controle de Temperatura</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
@@ -942,6 +946,75 @@
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.3s;
+        }
+
+        /* ─── OVERLAYS DE SINCRONIZAÇÃO ──────────────────── */
+        .sync-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(6, 18, 40, 0.74);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 4000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .sync-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .sync-overlay .sync-spinner {
+            border: 5px solid rgba(255, 255, 255, 0.16);
+            border-top: 5px solid #60a5fa;
+            border-radius: 50%;
+            width: 46px; height: 46px;
+            animation: spin 0.9s linear infinite;
+            margin-bottom: 18px;
+        }
+
+        .sync-overlay .sync-title {
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .sync-overlay .sync-sub {
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 13px;
+            margin-top: 10px;
+            text-align: center;
+            max-width: 340px;
+            line-height: 1.5;
+            padding: 0 20px;
+        }
+
+        #offline-screen {
+            background: rgba(48, 10, 16, 0.82);
+            z-index: 4500;
+        }
+
+        #offline-screen .sync-icon {
+            font-size: 46px;
+            color: #fca5a5;
+            margin-bottom: 18px;
+            animation: pulse-offline 1.6s ease-in-out infinite;
+        }
+
+        @keyframes pulse-offline {
+            0%, 100% { opacity: 1; }
+            50%      { opacity: 0.45; }
         }
 
         /* ─── LOADING SCREEN ─────────────────────────────── */
@@ -2117,6 +2190,18 @@
         <span id="loading-bar-text" class="loading-bar-text">0%</span>
     </div>
 </div>
+    <!-- Overlay de gravação: escurece a tela ate a alteração no BD terminar -->
+    <div class="sync-overlay" id="saving-overlay">
+        <div class="sync-spinner"></div>
+        <div class="sync-title" id="saving-overlay-text">Salvando alterações...</div>
+        <div class="sync-sub">Não feche nem atualize a página até a conclusão.</div>
+    </div>
+    <!-- Tela de desconectado -->
+    <div class="sync-overlay" id="offline-screen">
+        <div class="sync-icon"><i class="fas fa-wifi"></i></div>
+        <div class="sync-title">Desconectado</div>
+        <div class="sync-sub">Sem conexão com o servidor. Aguardando reconexão...<br>As alterações ficam bloqueadas até a conexão voltar.</div>
+    </div>
     <!-- ── Sidebar ── -->
     <aside class="sidebar">
         <div class="sidebar-brand">
@@ -2716,61 +2801,424 @@
             renderDashboardTable();
             updateCharts();
         }
-        // Funções para comunicação com Firebase
-        async function saveToFirebase() {
-            if (!selectedUnitId) return;
-            const data = { mnemonicos, archivedMnemonicos, responsaveis, archivedResponsaveis, dados };
+        /* ══════════════════════════════════════════════════════════════
+           CAMADA DE SINCRONIZAÇÃO MULTI-SESSÃO
+           - Escrita transacional com merge 3-vias (nunca sobrescreve
+             alterações de outra sessão)
+           - Listener em tempo real (nenhuma sessão fica desatualizada)
+           - Detecção de conexão + tela de desconectado
+           - Overlay de gravação em toda alteração no banco
+           - Invalidação de cache local (sem dados fantasmas)
+           ══════════════════════════════════════════════════════════════ */
+
+        const SCHEMA_VERSION = '2';
+        const SESSION_ID = 'S' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+
+        // Purga cache local de versões anteriores (evita dados fantasmas)
+        (function purgeStaleLocalCache() {
             try {
-                await database.ref(`unidades/${selectedUnitId}`).set(data);
-            } catch (error) {
-                console.error('Erro ao salvar no Firebase:', error);
-                alert('Erro ao salvar os dados no servidor.');
+                if (localStorage.getItem('appSchemaVersion') !== SCHEMA_VERSION) {
+                    Object.keys(localStorage).forEach(k => {
+                        if (k.startsWith('dashboardFilters_') || k === 'selectedUnitId' ||
+                            k.startsWith('unidade_') || k.startsWith('cache_')) {
+                            localStorage.removeItem(k);
+                        }
+                    });
+                    localStorage.setItem('appSchemaVersion', SCHEMA_VERSION);
+                }
+            } catch (e) { /* localStorage indisponível */ }
+        })();
+
+        let baselineState = emptyState();   // último estado confirmado pelo servidor
+        let unitRef = null, unitCallback = null;
+        let feriadosRef = null, feriadosCallback = null;
+        let connectedRef = null;
+        let isConnected = true;
+        let savingCount = 0;
+        let deferredRemoteState = null;
+        let hasDeferredRemoteState = false;
+        let offlineTimer = null;
+
+        function emptyState() {
+            return {
+                mnemonicos: [], archivedMnemonicos: [],
+                responsaveis: [], archivedResponsaveis: [], dados: []
+            };
+        }
+
+        function hashString(str) {
+            let h = 5381;
+            for (let i = 0; i < str.length; i++) h = (((h << 5) + h) ^ str.charCodeAt(i)) >>> 0;
+            return h.toString(36);
+        }
+
+        function deepEqual(a, b) {
+            if (a === b) return true;
+            if (a === null || b === null || a === undefined || b === undefined) return a === b;
+            if (typeof a !== 'object' || typeof b !== 'object') return false;
+            return JSON.stringify(a) === JSON.stringify(b);
+        }
+
+        function cloneState(state) { return JSON.parse(JSON.stringify(state)); }
+
+        // Identidade estável por registro. Sem isso, edições concorrentes por
+        // índice de array apagam o registro errado.
+        // O Realtime Database devolve arrays esparsos como objeto indexado.
+        function toArray(value) {
+            if (Array.isArray(value)) return value.filter(Boolean);
+            if (value && typeof value === 'object') {
+                return Object.keys(value)
+                    .sort((a, b) => Number(a) - Number(b))
+                    .map(k => value[k])
+                    .filter(Boolean);
+            }
+            return [];
+        }
+
+        function normalizeState(raw) {
+            const src = raw || {};
+            const out = emptyState();
+            ['mnemonicos', 'archivedMnemonicos', 'responsaveis', 'archivedResponsaveis'].forEach(name => {
+                out[name] = toArray(src[name]).map(i => Object.assign({}, i));
+            });
+            const seen = {};
+            out.dados = toArray(src.dados).map(item => {
+                const d = Object.assign({}, item);
+                if (!d.uid) {
+                    // uid determinístico: todas as sessões derivam o mesmo valor
+                    // para registros legados, então não há duplicação.
+                    const base = d.data + '|' + d.mnemonicoId + '|' + d.responsavelId;
+                    seen[base] = (seen[base] || 0) + 1;
+                    d.uid = 'L' + hashString(base + '#' + seen[base]);
+                }
+                return d;
+            });
+            return out;
+        }
+
+        function indexBy(arr, key) {
+            const m = new Map();
+            arr.forEach(i => m.set(String(i[key]), i));
+            return m;
+        }
+
+        // Só os campos que ESTA sessão alterou sobrescrevem o servidor.
+        function mergeFields(baseItem, localItem, serverItem) {
+            if (!baseItem) return Object.assign({}, serverItem, localItem);
+            const res = Object.assign({}, serverItem);
+            Object.keys(localItem).forEach(f => {
+                if (!deepEqual(localItem[f], baseItem[f])) res[f] = localItem[f];
+            });
+            Object.keys(baseItem).forEach(f => {
+                if (!(f in localItem) && (f in res)) delete res[f];
+            });
+            return res;
+        }
+
+        function mergeCollection(base, local, server, key, collisions, listIdx) {
+            const bMap = indexBy(base, key), lMap = indexBy(local, key), sMap = indexBy(server, key);
+            const out = [], emitted = new Set();
+
+            server.forEach(sItem => {
+                const k = String(sItem[key]);
+                if (bMap.has(k) && !lMap.has(k)) return;          // removido nesta sessão
+                if (lMap.has(k)) {
+                    if (!bMap.has(k) && collisions) {
+                        // item novo local colidiu com item novo de outra sessão:
+                        // preserva os dois, reatribuindo id ao local
+                        collisions.push({ item: lMap.get(k), oldKey: k, listIdx: listIdx });
+                        out.push(sItem); emitted.add(k);
+                        return;
+                    }
+                    out.push(mergeFields(bMap.get(k), lMap.get(k), sItem));
+                    emitted.add(k);
+                    return;
+                }
+                out.push(sItem); emitted.add(k);                  // criado por outra sessão
+            });
+
+            local.forEach(lItem => {
+                const k = String(lItem[key]);
+                if (emitted.has(k) || sMap.has(k)) return;
+                if (bMap.has(k)) return;                          // removido por outra sessão
+                out.push(lItem);                                  // criado nesta sessão
+            });
+
+            return out;
+        }
+
+        function reassignCollisions(collisions, targetArrays) {
+            const remap = {};
+            if (!collisions.length) return remap;
+            let maxId = 0;
+            targetArrays.forEach(arr => arr.forEach(i => {
+                const n = Number(i.id) || 0; if (n > maxId) maxId = n;
+            }));
+            collisions.forEach(c => {
+                maxId += 1;
+                remap[c.oldKey] = maxId;
+                const target = targetArrays[c.listIdx] || targetArrays[0];
+                target.push(Object.assign({}, c.item, { id: maxId }));
+            });
+            return remap;
+        }
+
+        // Merge 3-vias: base (último estado do servidor) x local x servidor atual
+        function buildMergedState(serverRaw) {
+            const server = normalizeState(serverRaw);
+            const base = baselineState;
+            const local = normalizeState({
+                mnemonicos: mnemonicos,
+                archivedMnemonicos: archivedMnemonicos,
+                responsaveis: responsaveis,
+                archivedResponsaveis: archivedResponsaveis,
+                dados: dados
+            });
+
+            const mnemoCollisions = [], respCollisions = [];
+            const merged = emptyState();
+
+            merged.mnemonicos = mergeCollection(base.mnemonicos, local.mnemonicos, server.mnemonicos, 'id', mnemoCollisions, 0);
+            merged.archivedMnemonicos = mergeCollection(base.archivedMnemonicos, local.archivedMnemonicos, server.archivedMnemonicos, 'id', mnemoCollisions, 1);
+            merged.responsaveis = mergeCollection(base.responsaveis, local.responsaveis, server.responsaveis, 'id', respCollisions, 0);
+            merged.archivedResponsaveis = mergeCollection(base.archivedResponsaveis, local.archivedResponsaveis, server.archivedResponsaveis, 'id', respCollisions, 1);
+
+            const mnemoRemap = reassignCollisions(mnemoCollisions, [merged.mnemonicos, merged.archivedMnemonicos]);
+            const respRemap = reassignCollisions(respCollisions, [merged.responsaveis, merged.archivedResponsaveis]);
+
+            const localDados = local.dados.map(d => {
+                const c = Object.assign({}, d);
+                if (mnemoRemap[String(c.mnemonicoId)] !== undefined) c.mnemonicoId = mnemoRemap[String(c.mnemonicoId)];
+                if (respRemap[String(c.responsavelId)] !== undefined) c.responsavelId = respRemap[String(c.responsavelId)];
+                return c;
+            });
+
+            merged.dados = mergeCollection(base.dados, localDados, server.dados, 'uid', null, 0);
+            merged.dados.sort((a, b) => new Date(b.data) - new Date(a.data));
+            merged._updatedAt = Date.now();
+            merged._updatedBy = SESSION_ID;
+            return merged;
+        }
+
+        function renderAll() {
+            try {
+                renderMnemonicos();
+                renderResponsaveis();
+                renderDropdowns();
+                renderDadosCards();
+                renderPagination();
+                renderDashboardTable();
+                updateCharts();
+                renderNotifications();
+            } catch (e) {
+                console.error('Erro ao renderizar estado sincronizado:', e);
             }
         }
 
-        
+        function applyServerState(raw, options) {
+            const opts = options || {};
+            const state = normalizeState(raw);
+            state.dados.sort((a, b) => new Date(b.data) - new Date(a.data));
+            baselineState = cloneState(state);
+            mnemonicos = state.mnemonicos;
+            archivedMnemonicos = state.archivedMnemonicos;
+            responsaveis = state.responsaveis;
+            archivedResponsaveis = state.archivedResponsaveis;
+            dados = state.dados;
+            const maxPage = Math.max(1, Math.ceil(dados.length / itemsPerPage));
+            if (currentPage > maxPage) currentPage = maxPage;
+            if (!opts.silent) renderAll();
+        }
+
+        function isUserEditing() {
+            const el = document.activeElement;
+            if (!el) return false;
+            const tag = el.tagName;
+            if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') return false;
+            if (el.readOnly || el.disabled) return false;
+            return el.type !== 'button' && el.type !== 'submit';
+        }
+
+        function isModalOpen() {
+            return Array.from(document.querySelectorAll('[id$="-modal"]'))
+                .some(m => m.style.display === 'flex' || m.style.display === 'block');
+        }
+
+        // Nunca sobrescreve o que o usuário está digitando: adia o repintar.
+        function flushDeferredRemoteState() {
+            if (!hasDeferredRemoteState) return;
+            if (savingCount > 0 || isUserEditing() || isModalOpen()) return;
+            const raw = deferredRemoteState;
+            hasDeferredRemoteState = false;
+            deferredRemoteState = null;
+            applyServerState(raw);
+        }
+
+        document.addEventListener('focusout', () => setTimeout(flushDeferredRemoteState, 200));
+        document.addEventListener('click', () => setTimeout(flushDeferredRemoteState, 250));
+
+        function attachRealtimeSync(unitId) {
+            detachRealtimeSync();
+
+            unitRef = database.ref('unidades/' + unitId);
+            unitCallback = unitRef.on('value', snap => {
+                if (savingCount > 0) return;      // gravação própria em andamento
+                const raw = snap.val();
+                if (isUserEditing() || isModalOpen()) {
+                    deferredRemoteState = raw;
+                    hasDeferredRemoteState = true;
+                    return;
+                }
+                applyServerState(raw);
+            }, err => console.error('Sincronização interrompida:', err));
+
+            feriadosRef = database.ref('feriados');
+            feriadosCallback = feriadosRef.on('value', snap => {
+                feriados = toArray(snap.val());
+                try {
+                    renderHolidayCalendar();
+                    renderNotifications();
+                } catch (e) { /* seções ainda não renderizadas */ }
+            }, err => console.error('Sincronização de feriados interrompida:', err));
+        }
+
+        function detachRealtimeSync() {
+            if (unitRef && unitCallback) unitRef.off('value', unitCallback);
+            if (feriadosRef && feriadosCallback) feriadosRef.off('value', feriadosCallback);
+            unitRef = unitCallback = feriadosRef = feriadosCallback = null;
+        }
+
+        /* ─── Tela de desconectado ─────────────────────────────── */
+        function toggleOfflineScreen(show) {
+            const el = document.getElementById('offline-screen');
+            if (!el) return;
+            if (show) {
+                if (offlineTimer) return;
+                offlineTimer = setTimeout(() => {
+                    offlineTimer = null;
+                    el.classList.add('visible');
+                }, 1500);
+            } else {
+                if (offlineTimer) { clearTimeout(offlineTimer); offlineTimer = null; }
+                el.classList.remove('visible');
+            }
+        }
+
+        function revalidateFromServer() {
+            if (!selectedUnitId || !isConnected || savingCount > 0) return;
+            database.ref('unidades/' + selectedUnitId).once('value')
+                .then(s => {
+                    if (isUserEditing() || isModalOpen()) {
+                        deferredRemoteState = s.val();
+                        hasDeferredRemoteState = true;
+                    } else {
+                        applyServerState(s.val());
+                    }
+                })
+                .catch(e => console.error('Falha ao revalidar dados:', e));
+        }
+
+        (function monitorConnection() {
+            connectedRef = database.ref('.info/connected');
+            connectedRef.on('value', snap => {
+                const online = snap.val() === true && navigator.onLine !== false;
+                isConnected = online;
+                toggleOfflineScreen(!online);
+                if (online) revalidateFromServer();
+            });
+            window.addEventListener('offline', () => {
+                isConnected = false;
+                toggleOfflineScreen(true);
+            });
+            window.addEventListener('online', () => toggleOfflineScreen(false));
+        })();
+
+        // Aba reaberta / voltou do bfcache: revalida contra o servidor
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') revalidateFromServer();
+        });
+        window.addEventListener('pageshow', e => { if (e.persisted) revalidateFromServer(); });
+
+        /* ─── Overlay de gravação ──────────────────────────────── */
+        function beginSaving(label) {
+            savingCount++;
+            const el = document.getElementById('saving-overlay');
+            if (el) {
+                const t = document.getElementById('saving-overlay-text');
+                if (t) t.textContent = label || 'Salvando alterações...';
+                el.classList.add('visible');
+            }
+        }
+
+        function endSaving() {
+            savingCount = Math.max(0, savingCount - 1);
+            if (savingCount === 0) {
+                const el = document.getElementById('saving-overlay');
+                if (el) el.classList.remove('visible');
+                setTimeout(flushDeferredRemoteState, 100);
+            }
+        }
+
+        /* ─── Escrita/leitura ──────────────────────────────────── */
+        async function saveToFirebase() {
+            if (!selectedUnitId) return;
+            if (!isConnected) {
+                toggleOfflineScreen(true);
+                alert('Sem conexão com o servidor. A alteração não foi salva.');
+                applyServerState(cloneState(baselineState));   // desfaz alteração não salva
+                return;
+            }
+            beginSaving();
+            try {
+                const result = await database.ref('unidades/' + selectedUnitId)
+                    .transaction(current => buildMergedState(current), undefined, false);
+                if (!result.committed) throw new Error('Transação não confirmada pelo servidor');
+                applyServerState(result.snapshot.val());
+            } catch (error) {
+                console.error('Erro ao salvar no Firebase:', error);
+                alert('Erro ao salvar os dados no servidor. Os dados atuais serão recarregados.');
+                try {
+                    const snap = await database.ref('unidades/' + selectedUnitId).once('value');
+                    applyServerState(snap.val());
+                } catch (e) { console.error('Falha ao recarregar após erro:', e); }
+            } finally {
+                endSaving();
+            }
+        }
+
+        // Sobrescrita explícita (restauração de backup) - intencional
+        async function overwriteUnitData(data) {
+            if (!selectedUnitId) throw new Error('Nenhuma unidade selecionada');
+            if (!isConnected) {
+                toggleOfflineScreen(true);
+                throw new Error('Sem conexão com o servidor');
+            }
+            beginSaving('Restaurando backup...');
+            try {
+                const state = normalizeState(data);
+                state.dados.sort((a, b) => new Date(b.data) - new Date(a.data));
+                state._updatedAt = Date.now();
+                state._updatedBy = SESSION_ID;
+                await database.ref('unidades/' + selectedUnitId).set(state);
+                applyServerState(state);
+            } finally {
+                endSaving();
+            }
+        }
+
         async function loadFromFirebase() {
             if (!selectedUnitId) return;
             startLoadingBar();
             toggleLoadingScreen(true);
             try {
-                const [snapshot, feriadosSnap] = await Promise.all([
-                    database.ref(`unidades/${selectedUnitId}`).once('value'),
+                const results = await Promise.all([
+                    database.ref('unidades/' + selectedUnitId).once('value'),
                     database.ref('feriados').once('value')
                 ]);
-                feriados = feriadosSnap.val() || [];
-                const data = snapshot.val();
-                if (data) {
-                    mnemonicos = data.mnemonicos || [];
-                    archivedMnemonicos = data.archivedMnemonicos || [];
-                    responsaveis = data.responsaveis || [];
-                    archivedResponsaveis = data.archivedResponsaveis || [];
-                    dados = data.dados || [];
-                    renderMnemonicos();
-                    renderResponsaveis();
-                    renderDropdowns();
-                    renderDadosCards();
-                    renderPagination();
-                    renderDashboardTable();
-                    updateCharts();
-                    renderNotifications();
-                    completeLoadingBar();
-                } else {
-                    mnemonicos = [];
-                    archivedMnemonicos = [];
-                    responsaveis = [];
-                    archivedResponsaveis = [];
-                    dados = [];
-                    renderMnemonicos();
-                    renderResponsaveis();
-                    renderDropdowns();
-                    renderDadosCards();
-                    renderPagination();
-                    renderDashboardTable();
-                    updateCharts();
-                    renderNotifications();
-                    completeLoadingBar();
-                }
+                feriados = toArray(results[1].val());
+                applyServerState(results[0].val());
+                attachRealtimeSync(selectedUnitId);
+                completeLoadingBar();
             } catch (error) {
                 console.error('Erro ao carregar do Firebase:', error);
                 stopLoadingBar();
@@ -2875,6 +3323,8 @@
         async function selectUnit() {
             const select = document.getElementById('unit-select');
             const selectedUnit = unidades.find(u => u.name === select.value);
+            detachRealtimeSync();
+            applyServerState(null, { silent: true });
             selectedUnitId = selectedUnit ? selectedUnit.id : null;
             localStorage.setItem('selectedUnitId', selectedUnitId);
             updateUnitDisplay();
@@ -4364,6 +4814,7 @@
             document.getElementById('data').value = today;
         
             selectedUnitId = null;
+            detachRealtimeSync();
             localStorage.removeItem('selectedUnitId');
             updateUnitDisplay();
         
@@ -4480,9 +4931,16 @@
             }
         }
         
-                const CORRECT_PASSWORD = 'Lamic6530@';
+                // A senha nunca fica no codigo-fonte: apenas o hash salgado
+                // gravado em config/cadastroPasswordHash no Firebase.
+                const PASSWORD_SALT = 'lamic-temp::';
                 let isCadastroAccessible = false;
-                
+
+                async function sha256Hex(text) {
+                    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+                    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+                }
+
                 function openPasswordModal() {
                     const modal = document.getElementById('password-modal');
                     const input = document.getElementById('password-input');
@@ -4501,27 +4959,48 @@
                     redirectToDashboard();
                 }
                 
-                function checkPassword() {
+                async function checkPassword() {
                     const input = document.getElementById('password-input');
                     const confirmButton = document.querySelector('#password-modal button:not(.close-modal)');
                     const modalContent = document.querySelector('.password-modal-content');
                     const password = input.value.trim();
-                
-                    if (password === CORRECT_PASSWORD) {
-                        isCadastroAccessible = true;
-                        closePasswordModal();
-                        document.querySelector('.tab-button[data-tab="cadastro"]').classList.add('active');
-                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                        document.getElementById('cadastro').classList.add('active');
-                        renderMnemonicos();
-                        renderResponsaveis();
-                    } else {
-                        input.classList.add('invalid');
-                        confirmButton.classList.add('invalid');
-                        modalContent.classList.add('shake');
-                        setTimeout(() => {
-                            modalContent.classList.remove('shake');
-                        }, 500);
+                    if (!password) return;
+
+                    input.disabled = true;
+                    confirmButton.disabled = true;
+                    const originalLabel = confirmButton.textContent;
+                    confirmButton.textContent = 'Verificando...';
+
+                    try {
+                        const [hash, snap] = await Promise.all([
+                            sha256Hex(PASSWORD_SALT + password),
+                            database.ref('config/cadastroPasswordHash').once('value')
+                        ]);
+                        const correctHash = snap.val();
+
+                        if (correctHash && hash === correctHash) {
+                            isCadastroAccessible = true;
+                            closePasswordModal();
+                            document.querySelector('.tab-button[data-tab="cadastro"]').classList.add('active');
+                            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                            document.getElementById('cadastro').classList.add('active');
+                            renderMnemonicos();
+                            renderResponsaveis();
+                        } else {
+                            input.classList.add('invalid');
+                            confirmButton.classList.add('invalid');
+                            modalContent.classList.add('shake');
+                            setTimeout(() => {
+                                modalContent.classList.remove('shake');
+                            }, 500);
+                        }
+                    } catch (e) {
+                        console.error('Erro ao verificar senha:', e);
+                        alert('Não foi possível verificar a senha. Verifique sua conexão e tente novamente.');
+                    } finally {
+                        input.disabled = false;
+                        confirmButton.disabled = false;
+                        confirmButton.textContent = originalLabel;
                     }
                 }
                 
@@ -4924,8 +5403,8 @@ async function uploadUnitBackup() {
         archivedResponsaveis = data.archivedResponsaveis || [];
         dados = data.dados || [];
         
-        // Salvar no Firebase
-        await saveToFirebase();
+        // Restauração de backup: sobrescrita intencional da unidade
+        await overwriteUnitData(data);
         
         // Atualizar interface
         renderMnemonicos();
@@ -5009,26 +5488,17 @@ async function uploadGeneralBackup() {
             return;
         }
         
-        // Salvar todos os dados no Firebase
-        await database.ref('unidades').set(allUnitsData);
+        // Salvar todos os dados no Firebase (sobrescrita intencional)
+        beginSaving('Restaurando backup geral...');
+        try {
+            await database.ref('unidades').set(allUnitsData);
+        } finally {
+            endSaving();
+        }
         
         // Se a unidade atual estiver nos dados, atualizar interface
         if (allUnitsData[selectedUnitId]) {
-            const currentUnitData = allUnitsData[selectedUnitId];
-            mnemonicos = currentUnitData.mnemonicos || [];
-            archivedMnemonicos = currentUnitData.archivedMnemonicos || [];
-            responsaveis = currentUnitData.responsaveis || [];
-            archivedResponsaveis = currentUnitData.archivedResponsaveis || [];
-            dados = currentUnitData.dados || [];
-            
-            // Atualizar interface
-            renderMnemonicos();
-            renderResponsaveis();
-            renderDropdowns();
-            renderDadosCards();
-            renderPagination();
-            renderDashboardTable();
-            updateCharts();
+            applyServerState(allUnitsData[selectedUnitId]);
             updateUnitInfo();
         }
         
@@ -5139,8 +5609,8 @@ async function uploadFullBackup() {
         archivedResponsaveis = data.archivedResponsaveis || [];
         dados = data.dados || [];
         
-        // Salvar no JSONBin
-        await saveToFirebase();
+        // Restauração de backup: sobrescrita intencional da unidade
+        await overwriteUnitData(data);
         
         // Atualizar interface
         renderMnemonicos();
@@ -5227,8 +5697,14 @@ async function deleteAllUnitData() {
         archivedResponsaveis = [];
         dados = [];
         
-        // Apagar do Firebase
-        await database.ref(`unidades/${selectedUnitId}`).remove();
+        // Apagar do Firebase (exclusão intencional)
+        beginSaving('Apagando dados da unidade...');
+        try {
+            await database.ref(`unidades/${selectedUnitId}`).remove();
+            applyServerState(null, { silent: true });
+        } finally {
+            endSaving();
+        }
         
         // Atualizar interface
         renderMnemonicos();
@@ -5273,22 +5749,30 @@ function showBackupStatus(message, type) {
 }
 
 // ─── FERIADOS ────────────────────────────────────────────────────
-async function saveFeriados() {
+// Alterna o feriado dentro de uma transação: duas sessões marcando
+// feriados diferentes no mesmo dia não apagam mais uma a outra.
+async function toggleFeriado(dateStr) {
+    if (!isConnected) {
+        toggleOfflineScreen(true);
+        alert('Sem conexão com o servidor. O feriado não foi salvo.');
+        return;
+    }
+    beginSaving('Atualizando feriados...');
     try {
-        await database.ref('feriados').set(feriados);
+        const result = await database.ref('feriados').transaction(current => {
+            const list = toArray(current).slice();
+            const i = list.indexOf(dateStr);
+            if (i === -1) list.push(dateStr); else list.splice(i, 1);
+            return list;
+        }, undefined, false);
+        if (!result.committed) throw new Error('Transação não confirmada pelo servidor');
+        feriados = toArray(result.snapshot.val());
     } catch (e) {
         console.error('Erro ao salvar feriados:', e);
+        alert('Erro ao salvar o feriado no servidor.');
+    } finally {
+        endSaving();
     }
-}
-
-async function toggleFeriado(dateStr) {
-    const idx = feriados.indexOf(dateStr);
-    if (idx === -1) {
-        feriados.push(dateStr);
-    } else {
-        feriados.splice(idx, 1);
-    }
-    await saveFeriados();
     renderHolidayCalendar();
     renderNotifications();
 }
