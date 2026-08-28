@@ -338,9 +338,206 @@
             width: 100%;
         }
 
-        .cadastro-section:last-child {
+        #responsaveis-section {
             max-width: 500px;
             margin: 0 auto;
+        }
+
+        /* ─── INVENTÁRIO DA REDE ─────────────────────────── */
+        #inventario-section { max-width: 100%; }
+
+        .inv-toolbar {
+            display: flex;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 18px;
+        }
+
+        .inv-field { display: flex; flex-direction: column; gap: 5px; }
+
+        .inv-field label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .inv-field select {
+            padding: 8px 11px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 13px;
+            background: #fff;
+            color: var(--text);
+            min-width: 120px;
+        }
+
+        .inv-check {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 13px;
+            color: var(--text);
+            cursor: pointer;
+            padding-bottom: 9px;
+            user-select: none;
+        }
+
+        .inv-check input { width: 15px; height: 15px; cursor: pointer; accent-color: var(--accent); }
+
+        .inv-btn-ghost, .inv-btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 16px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .inv-btn-ghost {
+            background: #fff;
+            color: var(--primary);
+            border: 1.5px solid var(--border);
+        }
+
+        .inv-btn-ghost:hover { background: #f0f5fb; border-color: var(--accent); color: var(--accent); }
+
+        .inv-btn-primary { background: var(--success); color: #fff; }
+        .inv-btn-primary:hover:not(:disabled) { background: #276749; transform: translateY(-1px); box-shadow: var(--shadow); }
+        .inv-btn-primary:disabled { background: #a8b6c8; cursor: not-allowed; }
+
+        .inv-updated {
+            font-size: 11px;
+            color: var(--text-muted);
+            padding-bottom: 11px;
+            margin-left: auto;
+        }
+
+        .inv-message {
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            background: #f0f5fb;
+            color: var(--text-muted);
+            font-size: 13px;
+            border: 1px solid var(--border);
+        }
+
+        .inv-message.error {
+            background: #fff0f0;
+            color: #c53030;
+            border-color: #f5c2c2;
+            font-weight: 600;
+        }
+
+        .inv-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .inv-kpi {
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 13px 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .inv-kpi.warn   { border-left-color: var(--warning); }
+        .inv-kpi.danger { border-left-color: var(--danger); }
+        .inv-kpi.ok     { border-left-color: var(--success); }
+
+        .inv-kpi-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.1;
+        }
+
+        .inv-kpi.warn .inv-kpi-value   { color: var(--warning); }
+        .inv-kpi.danger .inv-kpi-value { color: var(--danger); }
+        .inv-kpi.ok .inv-kpi-value     { color: var(--success); }
+
+        .inv-kpi-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 4px;
+        }
+
+        .inv-block { margin-bottom: 26px; }
+
+        .inv-block h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .inv-badge {
+            background: var(--danger);
+            color: #fff;
+            border-radius: 11px;
+            padding: 2px 9px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        .inv-badge.zero { background: var(--success); }
+
+        .inv-table-wrap { overflow-x: auto; }
+        .inv-table-wrap .dashboard-table { min-width: 640px; }
+        .inv-table-wrap .dashboard-table th { white-space: nowrap; }
+        .inv-table-wrap .dashboard-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+        .inv-table-wrap .dashboard-table tfoot td {
+            background: #e9f1fb !important;
+            font-weight: 800;
+            color: var(--primary);
+            border-top: 2px solid var(--border);
+        }
+
+        .inv-bar-cell { display: flex; align-items: center; gap: 8px; }
+        .inv-bar { flex: 1; height: 7px; background: #e3ebf5; border-radius: 4px; overflow: hidden; min-width: 50px; }
+        .inv-bar span { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+
+        .inv-pill {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 11px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .inv-pill.ativo     { background: #e6f4ec; color: var(--success); }
+        .inv-pill.arquivado { background: #eceff3; color: var(--text-muted); }
+        .inv-pill.critico   { background: #fff0f0; color: #c53030; }
+        .inv-pill.atencao   { background: #fffbeb; color: #b45309; }
+
+        .inv-empty {
+            padding: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+            background: #f6f9fd;
+            border-radius: var(--radius);
+            border: 1px dashed var(--border);
+            margin-top: 12px;
         }
 
         .cadastro-section h3 {
@@ -2567,6 +2764,9 @@
                     <button class="toggle-button" onclick="toggleCadastroSection('feriados')">
                         <span>Feriados</span>
                     </button>
+                    <button class="toggle-button" onclick="toggleCadastroSection('inventario')">
+                        <span>Inventário</span>
+                    </button>
                     <button id="downloadBtn" class="download-btn">Download Backup</button>
                     <select id="yearSelect" class="year-select">
                         <option value="">Ano</option>
@@ -2634,6 +2834,46 @@
                             <button onclick="addResponsavel()">Adicionar</button>
                         </div>
                         <div class="list-items" id="responsaveis-list"></div>
+                    </div>
+                    <div class="cadastro-section hidden" id="inventario-section">
+                        <h3>Inventário da Rede</h3>
+                        <div class="inv-toolbar">
+                            <div class="inv-field">
+                                <label for="inv-ano">Ano de referência</label>
+                                <select id="inv-ano" onchange="renderInventario()"></select>
+                            </div>
+                            <label class="inv-check">
+                                <input type="checkbox" id="inv-incluir-arquivados" onchange="renderInventario()">
+                                <span>Incluir arquivados</span>
+                            </label>
+                            <button class="inv-btn-ghost" onclick="loadInventario(true)">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                            <button class="inv-btn-primary" id="inv-download-btn" onclick="downloadInventarioExcel()" disabled>
+                                <i class="fas fa-file-excel"></i> Baixar Relatório
+                            </button>
+                            <span class="inv-updated" id="inv-updated"></span>
+                        </div>
+                        <div class="inv-message" id="inv-message" style="display:none"></div>
+                        <div id="inv-body" style="display:none">
+                            <div class="inv-kpis" id="inv-kpis"></div>
+                            <div class="inv-block">
+                                <h4>Por Tipo</h4>
+                                <div class="inv-table-wrap"><table class="dashboard-table" id="inv-table-tipo"></table></div>
+                            </div>
+                            <div class="inv-block">
+                                <h4>Por Unidade</h4>
+                                <div class="inv-table-wrap"><table class="dashboard-table" id="inv-table-unidade"></table></div>
+                            </div>
+                            <div class="inv-block">
+                                <h4>Matriz Unidade &times; Tipo</h4>
+                                <div class="inv-table-wrap"><table class="dashboard-table" id="inv-table-matriz"></table></div>
+                            </div>
+                            <div class="inv-block">
+                                <h4>Alertas <span class="inv-badge" id="inv-alertas-count">0</span></h4>
+                                <div class="inv-table-wrap"><table class="dashboard-table" id="inv-table-alertas"></table></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4238,9 +4478,9 @@
         }
         
         function toggleCadastroSection(section) {
-            document.getElementById('mnemonicos-section').classList.add('hidden');
-            document.getElementById('responsaveis-section').classList.add('hidden');
-            document.getElementById('feriados-section').classList.add('hidden');
+            document.querySelectorAll('.cadastro-section').forEach(sec => {
+                sec.classList.add('hidden');
+            });
 
             document.querySelectorAll('.toggle-button').forEach(btn => {
                 btn.classList.remove('active');
@@ -4254,9 +4494,917 @@
 
             if (section === 'feriados') {
                 renderHolidayCalendar();
+            } else if (section === 'inventario') {
+                loadInventario();
             }
         }
         
+        /* ─── INVENTÁRIO DA REDE ─────────────────────────────
+           Consolida os mnemonicos (equipamentos) de TODAS as unidades
+           em uma única leitura de `unidades`, cruza com os `dados` do ano
+           selecionado e exporta um relatório Excel formatado. */
+
+        let inventarioCache = null;   // { loadedAt, units: [...] } — dados crus da rede
+        let inventarioData  = null;   // resultado de buildInventario() para o ano/filtro atual
+
+        function invUnitName(key) {
+            const u = unidades.find(x => x.id === Number(key));
+            return u ? u.name : `Unidade ${key}`;
+        }
+
+        function invDateStr(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        // Mesmo critério de faixa usado no dashboard (tolerância de 1 grau).
+        function invClassifyValue(v, min, max) {
+            if (v === null || v === undefined || isNaN(v)) return null;
+            if (typeof min !== 'number' || typeof max !== 'number' || isNaN(min) || isNaN(max)) return null;
+            if (v < min - 1 || v > max + 1) return 'fora';
+            if ((v >= min - 1 && v <= min) || (v >= max && v <= max + 1)) return 'limite';
+            return 'ok';
+        }
+
+        // Dias úteis do ano até hoje: exclui domingos e feriados (regra das pendências).
+        function invWorkingDays(ano) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const start = new Date(ano, 0, 1);
+            if (start > today) return 0;
+            let end = new Date(ano, 11, 31);
+            if (end > today) end = today;
+            let count = 0;
+            const d = new Date(start);
+            while (d <= end) {
+                if (d.getDay() !== 0 && !feriados.includes(invDateStr(d))) count++;
+                d.setDate(d.getDate() + 1);
+            }
+            return count;
+        }
+
+        function invDaysBetween(dateStr) {
+            if (!dateStr) return null;
+            const [y, m, d] = dateStr.split('-').map(Number);
+            const then = new Date(y, m - 1, d);
+            then.setHours(0, 0, 0, 0);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return Math.round((today - then) / 86400000);
+        }
+
+        async function loadInventario(forceReload = false) {
+            const msg  = document.getElementById('inv-message');
+            const body = document.getElementById('inv-body');
+            if (inventarioCache && !forceReload) {
+                renderInventario();
+                return;
+            }
+            msg.className = 'inv-message';
+            msg.textContent = 'Carregando cadastro de todas as unidades...';
+            msg.style.display = 'block';
+            body.style.display = 'none';
+            document.getElementById('inv-download-btn').disabled = true;
+            toggleLoadingScreen(true);
+            try {
+                const snapshot = await database.ref('unidades').once('value');
+                const raw = snapshot.val();
+                if (!raw || !Object.keys(raw).length) {
+                    throw new Error('Nenhuma unidade encontrada no servidor.');
+                }
+                inventarioCache = {
+                    loadedAt: Date.now(),
+                    units: Object.keys(raw).map(key => {
+                        const u = raw[key] || {};
+                        return {
+                            id: Number(key),
+                            name: invUnitName(key),
+                            // O Realtime Database devolve arrays esparsos como objeto indexado.
+                            mnemonicos: toArray(u.mnemonicos),
+                            archivedMnemonicos: toArray(u.archivedMnemonicos),
+                            responsaveis: toArray(u.responsaveis),
+                            dados: toArray(u.dados)
+                        };
+                    }).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+                };
+                populateInventarioAnos();
+                msg.style.display = 'none';
+                renderInventario();
+            } catch (error) {
+                console.error('Erro ao carregar inventário:', error);
+                inventarioCache = null;
+                inventarioData = null;
+                document.getElementById('inv-download-btn').disabled = true;
+                msg.className = 'inv-message error';
+                msg.textContent = 'Erro ao carregar o inventário da rede: ' + error.message;
+                msg.style.display = 'block';
+            } finally {
+                toggleLoadingScreen(false);
+            }
+        }
+
+        function populateInventarioAnos() {
+            const select = document.getElementById('inv-ano');
+            const anterior = select.value;
+            const anos = new Set([new Date().getFullYear()]);
+            inventarioCache.units.forEach(u => u.dados.forEach(d => {
+                if (d && typeof d.data === 'string' && d.data.length >= 4) anos.add(Number(d.data.slice(0, 4)));
+            }));
+            const lista = Array.from(anos).filter(a => !isNaN(a)).sort((a, b) => b - a);
+            select.innerHTML = lista.map(a => `<option value="${a}">${a}</option>`).join('');
+            select.value = lista.includes(Number(anterior)) ? anterior : String(lista[0]);
+        }
+
+        // Função pura: a mesma estrutura alimenta a tela e o Excel.
+        function buildInventario(units, ano, incluirArquivados) {
+            const diasUteis = invWorkingDays(ano);
+            const anoStr = String(ano);
+            const itens = [];
+
+            units.forEach(unit => {
+                const respMap = new Map(unit.responsaveis.map(r => [String(r.id), r.name]));
+                const nomesVistos = new Map();
+
+                const grupos = [
+                    { arr: unit.mnemonicos, status: 'Ativo' },
+                    { arr: unit.archivedMnemonicos, status: 'Arquivado' }
+                ];
+
+                grupos.forEach(grupo => {
+                    if (grupo.status === 'Arquivado' && !incluirArquivados) return;
+                    grupo.arr.forEach(m => {
+                        if (!m) return;
+                        const min = typeof m.min === 'number' ? m.min : parseFloat(m.min);
+                        const max = typeof m.max === 'number' ? m.max : parseFloat(m.max);
+                        const nome = (m.mnemonico || '').trim();
+                        const tipo = (m.tipo || '').trim() || 'Sem tipo';
+
+                        const chave = nome.toLowerCase();
+                        nomesVistos.set(chave, (nomesVistos.get(chave) || 0) + 1);
+
+                        const doAno = unit.dados.filter(d => d && d.mnemonicoId === m.id && String(d.data || '').startsWith(anoStr));
+                        const todos = unit.dados.filter(d => d && d.mnemonicoId === m.id && d.data);
+
+                        let manha = 0, tarde = 0, completos = 0;
+                        let fora = 0, limite = 0, dentro = 0;
+                        const responsaveisUsados = new Set();
+
+                        doAno.forEach(d => {
+                            const temManha = d.manhaAtual !== null && d.manhaAtual !== undefined;
+                            const temTarde = d.tardeAtual !== null && d.tardeAtual !== undefined;
+                            if (temManha) manha++;
+                            if (temTarde) tarde++;
+                            if (temManha && temTarde) completos++;
+                            if (d.responsavelId !== null && d.responsavelId !== undefined) responsaveisUsados.add(String(d.responsavelId));
+                            ['manhaMin', 'manhaMax', 'manhaAtual', 'tardeMin', 'tardeMax', 'tardeAtual'].forEach(campo => {
+                                const cls = invClassifyValue(d[campo], min, max);
+                                if (cls === 'fora') fora++;
+                                else if (cls === 'limite') limite++;
+                                else if (cls === 'ok') dentro++;
+                            });
+                        });
+
+                        const totalValores = fora + limite + dentro;
+                        const ultimaLeitura = todos.length
+                            ? todos.reduce((acc, d) => (d.data > acc ? d.data : acc), todos[0].data)
+                            : null;
+
+                        itens.push({
+                            unidadeId: unit.id,
+                            unidade: unit.name,
+                            id: m.id,
+                            mnemonico: nome || '(sem nome)',
+                            tipo,
+                            legenda: (m.legenda || '').trim(),
+                            min: isNaN(min) ? null : min,
+                            max: isNaN(max) ? null : max,
+                            amplitude: (!isNaN(min) && !isNaN(max)) ? +(max - min).toFixed(1) : null,
+                            status: grupo.status,
+                            registros: doAno.length,
+                            leiturasManha: manha,
+                            leiturasTarde: tarde,
+                            diasCompletos: completos,
+                            diasUteis,
+                            cobertura: diasUteis > 0 ? completos / diasUteis : 0,
+                            foraFaixa: fora,
+                            noLimite: limite,
+                            conformidade: totalValores > 0 ? dentro / totalValores : null,
+                            responsaveis: responsaveisUsados.size,
+                            responsaveisNomes: Array.from(responsaveisUsados)
+                                .map(id => respMap.get(id) || ('#' + id))
+                                .sort((a, b) => a.localeCompare(b, 'pt-BR')).join(', '),
+                            ultimaLeitura,
+                            diasSemLeitura: invDaysBetween(ultimaLeitura),
+                            duplicado: false,
+                            _chaveNome: chave
+                        });
+                    });
+                });
+
+                // marca mnemonicos repetidos dentro da mesma unidade
+                itens.forEach(i => {
+                    if (i.unidadeId === unit.id) i.duplicado = nomesVistos.get(i._chaveNome) > 1;
+                });
+            });
+
+            itens.sort((a, b) => a.unidade.localeCompare(b.unidade, 'pt-BR')
+                || a.tipo.localeCompare(b.tipo, 'pt-BR')
+                || a.mnemonico.localeCompare(b.mnemonico, 'pt-BR'));
+
+            // As contagens principais consideram apenas equipamentos ativos.
+            const base = itens.filter(i => i.status === 'Ativo');
+            const totalBase = base.length || 1;
+
+            // ── Por tipo ──
+            const tipoMap = new Map();
+            base.forEach(i => {
+                if (!tipoMap.has(i.tipo)) {
+                    tipoMap.set(i.tipo, { tipo: i.tipo, qtd: 0, unidades: new Set(), min: null, max: null, registros: 0, foraFaixa: 0, coberturas: [], faixas: new Set() });
+                }
+                const t = tipoMap.get(i.tipo);
+                t.qtd++;
+                t.unidades.add(i.unidadeId);
+                t.registros += i.registros;
+                t.foraFaixa += i.foraFaixa;
+                t.coberturas.push(i.cobertura);
+                if (i.min !== null) t.min = (t.min === null) ? i.min : Math.min(t.min, i.min);
+                if (i.max !== null) t.max = (t.max === null) ? i.max : Math.max(t.max, i.max);
+                if (i.min !== null && i.max !== null) t.faixas.add(i.min + '|' + i.max);
+            });
+            const porTipo = Array.from(tipoMap.values()).map(t => ({
+                tipo: t.tipo,
+                qtd: t.qtd,
+                percentual: t.qtd / totalBase,
+                nUnidades: t.unidades.size,
+                min: t.min,
+                max: t.max,
+                registros: t.registros,
+                foraFaixa: t.foraFaixa,
+                cobertura: t.coberturas.length ? t.coberturas.reduce((a, b) => a + b, 0) / t.coberturas.length : 0,
+                faixasDivergentes: t.faixas.size > 1
+            })).sort((a, b) => b.qtd - a.qtd || a.tipo.localeCompare(b.tipo, 'pt-BR'));
+
+            // ── Por unidade ──
+            const unidadeMap = new Map();
+            units.forEach(u => unidadeMap.set(u.id, {
+                unidadeId: u.id, unidade: u.name, ativos: 0, arquivados: 0,
+                tipos: new Set(), registros: 0, foraFaixa: 0, coberturas: [],
+                responsaveis: u.responsaveis.length, semLeitura: 0
+            }));
+            itens.forEach(i => {
+                const u = unidadeMap.get(i.unidadeId);
+                if (!u) return;
+                if (i.status === 'Ativo') {
+                    u.ativos++;
+                    u.tipos.add(i.tipo);
+                    u.coberturas.push(i.cobertura);
+                    u.registros += i.registros;
+                    u.foraFaixa += i.foraFaixa;
+                    if (i.registros === 0) u.semLeitura++;
+                } else {
+                    u.arquivados++;
+                }
+            });
+            const porUnidade = Array.from(unidadeMap.values())
+                .filter(u => u.ativos > 0 || u.arquivados > 0)
+                .map(u => ({
+                    unidadeId: u.unidadeId,
+                    unidade: u.unidade,
+                    ativos: u.ativos,
+                    arquivados: u.arquivados,
+                    nTipos: u.tipos.size,
+                    registros: u.registros,
+                    foraFaixa: u.foraFaixa,
+                    semLeitura: u.semLeitura,
+                    responsaveis: u.responsaveis,
+                    cobertura: u.coberturas.length ? u.coberturas.reduce((a, b) => a + b, 0) / u.coberturas.length : 0
+                }))
+                .sort((a, b) => b.ativos - a.ativos || a.unidade.localeCompare(b.unidade, 'pt-BR'));
+
+            // ── Matriz unidade × tipo ──
+            const tiposOrdenados = porTipo.map(t => t.tipo);
+            const matriz = {
+                tipos: tiposOrdenados,
+                linhas: porUnidade.map(u => {
+                    const counts = tiposOrdenados.map(t => base.filter(i => i.unidadeId === u.unidadeId && i.tipo === t).length);
+                    return { unidade: u.unidade, counts, total: counts.reduce((a, b) => a + b, 0) };
+                }),
+                totais: tiposOrdenados.map(t => base.filter(i => i.tipo === t).length)
+            };
+
+            // ── Alertas ──
+            const tiposDivergentes = new Set(porTipo.filter(t => t.faixasDivergentes).map(t => t.tipo));
+            const alertas = [];
+            const addAlerta = (i, severidade, alerta, detalhe) =>
+                alertas.push({ unidade: i.unidade, mnemonico: i.mnemonico, tipo: i.tipo, severidade, alerta, detalhe });
+
+            base.forEach(i => {
+                if (i.min === null || i.max === null) {
+                    addAlerta(i, 'Crítico', 'Faixa não definida', 'Min e/ou Max ausentes no cadastro');
+                } else if (i.min >= i.max) {
+                    addAlerta(i, 'Crítico', 'Faixa inválida', 'Min (' + i.min + ') maior ou igual ao Max (' + i.max + ')');
+                }
+                if (!i.legenda) addAlerta(i, 'Atenção', 'Sem legenda', 'Campo legenda vazio no cadastro');
+                if (i.registros === 0) {
+                    addAlerta(i, 'Crítico', 'Sem registros no ano', 'Nenhum lançamento em ' + ano);
+                } else if (i.cobertura < 0.8) {
+                    addAlerta(i, 'Atenção', 'Cobertura baixa', (i.cobertura * 100).toFixed(1) + '% dos ' + i.diasUteis + ' dias úteis');
+                }
+                if (i.diasSemLeitura === null) {
+                    addAlerta(i, 'Crítico', 'Nunca utilizado', 'Equipamento cadastrado sem nenhuma leitura');
+                } else if (i.diasSemLeitura > 30) {
+                    addAlerta(i, 'Crítico', 'Sem leitura há mais de 30 dias', 'Última leitura em ' + formatDateBR(i.ultimaLeitura) + ' (' + i.diasSemLeitura + ' dias)');
+                } else if (i.diasSemLeitura > 7) {
+                    addAlerta(i, 'Atenção', 'Sem leitura há mais de 7 dias', 'Última leitura em ' + formatDateBR(i.ultimaLeitura) + ' (' + i.diasSemLeitura + ' dias)');
+                }
+                if (i.conformidade !== null && i.conformidade < 0.95) {
+                    addAlerta(i, 'Atenção', 'Conformidade abaixo de 95%', (i.conformidade * 100).toFixed(1) + '% das leituras dentro da faixa');
+                }
+                if (i.duplicado) {
+                    addAlerta(i, 'Atenção', 'Mnemonico duplicado na unidade', 'Existe outro equipamento com o mesmo nome nesta unidade');
+                }
+                if (tiposDivergentes.has(i.tipo)) {
+                    addAlerta(i, 'Atenção', 'Faixa divergente para o tipo', 'Outras unidades usam faixa diferente para "' + i.tipo + '"');
+                }
+            });
+
+            const ordemSeveridade = { 'Crítico': 0, 'Atenção': 1 };
+            alertas.sort((a, b) => ordemSeveridade[a.severidade] - ordemSeveridade[b.severidade]
+                || a.unidade.localeCompare(b.unidade, 'pt-BR')
+                || a.mnemonico.localeCompare(b.mnemonico, 'pt-BR'));
+
+            const comConformidade = base.filter(i => i.conformidade !== null);
+            const resumo = {
+                ano,
+                geradoEm: new Date(),
+                totalItens: itens.length,
+                ativos: base.length,
+                arquivados: itens.filter(i => i.status === 'Arquivado').length,
+                nUnidades: porUnidade.length,
+                nTipos: porTipo.length,
+                registros: base.reduce((a, i) => a + i.registros, 0),
+                semLeituraNoAno: base.filter(i => i.registros === 0).length,
+                paradosMais30: base.filter(i => i.diasSemLeitura === null || i.diasSemLeitura > 30).length,
+                cobertura: base.length ? base.reduce((a, i) => a + i.cobertura, 0) / base.length : 0,
+                conformidade: comConformidade.length ? comConformidade.reduce((a, i) => a + i.conformidade, 0) / comConformidade.length : null,
+                foraFaixa: base.reduce((a, i) => a + i.foraFaixa, 0),
+                diasUteis,
+                criticos: alertas.filter(a => a.severidade === 'Crítico').length,
+                atencao: alertas.filter(a => a.severidade === 'Atenção').length
+            };
+
+            return { itens, porTipo, porUnidade, matriz, alertas, resumo };
+        }
+
+        // ─── Renderização na tela ───
+        function invEscape(v) {
+            return String(v === null || v === undefined ? '' : v)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function invPct(v) {
+            return (v === null || v === undefined) ? '-' : (v * 100).toFixed(1) + '%';
+        }
+
+        function invNum(v) {
+            return (v === null || v === undefined || isNaN(v)) ? '-' : v.toFixed(1);
+        }
+
+        function invBarCell(valor) {
+            const pct = Math.max(0, Math.min(100, (valor || 0) * 100));
+            return `<div class="inv-bar-cell"><span>${pct.toFixed(1)}%</span><div class="inv-bar"><span style="width:${pct}%"></span></div></div>`;
+        }
+
+        function renderInventario() {
+            if (!inventarioCache) return;
+            const ano = parseInt(document.getElementById('inv-ano').value, 10) || new Date().getFullYear();
+            const incluirArquivados = document.getElementById('inv-incluir-arquivados').checked;
+
+            inventarioData = buildInventario(inventarioCache.units, ano, incluirArquivados);
+
+            document.getElementById('inv-message').style.display = 'none';
+            document.getElementById('inv-body').style.display = 'block';
+            document.getElementById('inv-download-btn').disabled = false;
+            document.getElementById('inv-updated').textContent =
+                'Dados da rede carregados em ' + new Date(inventarioCache.loadedAt).toLocaleString('pt-BR');
+
+            renderInvKpis(inventarioData.resumo);
+            renderInvTipos(inventarioData.porTipo, inventarioData.resumo);
+            renderInvUnidades(inventarioData.porUnidade, inventarioData.resumo);
+            renderInvMatriz(inventarioData.matriz);
+            renderInvAlertas(inventarioData.alertas);
+        }
+
+        function renderInvKpis(r) {
+            const kpis = [
+                { valor: r.ativos, label: 'Equipamentos ativos', cls: '' },
+                { valor: r.arquivados, label: 'Arquivados', cls: '' },
+                { valor: r.nUnidades, label: 'Unidades com cadastro', cls: '' },
+                { valor: r.nTipos, label: 'Tipos distintos', cls: '' },
+                { valor: r.registros.toLocaleString('pt-BR'), label: 'Registros em ' + r.ano, cls: '' },
+                { valor: invPct(r.cobertura), label: 'Cobertura média', cls: r.cobertura >= 0.8 ? 'ok' : 'warn' },
+                { valor: invPct(r.conformidade), label: 'Conformidade média', cls: (r.conformidade === null || r.conformidade >= 0.95) ? 'ok' : 'warn' },
+                { valor: r.semLeituraNoAno, label: 'Sem leitura no ano', cls: r.semLeituraNoAno ? 'danger' : 'ok' },
+                { valor: r.paradosMais30, label: 'Parados há +30 dias', cls: r.paradosMais30 ? 'danger' : 'ok' },
+                { valor: r.criticos, label: 'Alertas críticos', cls: r.criticos ? 'danger' : 'ok' }
+            ];
+            document.getElementById('inv-kpis').innerHTML = kpis.map(k =>
+                `<div class="inv-kpi ${k.cls}"><div class="inv-kpi-value">${invEscape(k.valor)}</div><div class="inv-kpi-label">${invEscape(k.label)}</div></div>`
+            ).join('');
+        }
+
+        function renderInvTipos(porTipo, resumo) {
+            const table = document.getElementById('inv-table-tipo');
+            if (!porTipo.length) {
+                table.innerHTML = '<tbody><tr><td>Nenhum equipamento ativo cadastrado na rede.</td></tr></tbody>';
+                return;
+            }
+            const linhas = porTipo.map(t => `
+                <tr>
+                    <td>${invEscape(t.tipo)}${t.faixasDivergentes ? ' <span class="inv-pill atencao">faixa divergente</span>' : ''}</td>
+                    <td class="num">${t.qtd}</td>
+                    <td>${invBarCell(t.percentual)}</td>
+                    <td class="num">${t.nUnidades}</td>
+                    <td class="num">${invNum(t.min)}</td>
+                    <td class="num">${invNum(t.max)}</td>
+                    <td class="num">${t.registros.toLocaleString('pt-BR')}</td>
+                    <td class="num">${invPct(t.cobertura)}</td>
+                    <td class="num">${t.foraFaixa.toLocaleString('pt-BR')}</td>
+                </tr>`).join('');
+            table.innerHTML = `
+                <thead><tr>
+                    <th>Tipo</th><th>Qtd</th><th>% do total</th><th>Unidades</th>
+                    <th>Min ºC</th><th>Max ºC</th><th>Registros</th><th>Cobertura</th><th>Fora de faixa</th>
+                </tr></thead>
+                <tbody>${linhas}</tbody>
+                <tfoot><tr>
+                    <td>TOTAL</td>
+                    <td class="num">${resumo.ativos}</td>
+                    <td class="num">100.0%</td>
+                    <td class="num">${resumo.nUnidades}</td>
+                    <td class="num">-</td><td class="num">-</td>
+                    <td class="num">${resumo.registros.toLocaleString('pt-BR')}</td>
+                    <td class="num">${invPct(resumo.cobertura)}</td>
+                    <td class="num">${resumo.foraFaixa.toLocaleString('pt-BR')}</td>
+                </tr></tfoot>`;
+        }
+
+        function renderInvUnidades(porUnidade, resumo) {
+            const table = document.getElementById('inv-table-unidade');
+            if (!porUnidade.length) {
+                table.innerHTML = '<tbody><tr><td>Nenhuma unidade com equipamentos cadastrados.</td></tr></tbody>';
+                return;
+            }
+            const linhas = porUnidade.map(u => `
+                <tr>
+                    <td>${invEscape(u.unidade)}</td>
+                    <td class="num">${u.ativos}</td>
+                    <td class="num">${u.arquivados}</td>
+                    <td class="num">${u.nTipos}</td>
+                    <td class="num">${u.responsaveis}</td>
+                    <td class="num">${u.registros.toLocaleString('pt-BR')}</td>
+                    <td>${invBarCell(u.cobertura)}</td>
+                    <td class="num">${u.foraFaixa.toLocaleString('pt-BR')}</td>
+                    <td class="num">${u.semLeitura ? '<span class="inv-pill critico">' + u.semLeitura + '</span>' : '0'}</td>
+                </tr>`).join('');
+            const totalArquivados = porUnidade.reduce((a, u) => a + u.arquivados, 0);
+            table.innerHTML = `
+                <thead><tr>
+                    <th>Unidade</th><th>Ativos</th><th>Arquiv.</th><th>Tipos</th><th>Respons.</th>
+                    <th>Registros</th><th>Cobertura</th><th>Fora de faixa</th><th>Sem leitura</th>
+                </tr></thead>
+                <tbody>${linhas}</tbody>
+                <tfoot><tr>
+                    <td>TOTAL DA REDE</td>
+                    <td class="num">${resumo.ativos}</td>
+                    <td class="num">${totalArquivados}</td>
+                    <td class="num">${resumo.nTipos}</td>
+                    <td class="num">-</td>
+                    <td class="num">${resumo.registros.toLocaleString('pt-BR')}</td>
+                    <td class="num">${invPct(resumo.cobertura)}</td>
+                    <td class="num">${resumo.foraFaixa.toLocaleString('pt-BR')}</td>
+                    <td class="num">${resumo.semLeituraNoAno}</td>
+                </tr></tfoot>`;
+        }
+
+        function renderInvMatriz(matriz) {
+            const table = document.getElementById('inv-table-matriz');
+            if (!matriz.tipos.length) {
+                table.innerHTML = '<tbody><tr><td>Sem tipos cadastrados para cruzar.</td></tr></tbody>';
+                return;
+            }
+            const head = '<thead><tr><th>Unidade</th>' + matriz.tipos.map(t => `<th>${invEscape(t)}</th>`).join('') + '<th>Total</th></tr></thead>';
+            const body = matriz.linhas.map(l =>
+                `<tr><td>${invEscape(l.unidade)}</td>` +
+                l.counts.map(c => `<td class="num">${c || '-'}</td>`).join('') +
+                `<td class="num"><strong>${l.total}</strong></td></tr>`
+            ).join('');
+            const totalGeral = matriz.totais.reduce((a, b) => a + b, 0);
+            const foot = '<tfoot><tr><td>TOTAL</td>' + matriz.totais.map(t => `<td class="num">${t}</td>`).join('') + `<td class="num">${totalGeral}</td></tr></tfoot>`;
+            table.innerHTML = head + '<tbody>' + body + '</tbody>' + foot;
+        }
+
+        function renderInvAlertas(alertas) {
+            const table = document.getElementById('inv-table-alertas');
+            const badge = document.getElementById('inv-alertas-count');
+            badge.textContent = alertas.length;
+            badge.className = 'inv-badge' + (alertas.length ? '' : ' zero');
+            if (!alertas.length) {
+                table.innerHTML = '<tbody><tr><td>Nenhum alerta — todos os equipamentos estão regulares.</td></tr></tbody>';
+                return;
+            }
+            const linhas = alertas.map(a => `
+                <tr>
+                    <td><span class="inv-pill ${a.severidade === 'Crítico' ? 'critico' : 'atencao'}">${invEscape(a.severidade)}</span></td>
+                    <td>${invEscape(a.unidade)}</td>
+                    <td>${invEscape(a.mnemonico)}</td>
+                    <td>${invEscape(a.tipo)}</td>
+                    <td>${invEscape(a.alerta)}</td>
+                    <td>${invEscape(a.detalhe)}</td>
+                </tr>`).join('');
+            table.innerHTML = '<thead><tr><th>Severidade</th><th>Unidade</th><th>Mnemonico</th><th>Tipo</th><th>Alerta</th><th>Detalhe</th></tr></thead><tbody>' + linhas + '</tbody>';
+        }
+
+        // ─── Exportação Excel (ExcelJS carregado sob demanda) ───
+        // O SheetJS já presente na página é a build comunitária e ignora
+        // estilos de célula, por isso o relatório usa ExcelJS.
+        const INV_XLS = {
+            header:     'FF0E1628',
+            headerAlt:  'FF1A2D4F',
+            accent:     'FF1E73D4',
+            zebra:      'FFF6F9FD',
+            grid:       'FFD1DCE8',
+            dangerFill: 'FFFFF0F0',
+            dangerFont: 'FFC53030',
+            warnFill:   'FFFFFBEB',
+            warnFont:   'FFB45309',
+            okFont:     'FF2F855A',
+            muted:      'FF5A6A85',
+            font:       'Segoe UI'
+        };
+
+        function loadExcelJS() {
+            return new Promise((resolve, reject) => {
+                if (window.ExcelJS) return resolve(window.ExcelJS);
+                const s = document.createElement('script');
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
+                s.onload = () => window.ExcelJS
+                    ? resolve(window.ExcelJS)
+                    : reject(new Error('ExcelJS não inicializou.'));
+                s.onerror = () => reject(new Error('Falha ao carregar a biblioteca ExcelJS. Verifique a conexão com a internet.'));
+                document.head.appendChild(s);
+            });
+        }
+
+        function invBorder() {
+            const side = { style: 'thin', color: { argb: INV_XLS.grid } };
+            return { top: side, left: side, bottom: side, right: side };
+        }
+
+        function invFill(argb) {
+            return { type: 'pattern', pattern: 'solid', fgColor: { argb } };
+        }
+
+        // Monta uma aba tabular já formatada (cabeçalho, zebra, bordas, autofiltro, painel congelado).
+        function invAddSheet(wb, nome, columns, rows, opts) {
+            opts = opts || {};
+            const ws = wb.addWorksheet(nome, {
+                views: [{ state: 'frozen', ySplit: 1, xSplit: opts.xSplit || 0 }],
+                pageSetup: {
+                    orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+                    margins: { left: 0.3, right: 0.3, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 }
+                }
+            });
+            ws.columns = columns;
+
+            const header = ws.getRow(1);
+            header.height = 28;
+            header.eachCell(cell => {
+                cell.fill = invFill(INV_XLS.header);
+                cell.font = { name: INV_XLS.font, size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+                cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                cell.border = invBorder();
+            });
+
+            rows.forEach((data, i) => {
+                const row = ws.addRow(data);
+                row.height = 18;
+                row.eachCell({ includeEmpty: true }, cell => {
+                    cell.border = invBorder();
+                    cell.font = { name: INV_XLS.font, size: 10 };
+                    if (i % 2 === 1) cell.fill = invFill(INV_XLS.zebra);
+                });
+                if (opts.styleRow) opts.styleRow(row, data, i);
+            });
+
+            if (rows.length) {
+                ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: columns.length } };
+            }
+            if (opts.totalRow) {
+                const total = ws.addRow(opts.totalRow);
+                total.height = 20;
+                total.eachCell({ includeEmpty: true }, cell => {
+                    cell.border = invBorder();
+                    cell.fill = invFill('FFE9F1FB');
+                    cell.font = { name: INV_XLS.font, size: 10, bold: true, color: { argb: INV_XLS.header } };
+                });
+            }
+            return ws;
+        }
+
+        // Pinta uma célula conforme a severidade (mesma semântica do dashboard).
+        function invMarkCell(row, key, nivel, size) {
+            const cell = row.getCell(key);
+            const tamanho = size || (cell.font && cell.font.size) || 10;
+            if (nivel === 'danger') {
+                cell.fill = invFill(INV_XLS.dangerFill);
+                cell.font = { name: INV_XLS.font, size: tamanho, bold: true, color: { argb: INV_XLS.dangerFont } };
+            } else if (nivel === 'warn') {
+                cell.fill = invFill(INV_XLS.warnFill);
+                cell.font = { name: INV_XLS.font, size: tamanho, bold: true, color: { argb: INV_XLS.warnFont } };
+            } else if (nivel === 'ok') {
+                cell.font = { name: INV_XLS.font, size: tamanho, bold: true, color: { argb: INV_XLS.okFont } };
+            }
+        }
+
+        function invAddResumoSheet(wb, r, incluirArquivados) {
+            const ws = wb.addWorksheet('Resumo', {
+                pageSetup: { orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0 }
+            });
+            ws.columns = [{ width: 42 }, { width: 22 }, { width: 42 }, { width: 22 }];
+
+            ws.mergeCells('A1:D1');
+            const titulo = ws.getCell('A1');
+            titulo.value = 'INVENTÁRIO DE EQUIPAMENTOS DA REDE';
+            titulo.fill = invFill(INV_XLS.header);
+            titulo.font = { name: INV_XLS.font, size: 18, bold: true, color: { argb: 'FFFFFFFF' } };
+            titulo.alignment = { vertical: 'middle', horizontal: 'center' };
+            ws.getRow(1).height = 42;
+
+            ws.mergeCells('A2:D2');
+            const sub = ws.getCell('A2');
+            sub.value = 'Controle de Temperatura  •  Ano de referência ' + r.ano +
+                '  •  Gerado em ' + r.geradoEm.toLocaleString('pt-BR') +
+                (incluirArquivados ? '  •  Inclui equipamentos arquivados' : '  •  Apenas equipamentos ativos');
+            sub.fill = invFill(INV_XLS.headerAlt);
+            sub.font = { name: INV_XLS.font, size: 10, color: { argb: 'FFFFFFFF' } };
+            sub.alignment = { vertical: 'middle', horizontal: 'center' };
+            ws.getRow(2).height = 24;
+
+            ws.addRow([]);
+
+            const blocos = [
+                { id: 'contagem',  celulas: ['Equipamentos ativos', r.ativos, 'Equipamentos arquivados', r.arquivados] },
+                { id: 'escopo',    celulas: ['Unidades com cadastro', r.nUnidades, 'Tipos distintos', r.nTipos] },
+                { id: 'volume',    celulas: ['Registros no ano', r.registros, 'Dias úteis no período', r.diasUteis] },
+                { id: 'qualidade', celulas: ['Cobertura média', r.cobertura, 'Conformidade média', r.conformidade], pct: true },
+                { id: 'parados',   celulas: ['Sem leitura no ano', r.semLeituraNoAno, 'Parados há mais de 30 dias', r.paradosMais30] },
+                { id: 'faixa',     celulas: ['Leituras fora de faixa', r.foraFaixa, 'Total de itens no relatório', r.totalItens] },
+                { id: 'alertas',   celulas: ['Alertas críticos', r.criticos, 'Alertas de atenção', r.atencao] }
+            ];
+
+            const linhas = {};
+            blocos.forEach(b => {
+                const row = ws.addRow(b.celulas);
+                row.height = 24;
+                [1, 3].forEach(c => {
+                    const cell = row.getCell(c);
+                    cell.font = { name: INV_XLS.font, size: 10, bold: true, color: { argb: INV_XLS.header } };
+                    cell.fill = invFill(INV_XLS.zebra);
+                    cell.alignment = { vertical: 'middle' };
+                    cell.border = invBorder();
+                });
+                [2, 4].forEach(c => {
+                    const cell = row.getCell(c);
+                    cell.font = { name: INV_XLS.font, size: 14, bold: true, color: { argb: INV_XLS.accent } };
+                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                    cell.border = invBorder();
+                    cell.numFmt = b.pct ? '0.0%' : '#,##0';
+                });
+                linhas[b.id] = row;
+            });
+
+            // destaques por severidade
+            if (r.cobertura < 0.8) invMarkCell(linhas.qualidade, 2, 'warn');
+            if (r.conformidade !== null && r.conformidade < 0.95) invMarkCell(linhas.qualidade, 4, 'warn');
+            linhas.qualidade.getCell(2).numFmt = '0.0%';
+            linhas.qualidade.getCell(4).numFmt = '0.0%';
+
+            if (r.semLeituraNoAno > 0) invMarkCell(linhas.parados, 2, 'danger');
+            if (r.paradosMais30 > 0) invMarkCell(linhas.parados, 4, 'danger');
+
+            if (r.criticos > 0) invMarkCell(linhas.alertas, 2, 'danger');
+            if (r.atencao > 0) invMarkCell(linhas.alertas, 4, 'warn');
+
+            ws.addRow([]);
+            const nota = ws.addRow(['Critério de faixa: valores fora de [Min-1 ; Max+1] contam como fora de faixa; os extremos contam como "no limite" (mesma regra do dashboard).']);
+            ws.mergeCells('A' + nota.number + ':D' + nota.number);
+            nota.getCell(1).font = { name: INV_XLS.font, size: 9, italic: true, color: { argb: INV_XLS.muted } };
+            nota.getCell(1).alignment = { wrapText: true, vertical: 'middle' };
+            nota.height = 26;
+
+            const nota2 = ws.addRow(['Cobertura = dias com leitura de manhã e tarde ÷ dias úteis do período (domingos e feriados excluídos).']);
+            ws.mergeCells('A' + nota2.number + ':D' + nota2.number);
+            nota2.getCell(1).font = { name: INV_XLS.font, size: 9, italic: true, color: { argb: INV_XLS.muted } };
+            nota2.getCell(1).alignment = { wrapText: true, vertical: 'middle' };
+            nota2.height = 26;
+
+            return ws;
+        }
+
+        async function downloadInventarioExcel() {
+            if (!inventarioData) {
+                alert('Carregue o inventário antes de baixar o relatório.');
+                return;
+            }
+            const btn = document.getElementById('inv-download-btn');
+            const htmlOriginal = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+            toggleLoadingScreen(true);
+
+            try {
+                const ExcelJSLib = await loadExcelJS();
+                const inv = inventarioData;
+                const r = inv.resumo;
+                const incluirArquivados = document.getElementById('inv-incluir-arquivados').checked;
+
+                const wb = new ExcelJSLib.Workbook();
+                wb.creator = 'Controle de Temperatura';
+                wb.created = r.geradoEm;
+
+                // 1 ─ Resumo
+                invAddResumoSheet(wb, r, incluirArquivados);
+
+                // 2 ─ Por Tipo
+                invAddSheet(wb, 'Por Tipo', [
+                    { header: 'Tipo', key: 'tipo', width: 26 },
+                    { header: 'Qtd', key: 'qtd', width: 9, style: { alignment: { horizontal: 'center' } } },
+                    { header: '% do total', key: 'pct', width: 12, style: { numFmt: '0.0%', alignment: { horizontal: 'center' } } },
+                    { header: 'Unidades', key: 'unidades', width: 11, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Min ºC', key: 'min', width: 10, style: { numFmt: '0.0', alignment: { horizontal: 'center' } } },
+                    { header: 'Max ºC', key: 'max', width: 10, style: { numFmt: '0.0', alignment: { horizontal: 'center' } } },
+                    { header: 'Registros no ano', key: 'registros', width: 16, style: { numFmt: '#,##0', alignment: { horizontal: 'center' } } },
+                    { header: 'Cobertura média', key: 'cobertura', width: 16, style: { numFmt: '0.0%', alignment: { horizontal: 'center' } } },
+                    { header: 'Leituras fora de faixa', key: 'fora', width: 20, style: { numFmt: '#,##0', alignment: { horizontal: 'center' } } },
+                    { header: 'Faixa padronizada', key: 'padrao', width: 18, style: { alignment: { horizontal: 'center' } } }
+                ], inv.porTipo.map(t => ({
+                    tipo: t.tipo, qtd: t.qtd, pct: t.percentual, unidades: t.nUnidades,
+                    min: t.min, max: t.max, registros: t.registros,
+                    cobertura: t.cobertura, fora: t.foraFaixa,
+                    padrao: t.faixasDivergentes ? 'Divergente' : 'Sim'
+                })), {
+                    styleRow: (row, data) => {
+                        if (data.cobertura < 0.8) invMarkCell(row, 'cobertura', 'warn');
+                        if (data.fora > 0) invMarkCell(row, 'fora', 'warn');
+                        if (data.padrao === 'Divergente') invMarkCell(row, 'padrao', 'danger');
+                        else invMarkCell(row, 'padrao', 'ok');
+                    },
+                    totalRow: {
+                        tipo: 'TOTAL', qtd: r.ativos, pct: 1, unidades: r.nUnidades,
+                        min: null, max: null, registros: r.registros,
+                        cobertura: r.cobertura, fora: r.foraFaixa, padrao: ''
+                    }
+                });
+
+                // 3 ─ Por Unidade
+                invAddSheet(wb, 'Por Unidade', [
+                    { header: 'Unidade', key: 'unidade', width: 32 },
+                    { header: 'Ativos', key: 'ativos', width: 10, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Arquivados', key: 'arquivados', width: 12, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Tipos distintos', key: 'tipos', width: 15, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Responsáveis', key: 'responsaveis', width: 14, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Registros no ano', key: 'registros', width: 16, style: { numFmt: '#,##0', alignment: { horizontal: 'center' } } },
+                    { header: 'Cobertura média', key: 'cobertura', width: 16, style: { numFmt: '0.0%', alignment: { horizontal: 'center' } } },
+                    { header: 'Leituras fora de faixa', key: 'fora', width: 20, style: { numFmt: '#,##0', alignment: { horizontal: 'center' } } },
+                    { header: 'Equip. sem leitura', key: 'semLeitura', width: 18, style: { alignment: { horizontal: 'center' } } }
+                ], inv.porUnidade.map(u => ({
+                    unidade: u.unidade, ativos: u.ativos, arquivados: u.arquivados,
+                    tipos: u.nTipos, responsaveis: u.responsaveis, registros: u.registros,
+                    cobertura: u.cobertura, fora: u.foraFaixa, semLeitura: u.semLeitura
+                })), {
+                    styleRow: (row, data) => {
+                        if (data.cobertura < 0.8) invMarkCell(row, 'cobertura', 'warn');
+                        else invMarkCell(row, 'cobertura', 'ok');
+                        if (data.semLeitura > 0) invMarkCell(row, 'semLeitura', 'danger');
+                        if (data.fora > 0) invMarkCell(row, 'fora', 'warn');
+                    },
+                    totalRow: {
+                        unidade: 'TOTAL DA REDE', ativos: r.ativos,
+                        arquivados: inv.porUnidade.reduce((a, u) => a + u.arquivados, 0),
+                        tipos: r.nTipos, responsaveis: null, registros: r.registros,
+                        cobertura: r.cobertura, fora: r.foraFaixa, semLeitura: r.semLeituraNoAno
+                    }
+                });
+
+                // 4 ─ Matriz Unidade × Tipo
+                const colsMatriz = [{ header: 'Unidade', key: 'c0', width: 32 }].concat(
+                    inv.matriz.tipos.map((t, i) => ({ header: t, key: 'c' + (i + 1), width: 14, style: { alignment: { horizontal: 'center' } } }))
+                ).concat([{ header: 'Total', key: 'cTotal', width: 11, style: { alignment: { horizontal: 'center' } } }]);
+                const rowsMatriz = inv.matriz.linhas.map(l => {
+                    const obj = { c0: l.unidade, cTotal: l.total };
+                    l.counts.forEach((c, i) => { obj['c' + (i + 1)] = c || null; });
+                    return obj;
+                });
+                const totalMatriz = { c0: 'TOTAL', cTotal: inv.matriz.totais.reduce((a, b) => a + b, 0) };
+                inv.matriz.totais.forEach((t, i) => { totalMatriz['c' + (i + 1)] = t; });
+                invAddSheet(wb, 'Matriz Unid x Tipo', colsMatriz, rowsMatriz, {
+                    xSplit: 1,
+                    totalRow: totalMatriz,
+                    styleRow: row => {
+                        row.getCell('cTotal').font = { name: INV_XLS.font, size: 10, bold: true, color: { argb: INV_XLS.header } };
+                    }
+                });
+
+                // 5 ─ Inventário detalhado
+                invAddSheet(wb, 'Inventário Detalhado', [
+                    { header: 'Unidade', key: 'unidade', width: 30 },
+                    { header: 'Cód. Unid.', key: 'unidadeId', width: 11, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Mnemonico', key: 'mnemonico', width: 18 },
+                    { header: 'Tipo', key: 'tipo', width: 20 },
+                    { header: 'Legenda', key: 'legenda', width: 34 },
+                    { header: 'Min ºC', key: 'min', width: 9, style: { numFmt: '0.0', alignment: { horizontal: 'center' } } },
+                    { header: 'Max ºC', key: 'max', width: 9, style: { numFmt: '0.0', alignment: { horizontal: 'center' } } },
+                    { header: 'Amplitude', key: 'amplitude', width: 11, style: { numFmt: '0.0', alignment: { horizontal: 'center' } } },
+                    { header: 'Status', key: 'status', width: 12, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Registros no ano', key: 'registros', width: 15, style: { numFmt: '#,##0', alignment: { horizontal: 'center' } } },
+                    { header: 'Leituras manhã', key: 'manha', width: 14, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Leituras tarde', key: 'tarde', width: 14, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Dias completos', key: 'completos', width: 14, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Dias úteis', key: 'diasUteis', width: 11, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Cobertura', key: 'cobertura', width: 12, style: { numFmt: '0.0%', alignment: { horizontal: 'center' } } },
+                    { header: 'Fora de faixa', key: 'fora', width: 13, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'No limite', key: 'limite', width: 11, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Conformidade', key: 'conformidade', width: 14, style: { numFmt: '0.0%', alignment: { horizontal: 'center' } } },
+                    { header: 'Responsáveis', key: 'responsaveis', width: 13, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Última leitura', key: 'ultima', width: 14, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Dias sem leitura', key: 'diasSem', width: 16, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'ID interno', key: 'id', width: 11, style: { alignment: { horizontal: 'center' } } }
+                ], inv.itens.map(i => ({
+                    unidade: i.unidade, unidadeId: i.unidadeId, mnemonico: i.mnemonico,
+                    tipo: i.tipo, legenda: i.legenda || '-',
+                    min: i.min, max: i.max, amplitude: i.amplitude,
+                    status: i.status, registros: i.registros,
+                    manha: i.leiturasManha, tarde: i.leiturasTarde,
+                    completos: i.diasCompletos, diasUteis: i.diasUteis,
+                    cobertura: i.cobertura, fora: i.foraFaixa, limite: i.noLimite,
+                    conformidade: i.conformidade,
+                    responsaveis: i.responsaveis,
+                    ultima: i.ultimaLeitura ? formatDateBR(i.ultimaLeitura) : 'Nunca',
+                    diasSem: i.diasSemLeitura === null ? '-' : i.diasSemLeitura,
+                    id: i.id
+                })), {
+                    styleRow: (row, data) => {
+                        if (data.status === 'Arquivado') {
+                            row.eachCell({ includeEmpty: true }, cell => {
+                                cell.font = { name: INV_XLS.font, size: 10, italic: true, color: { argb: INV_XLS.muted } };
+                            });
+                        }
+                        if (data.registros === 0) invMarkCell(row, 'registros', 'danger');
+                        if (data.cobertura < 0.8) invMarkCell(row, 'cobertura', 'warn');
+                        else invMarkCell(row, 'cobertura', 'ok');
+                        if (data.fora > 0) invMarkCell(row, 'fora', 'danger');
+                        if (data.limite > 0) invMarkCell(row, 'limite', 'warn');
+                        if (data.conformidade !== null && data.conformidade < 0.95) invMarkCell(row, 'conformidade', 'warn');
+                        if (data.ultima === 'Nunca') invMarkCell(row, 'ultima', 'danger');
+                        if (typeof data.diasSem === 'number' && data.diasSem > 30) invMarkCell(row, 'diasSem', 'danger');
+                        else if (typeof data.diasSem === 'number' && data.diasSem > 7) invMarkCell(row, 'diasSem', 'warn');
+                    }
+                });
+
+                // 6 ─ Alertas
+                invAddSheet(wb, 'Alertas', [
+                    { header: 'Severidade', key: 'severidade', width: 13, style: { alignment: { horizontal: 'center' } } },
+                    { header: 'Unidade', key: 'unidade', width: 30 },
+                    { header: 'Mnemonico', key: 'mnemonico', width: 18 },
+                    { header: 'Tipo', key: 'tipo', width: 20 },
+                    { header: 'Alerta', key: 'alerta', width: 34 },
+                    { header: 'Detalhe', key: 'detalhe', width: 52 }
+                ], inv.alertas, {
+                    styleRow: (row, data) => {
+                        invMarkCell(row, 'severidade', data.severidade === 'Crítico' ? 'danger' : 'warn');
+                    }
+                });
+
+                const buffer = await wb.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Inventario_Rede_${r.ano}_${invDateStr(r.geradoEm)}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Erro ao gerar o relatório de inventário:', error);
+                alert('Erro ao gerar o relatório: ' + error.message);
+            } finally {
+                toggleLoadingScreen(false);
+                btn.innerHTML = htmlOriginal;
+                btn.disabled = false;
+            }
+        }
+
         function formatDateBR(dateString) {
             const [year, month, day] = dateString.split('-').map(Number);
             return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
