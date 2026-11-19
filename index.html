@@ -6250,6 +6250,7 @@ async function downloadBackup() {
 
     if (format === 'excel') {
       // Mapear os dados para incluir nomes em vez de IDs para Excel
+      const fmtTemp = v => (v === null || v === undefined || v === "" || isNaN(Number(v))) ? "-" : Number(v).toFixed(1);
       const formattedData = filteredData.map(item => {
         const mnemonico = mnemonicos.find(m => m.id === item.mnemonicoId)?.mnemonico || 'Desconhecido';
         const responsavel = responsaveis.find(r => r.id === item.responsavelId)?.name || 'Desconhecido';
@@ -6257,12 +6258,12 @@ async function downloadBackup() {
           Data: formatDateBR(item.data),
           Mnemonico: mnemonico,
           Responsável: responsavel,
-          'Min Manhã ºC': item.manhaMin !== null ? item.manhaMin.toFixed(1) : '-',
-          'Max Manhã ºC': item.manhaMax !== null ? item.manhaMax.toFixed(1) : '-',
-          'Atual Manhã ºC': item.manhaAtual !== null ? item.manhaAtual.toFixed(1) : '-',
-          'Min Tarde ºC': item.tardeMin !== null ? item.tardeMin.toFixed(1) : '-',
-          'Max Tarde ºC': item.tardeMax !== null ? item.tardeMax.toFixed(1) : '-',
-          'Atual Tarde ºC': item.tardeAtual !== null ? item.tardeAtual.toFixed(1) : '-',
+          'Min Manhã ºC': fmtTemp(item.manhaMin),
+          'Max Manhã ºC': fmtTemp(item.manhaMax),
+          'Atual Manhã ºC': fmtTemp(item.manhaAtual),
+          'Min Tarde ºC': fmtTemp(item.tardeMin),
+          'Max Tarde ºC': fmtTemp(item.tardeMax),
+          'Atual Tarde ºC': fmtTemp(item.tardeAtual),
           'Anotação': item.annotation || '-'
         };
       });
